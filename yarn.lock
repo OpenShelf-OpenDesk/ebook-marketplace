@@ -7500,6 +7500,11 @@ raw-body@2.4.1, raw-body@^2.4.1:
     iconv-lite "0.4.24"
     unpipe "1.0.0"
 
+react-blockies-image@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/react-blockies-image/-/react-blockies-image-0.0.2.tgz#4168b11ff20a2027fdd0245e356ad76d10b5cf1c"
+  integrity sha512-4Tk8pKgkLafmUvD1WTJfgRdGjLwlv/UPCceHEoi66ehbByEJi1lU37lRsvpI6/GJ4321naX9tmZoCs/FCPcn6Q==
+
 react-dom@17.0.2:
   version "17.0.2"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-17.0.2.tgz#ecffb6845e3ad8dbfcdc498f0d0a939736502c23"
