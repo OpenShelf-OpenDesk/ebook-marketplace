@@ -1,5 +1,5 @@
 import type { NextPage } from 'next';
-import Home from '../src/components/OpenShelf/Views/Home';
+import Home from '../../src/components/OpenShelf/Views/Home';
 
 const OpenShelf: NextPage = () => {
   return <Home />;
