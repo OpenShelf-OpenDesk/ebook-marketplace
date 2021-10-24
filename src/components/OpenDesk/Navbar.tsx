@@ -1,0 +1,79 @@
+import { useReducer } from 'react';
+import { BellIcon as BellIconOutline } from '@heroicons/react/outline';
+import { BellIcon as BellIconSolid } from '@heroicons/react/solid';
+import { ChevronDownIcon } from '@heroicons/react/solid';
+import Blockies from 'react-blockies-image';
+
+interface Props {}
+
+function navbarReducer(state, action) {
+  switch (action.type) {
+    case 'NOTIFICATION':
+      return { search: false, notification: true };
+    default:
+      return { search: false, notification: false };
+  }
+}
+
+const Navbar = (props: Props) => {
+  const [navbarState, dispatch] = useReducer(navbarReducer, {
+    search: false,
+    notification: false,
+  });
+
+  return (
+    <nav className='navbar w-full text-neutral space-x-3 bg-white fixed pl-28 pr-5 z-10'>
+      <div className='flex-1 hidden lg:flex'>
+        <span className='text-accent text-2xl font-bold'>OpenDesk</span>
+      </div>
+      <div className='flex-1 lg:flex-none h-10'>
+        <div data-theme='light' className='form-control w-full'>
+          <div className='relative'>
+            <button className='btn btn-accent '>New Book</button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        className={`flex-none ${
+          navbarState.notification && 'bg-green-100'
+        } rounded-lg`}
+        onClick={() => {
+          dispatch({ type: 'NOTIFICATION' });
+        }}>
+        <button className='btn btn-ghost focus:outline-none'>
+          {navbarState.notification ? (
+            <BellIconSolid className='h-5 w-5 text-accent' />
+          ) : (
+            <BellIconOutline className='h-5 w-5' />
+          )}
+        </button>
+      </div>
+
+      <div className='flex-none bg-gray-100 w-2/12 rounded-lg cursor-pointer'>
+        <div className='avatar flex-none'>
+          <div className='rounded-tl-lg rounded-bl-lg w-12 h-12 bg-white object-fill'>
+            <Blockies
+              seed={'sdgdoguoiydfjhgjhgfjhhgdyjhioghfioh.eth'}
+              size={48}
+              scale={8}
+            />
+          </div>
+        </div>
+        <div className='flex-1 ml-5'>
+          <div className='flex flex-col truncate'>
+            <p className='text-sm font-semibold'>Personal Wallet</p>
+            <p className='text-2xs'>0xB4B2C....869364b8d</p>
+          </div>
+        </div>
+        <div className='flex-none mx-3'>
+          <span className='block leading-relaxed text-center'>
+            <ChevronDownIcon className='w-4 h-4' />
+          </span>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;
