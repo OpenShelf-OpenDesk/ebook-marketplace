@@ -4,13 +4,11 @@ interface Props {}
 
 const RoleSelection = (props: Props) => {
   return (
-    <section
-      id='role-selection'
-      className='hero min-h-screen max-h-screen bg-white'>
+    <section id='role-selection' className='hero min-h-screen max-h-screen'>
       <div className='hero-content w-3/4 h-3/5'>
-        <div className='grid grid-cols-2 gap-x-16 w-full h-full'>
+        <div className='grid grid-cols-2 gap-x-20 w-full h-full'>
           <div className='group flex flex-col card border border-gray-200 shadow-lg'>
-            <div className='flex bg-gray-50 h-64 justify-center relative'>
+            <div className='flex h-64 justify-center relative'>
               <Image
                 src={`/undraw_book_lover_mkck.svg`}
                 layout='fill'
@@ -28,7 +26,7 @@ const RoleSelection = (props: Props) => {
             </div>
           </div>
           <div className='group flex flex-col card border border-gray-200 shadow-lg'>
-            <div className='flex bg-gray-50 h-64 justify-center relative'>
+            <div className='flex h-64 justify-center relative'>
               <Image
                 src={`/undraw_studying_s3l7.svg`}
                 layout='fill'
