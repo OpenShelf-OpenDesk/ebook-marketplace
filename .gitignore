@@ -42,3 +42,5 @@ typechain
 #Hardhat files
 cache
 artifacts
+
+contract_address.json
