@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface Props {}
 
@@ -19,9 +20,11 @@ const RoleSelection = (props: Props) => {
               <div className='card-title text-2xl'>OpenShelf</div>
               <p>Fill your shelf with the bestselling classic books.</p>
               <div className='flex flex-col justify-end h-full'>
-                <button className='btn btn-sm btn-primary self-end w-full'>
-                  Reader
-                </button>
+                <Link href='/OpenShelf'>
+                  <button className='btn btn-sm btn-primary self-end w-full'>
+                    Reader
+                  </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -40,9 +43,11 @@ const RoleSelection = (props: Props) => {
                 research.
               </p>
               <div className='flex flex-col justify-end h-full'>
-                <button className='btn btn-sm btn-accent self-end w-full'>
-                  Author
-                </button>
+                <Link href='/OpenDesk'>
+                  <button className='btn btn-sm btn-accent self-end w-full'>
+                    Author
+                  </button>
+                </Link>
               </div>
             </div>
           </div>

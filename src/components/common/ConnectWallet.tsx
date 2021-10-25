@@ -1,10 +1,14 @@
 import React from 'react';
 import Image from 'next/image';
 import { XIcon } from '@heroicons/react/solid';
+import { connectToWallet } from '../../controllers/ConnectWallet';
+import { useSignerContext } from '../../context/Signer';
 
 interface Props {}
 
 const ConnectWallet = (props: Props) => {
+  const { setSigner } = useSignerContext();
+
   return (
     <section className='fixed z-10 w-screen h-screen flex flex-row justify-center'>
       <div className='bg-white h-2/4 w-1/4 self-center relative pt-5 rounded-lg shadow-md'>
@@ -18,7 +22,16 @@ const ConnectWallet = (props: Props) => {
             <h3 className='text-center font-bold text-xl py-2 text-gray-600'>
               Connect To Wallet
             </h3>
-            <button className='btn btn-outline border-gray-300 flex flex-row justify-between'>
+            <button
+              className='btn btn-outline border-gray-300 flex flex-row justify-between'
+              onClick={async () => {
+                connectToWallet().then(async (_signer) => {
+                  if (_signer) {
+                    const _address = await _signer.getAddress();
+                    setSigner({ address: _address, signer: _signer });
+                  }
+                });
+              }}>
               <span className='text-sm text-semibold'>Metamask</span>
               <Image
                 src='/Metamask_Fox.svg'

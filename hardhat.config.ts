@@ -1,4 +1,4 @@
-require('@nomiclabs/hardhat-ganache');
+require('@nomiclabs/hardhat-waffle');
 
 module.exports = {
   networks: {
@@ -7,10 +7,11 @@ module.exports = {
       accounts: {
         mnemonic:
           'throw palm spice hurt grain govern firm damage case inquiry plug crucial',
-        path: "m/44'/60'/0'/0/account_index",
+        path: "m/44'/60'/0'/0",
         initialIndex: 0,
         count: 20,
       },
+
       chainId: 1337,
     },
   },

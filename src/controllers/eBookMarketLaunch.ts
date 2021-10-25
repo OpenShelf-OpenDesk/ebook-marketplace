@@ -40,21 +40,25 @@ export async function publish(eBook: eBook, author) {
     eBookMarketLaunch.abi,
     author,
   );
+
   const { ebook_file, ...metadata } = eBook;
   const eBookURI = await uploadBook(ebook_file);
   const metadataURI = await uploadBookMetadata({
     ...metadata,
     ebook_file: new File(['Preview not available'], 'preview'),
   });
-  const transaction = await contract.publish(
-    eBookURI,
-    ethers.utils.parseUnits(metadata.launch_price.toString(), 'ether'),
-    metadata.supply_limit,
-  );
-
-  const transactionStatus = await transaction.wait();
-  console.log(transactionStatus.events[0]);
-  return metadataURI;
+  try {
+    const transaction = await contract.publish(
+      eBookURI,
+      ethers.utils.parseUnits(metadata.launch_price.toString(), 'ether'),
+      metadata.supply_limit,
+    );
+    const transactionStatus = await transaction.wait();
+    console.log(transactionStatus.events[0]);
+    return metadataURI;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 // export function purchaseFirstHand(bookID, reader) {

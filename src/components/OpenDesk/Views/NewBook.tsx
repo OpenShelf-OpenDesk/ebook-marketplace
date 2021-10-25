@@ -1,25 +1,35 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { eBook, publish } from '../../../controllers/eBookMarketLaunch';
+import { useSignerContext } from '../../../context/Signer';
+import { DocumentAddIcon } from '@heroicons/react/outline';
+import { ExclamationCircleIcon } from '@heroicons/react/outline';
 
 interface Props {}
 
 const NewBook = (props: Props) => {
   const [supplyLimitBool, setSupplyLimitBool] = useState<boolean>(false);
   const [selectedBookFile, setSelectedBookFile] = useState<File>();
+  const [attemptSubmit, setAttemptSubmit] = useState<boolean>(false);
+  const { signer } = useSignerContext();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newBook: eBook = {
-      title: e.target.title.value,
-      description: e.target.description.value,
-      launch_price: e.target.launch_price.value,
-      currency: e.target.currency.value,
-      supply_limit_bool: supplyLimitBool,
-      supply_limit: supplyLimitBool ? e.target.supply_limit.value : -1,
-      ebook_file: selectedBookFile,
-    };
-    publish(newBook);
+    if (selectedBookFile) {
+      const newBook: eBook = {
+        title: e.target.title.value,
+        description: e.target.description.value,
+        launch_price: e.target.launch_price.value,
+        currency: e.target.currency.value,
+        supply_limit_bool: supplyLimitBool,
+        supply_limit: supplyLimitBool ? e.target.supply_limit.value : -1,
+        ebook_file: selectedBookFile,
+      };
+      console.log('publishing');
+      publish(newBook, signer.signer);
+    } else {
+      setAttemptSubmit(true);
+    }
   };
 
   return (
@@ -27,7 +37,7 @@ const NewBook = (props: Props) => {
       <form
         className='w-full h-full flex flex-row justify-center content-center space-x-40'
         onSubmit={handleSubmit}>
-        <label className='h-full w-full flex justify-center'>
+        <label className='h-full w-full flex flex-col justify-center space-y-5'>
           <input
             name='ebook_file'
             type='file'
@@ -36,7 +46,6 @@ const NewBook = (props: Props) => {
             onChange={(e) => {
               setSelectedBookFile(e.target.files[0]);
             }}
-            required
           />
           <div className='group bg-gray-50 relative w-full h-4/5 self-center cursor-pointer'>
             <Image
@@ -45,6 +54,22 @@ const NewBook = (props: Props) => {
               className='scale-95 transition duration-500 ease-in-out transform group-hover:-translate-y-1 group-hover:scale-105'
             />
           </div>
+          {!attemptSubmit && !selectedBookFile && (
+            <div className='alert alert-success'>
+              <div className='flex-1 space-x-5'>
+                <DocumentAddIcon className='w-6 h-6' />
+                <label>Click to add e-book file</label>
+              </div>
+            </div>
+          )}
+          {attemptSubmit && !selectedBookFile && (
+            <div className='alert alert-error'>
+              <div className='flex-1 space-x-5'>
+                <ExclamationCircleIcon className='w-6 h-6' />
+                <label>No file selected</label>
+              </div>
+            </div>
+          )}
         </label>
         <div className='w-full h-full flex flex-col justify-center space-y-5'>
           <h1 className='w-full text-2xl font-bold text-accent'>
@@ -107,7 +132,9 @@ const NewBook = (props: Props) => {
               required
             />
           </div>
-          <button className='btn btn-accent'>Publish</button>
+          <button type='submit' className='btn btn-accent'>
+            Publish
+          </button>
         </div>
       </form>
     </section>

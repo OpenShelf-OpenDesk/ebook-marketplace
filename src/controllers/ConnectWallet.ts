@@ -5,6 +5,8 @@ export async function connectToWallet() {
   const we3modal = new Web3Modal();
   const connection = await we3modal.connect();
   const provider = new ethers.providers.Web3Provider(connection);
-  const signer = provider.getSigner();
-  return signer;
+  if ((await provider.listAccounts()).length > 0) {
+    return provider.getSigner();
+  }
+  return undefined;
 }

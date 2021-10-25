@@ -3,6 +3,7 @@ import { BellIcon as BellIconOutline } from '@heroicons/react/outline';
 import { BellIcon as BellIconSolid } from '@heroicons/react/solid';
 import { ChevronDownIcon } from '@heroicons/react/solid';
 import Blockies from 'react-blockies-image';
+import Link from 'next/link';
 
 interface Props {}
 
@@ -29,7 +30,9 @@ const Navbar = (props: Props) => {
       <div className='flex-1 lg:flex-none h-10'>
         <div data-theme='light' className='form-control w-full'>
           <div className='relative'>
-            <button className='btn btn-accent '>New Book</button>
+            <Link href='/OpenDesk/newbook'>
+              <button className='btn btn-accent '>New Book</button>
+            </Link>
           </div>
         </div>
       </div>

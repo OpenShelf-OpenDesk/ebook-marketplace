@@ -1,6 +1,5 @@
 import React from 'react';
 import Image from 'next/image';
-import BookCard from '../../common/BookCard';
 import Layout from '../../common/Layout';
 import Navbar from '../Navbar';
 import Sidebar from '../Sidebar';
