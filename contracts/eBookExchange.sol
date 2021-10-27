@@ -31,7 +31,7 @@ contract eBookExchange {
             if (
                 keccak256(bytes(_uri)) ==
                 keccak256(
-                    bytes(ss.getBooks(ss.getAuthorsDesk(msg.sender)[i]).uri)
+                    bytes(ss.getBook(ss.getAuthorsDesk(msg.sender)[i]).uri)
                 )
             ) {
                 revert BookAlreadyOnDesk(_uri, msg.sender);
@@ -51,7 +51,7 @@ contract eBookExchange {
     }
 
     modifier bookExists(uint256 _bookId) {
-        if (ss.getBooks(_bookId).contractAddress == address(0)) {
+        if (ss.getBook(_bookId).contractAddress == address(0)) {
             revert InvalidBookId(_bookId);
         }
         _;
@@ -88,16 +88,13 @@ contract eBookExchange {
             StorageStructures.eBook memory eBookOnSale = ss.getOnSale(_bookID)[
                 ss.getOnSale(_bookID).length - 1
             ];
-            require(
-                msg.value >= eBookOnSale.price,
-                "Funds are lesser than the book's price!!"
-            );
-            eBookPublisher(ss.getBooks(_bookID).contractAddress).transfer(
+            require(msg.value >= eBookOnSale.price, "Insufficient funds!!");
+            eBookPublisher(ss.getBook(_bookID).contractAddress).transfer(
                 eBookOnSale.owner,
                 msg.sender,
                 eBookOnSale.eBookID
             );
-            payable(ss.getBooks(_bookID).author).transfer(
+            payable(ss.getBook(_bookID).author).transfer(
                 (eBookOnSale.price * 10) / 100
             );
             payable(eBookOnSale.owner).transfer((eBookOnSale.price * 90) / 100);

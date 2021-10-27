@@ -36,7 +36,7 @@ contract eBookMarketLaunch {
             if (
                 keccak256(bytes(_uri)) ==
                 keccak256(
-                    bytes(ss.getBooks(ss.getAuthorsDesk(msg.sender)[i]).uri)
+                    bytes(ss.getBook(ss.getAuthorsDesk(msg.sender)[i]).uri)
                 )
             ) {
                 revert BookAlreadyOnDesk(_uri, msg.sender);
@@ -56,7 +56,7 @@ contract eBookMarketLaunch {
     }
 
     modifier bookExists(uint256 _bookId) {
-        if (ss.getBooks(_bookId).contractAddress == address(0)) {
+        if (ss.getBook(_bookId).contractAddress == address(0)) {
             revert InvalidBookId(_bookId);
         }
         _;
@@ -75,9 +75,8 @@ contract eBookMarketLaunch {
             _eBookURI,
             _pricedBooksSupplyLimit
         );
-        uint256 _bookID = neweBookPublisher.bookID();
+        // uint256 _bookID = neweBookPublisher.bookID();
         ss.addBook(
-            _bookID,
             StorageStructures.Book({
                 author: msg.sender,
                 uri: _eBookURI,
@@ -95,13 +94,10 @@ contract eBookMarketLaunch {
         newInShelf(_bookID)
     {
         eBookPublisher publisher = eBookPublisher(
-            ss.getBooks(_bookID).contractAddress
+            ss.getBook(_bookID).contractAddress
         );
         uint256 _price = publisher.price();
-        require(
-            msg.value >= _price,
-            "Funds are lesser than the book's price!!"
-        );
+        require(msg.value >= _price, "Insufficient funds!!");
         payable(publisher.author()).transfer(msg.value);
         uint256 _eBookID = publisher.printPaidVersion(msg.sender);
         ss.addToShelf(

@@ -23,7 +23,7 @@ contract StorageStructures {
     }
 
     mapping(address => uint256[]) internal authorsDesk;
-    mapping(uint256 => Book) private books;
+    Book[] private books;
     mapping(address => eBook[]) private readersShelf;
     mapping(uint256 => eBook[]) public onSale;
 
@@ -51,12 +51,16 @@ contract StorageStructures {
         authorsDesk[_author].push(_bookID);
     }
 
-    function getBooks(uint256 _index) public view returns (Book memory) {
+    function getBook(uint256 _index) public view returns (Book memory) {
         return books[_index];
     }
 
-    function addBook(uint256 _bookID, Book memory _book) public {
-        books[_bookID] = _book;
+    function getAllBooks() public view returns (Book[] memory) {
+        return books;
+    }
+
+    function addBook(Book memory _book) public {
+        books.push(_book);
     }
 
     function getOnSale(uint256 _index) public view returns (eBook[] memory) {
