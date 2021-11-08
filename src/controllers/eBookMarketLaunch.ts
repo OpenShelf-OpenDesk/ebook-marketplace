@@ -1,7 +1,11 @@
 import { ethers } from 'ethers';
 import eBookMarketLaunch from '../../artifacts/contracts/eBookMarketLaunch.sol/eBookMarketlaunch.json';
+import StorageStructures from '../../artifacts/contracts/StorageStructures.sol/StorageStructures.json';
 import contract_address from '../../contract_address.json';
 import { NFTStorage, Blob } from 'nft.storage';
+import { pdfjs } from 'react-pdf';
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 export interface eBook {
   title: string;
@@ -10,7 +14,36 @@ export interface eBook {
   currency?: string;
   supply_limit_bool: boolean;
   supply_limit: number;
-  ebook_file: File;
+  ebook_file?: File;
+  ebook_cover_image?: string;
+}
+
+const readFileData = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      resolve(e.target.result);
+    };
+    reader.onerror = (err) => {
+      reject(err);
+    };
+    reader.readAsDataURL(file);
+  });
+};
+
+async function extractCoverImage(file) {
+  const data = await readFileData(file);
+  const pdf = await pdfjs.getDocument(data).promise;
+  const canvas = document.createElement('canvas');
+  const page = await pdf.getPage(1);
+  const viewport = page.getViewport({ scale: 1 });
+  const context = canvas.getContext('2d');
+  canvas.height = viewport.height;
+  canvas.width = viewport.width;
+  await page.render({ canvasContext: context, viewport: viewport }).promise;
+  const image = canvas.toDataURL();
+  canvas.remove();
+  return image;
 }
 
 async function uploadBook(eBookFile: File) {
@@ -43,13 +76,15 @@ export async function publish(eBook: eBook, author) {
 
   const { ebook_file, ...metadata } = eBook;
   const eBookURI = await uploadBook(ebook_file);
+  const eBookCoverImage = await extractCoverImage(ebook_file);
   const metadataURI = await uploadBookMetadata({
     ...metadata,
-    ebook_file: new File(['Preview not available'], 'preview'),
+    ebook_cover_image: eBookCoverImage,
   });
   try {
     const transaction = await contract.publish(
       eBookURI,
+      metadataURI,
       ethers.utils.parseUnits(metadata.launch_price.toString(), 'ether'),
       metadata.supply_limit,
     );
@@ -61,6 +96,36 @@ export async function publish(eBook: eBook, author) {
   }
 }
 
-// export function purchaseFirstHand(bookID, reader) {
-//   eBookMarketLaunch.purchaseFirstHand(bookID);
-// }
+export async function getAllBooks() {
+  const StorageStructuresContractAddress = contract_address.StorageStructures;
+  const provider = new ethers.providers.JsonRpcProvider(
+    `http://localhost:7545/`,
+  );
+  const contract = new ethers.Contract(
+    StorageStructuresContractAddress,
+    StorageStructures.abi,
+    provider,
+  );
+  const books = await contract.getAllBooks();
+  return books.map((book) => {
+    return book.metadataURI;
+  });
+}
+
+export async function purchaseFirstHand(bookID, price, reader) {
+  const eBookMarketLaunchContractAddress = contract_address.eBookMarketLaunch;
+  const contract = new ethers.Contract(
+    eBookMarketLaunchContractAddress,
+    eBookMarketLaunch.abi,
+    reader,
+  );
+  try {
+    const transaction = await contract.purchaseFirstHand(bookID, {
+      value: ethers.utils.parseUnits(price.toString(), 'ether'),
+    });
+    const transactionStatus = await transaction.wait();
+    console.log(transactionStatus);
+  } catch (error) {
+    console.log(error);
+  }
+}

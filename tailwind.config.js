@@ -13,7 +13,11 @@ module.exports = {
     extend: {},
   },
   variants: {
-    extend: { backgroundColor: ['active'], scale: ['group-hover'] },
+    extend: {
+      backgroundColor: ['active'],
+      scale: ['group-hover'],
+      animation: ['group-hover'],
+    },
     translate: ({ after }) => after(['group-hover']),
   },
   plugins: [require('daisyui'), require('tailwindcss-nested-groups')],

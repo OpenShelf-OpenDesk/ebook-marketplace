@@ -28,7 +28,9 @@ const Sidebar = ({ selected, setSelected }: SidebarProps) => {
               <a>
                 <div className='flex flex-col justify-center content-center h-10 w-full'>
                   <HomeIconOutline className='h-5 w-5 self-center' />
-                  <span className='text-2xs p-0.5 text-center'>Home</span>
+                  <span className='text-2xs p-0.5 text-center font-semibold'>
+                    Home
+                  </span>
                 </div>
               </a>
             </li>
@@ -49,7 +51,9 @@ const Sidebar = ({ selected, setSelected }: SidebarProps) => {
               <a>
                 <div className='flex flex-col justify-center content-center h-10 w-full'>
                   <ViewBoardsIconOutline className='h-5 w-5 self-center' />
-                  <span className='text-2xs p-0.5 text-center'>Shelf</span>
+                  <span className='text-2xs p-0.5 text-center font-semibold'>
+                    Shelf
+                  </span>
                 </div>
               </a>
             </li>
@@ -70,7 +74,9 @@ const Sidebar = ({ selected, setSelected }: SidebarProps) => {
               <a>
                 <div className='flex flex-col justify-center content-center h-10 w-full'>
                   <SwitchHorizontalIconOutline className='h-5 w-5 self-center' />
-                  <span className='text-2xs p-0.5 text-center'>Exchange</span>
+                  <span className='text-2xs p-0.5 text-center font-semibold'>
+                    Exchange
+                  </span>
                 </div>
               </a>
             </li>

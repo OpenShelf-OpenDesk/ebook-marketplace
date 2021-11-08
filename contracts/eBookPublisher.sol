@@ -2,9 +2,10 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract eBookPublisher is ERC1155 {
+contract eBookPublisher is ERC1155, ReentrancyGuard {
     using Counters for Counters.Counter;
     uint256 public immutable bookID;
     address public immutable author;
@@ -64,7 +65,11 @@ contract eBookPublisher is ERC1155 {
         _;
     }
 
-    function setFreeBookSupplyLimit(uint256 limit) external onlyAuthor {
+    function setFreeBookSupplyLimit(uint256 limit)
+        external
+        nonReentrant
+        onlyAuthor
+    {
         require(
             limit > freeBooksPrinted,
             "Limit cannot be lesser than already supplied books!!"
@@ -72,7 +77,11 @@ contract eBookPublisher is ERC1155 {
         freeBooksSupplyLimit = limit;
     }
 
-    function setPricedBookSupplyLimit(int256 limit) external onlyAuthor {
+    function setPricedBookSupplyLimit(int256 limit)
+        external
+        nonReentrant
+        onlyAuthor
+    {
         if (limit != -1) {
             require(
                 limit > int256(pricedBooksPrinted),
@@ -82,12 +91,13 @@ contract eBookPublisher is ERC1155 {
         pricedBooksSupplyLimit = limit;
     }
 
-    function setPrice(uint256 _price) external onlyAuthor {
+    function setPrice(uint256 _price) external nonReentrant onlyAuthor {
         price = _price;
     }
 
     function printFreeVersion(address to)
         external
+        nonReentrant
         onlyAuthor
         withinFreeBookSupplyLimit
     {
@@ -96,6 +106,7 @@ contract eBookPublisher is ERC1155 {
 
     function printPaidVersion(address to)
         external
+        nonReentrant
         withinPricedBookSupplyLimit
         returns (uint256)
     {

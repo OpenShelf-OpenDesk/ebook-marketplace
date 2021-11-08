@@ -1,25 +1,55 @@
-import React from 'react';
-
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
+import { usePreviewBookContext } from '../../context/PreviewBook';
+import { eBook } from '../../controllers/eBookMarketLaunch';
+import PreviewBookCoverPage from '../common/PreviewBookCoverPage';
 interface Props {
-  color: string;
+  book_metadata_uri: string;
 }
 
-const BookCard = ({ color }: Props) => {
-  return (
+const BookCard = ({ book_metadata_uri }: Props) => {
+  const router = useRouter();
+  const [bookMetadata, setBookMetadata] = useState<eBook | undefined>();
+  const { setPreviewBook } = usePreviewBookContext();
+  useEffect(() => {
+    const fetchMetadata = async () => {
+      const response = await fetch(
+        `https://${book_metadata_uri}.ipfs.dweb.link`,
+      );
+      const json = await response.json();
+      return json;
+    };
+    fetchMetadata().then((_metadata) => {
+      setBookMetadata(_metadata);
+    });
+  }, []);
+
+  return bookMetadata ? (
     <div className='overscroll-contain relative'>
-      <div className='group carousel-item w-60 h-72 rounded cursor-pointer bg-white mr-8'>
+      <div className='group carousel-item w-60 h-80 rounded bg-white mr-8'>
         <div
-          className={`absolute transition duration-500 ease-in-out transform group-hover:-translate-y-36 group-hover:shadow-lg h-72 w-60 bg-${color}-400 rounded`}></div>
-        <div className='pt-36 w-full rounded border-2 border-transparent group-hover:border-gray-400 overscroll-none'>
+          className={`absolute transition duration-500 ease-in-out transform group-hover:-translate-y-40 shadow-lg w-60 h-72 rounded bg-none`}>
+          <PreviewBookCoverPage
+            src={bookMetadata.ebook_cover_image}
+            height={320}
+            width={240}
+          />
+        </div>
+        <div className='pt-40 w-full rounded border border-transparent group-hover:border-gray-400 overscroll-none'>
           <div className='flex flex-col p-3 text-gray-700 h-full'>
-            <p className='font-semibold mb-2'>Book Title</p>
+            <p className='font-semibold mb-2'>{bookMetadata.title}</p>
             <p className='text-xs '>
-              Book Description - Lorem ipsum dolor sit amet, consectetur
-              adipiscing elit, sed do
+              {bookMetadata.description.length > 110
+                ? `${bookMetadata.description.substring(0, 110)}...`
+                : bookMetadata.description}
             </p>
             <div className='flex w-full h-full justify-end'>
               <button
-                className={`px-2 text-2xs text-center font-semibold h-7 text-white p-1 bg-${color}-400 rounded self-end`}>
+                className={`px-2 text-2xs text-center font-semibold h-7 text-white p-1 btn-primary rounded self-end`}
+                onClick={() => {
+                  setPreviewBook(bookMetadata);
+                  router.push(`/OpenShelf/bookpreview`);
+                }}>
                 More &#10142;
               </button>
             </div>
@@ -27,6 +57,8 @@ const BookCard = ({ color }: Props) => {
         </div>
       </div>
     </div>
+  ) : (
+    <p>Unable to load metadata</p>
   );
 };
 

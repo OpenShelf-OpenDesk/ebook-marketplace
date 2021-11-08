@@ -1,17 +1,31 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { eBook, publish } from '../../../controllers/eBookMarketLaunch';
 import { useSignerContext } from '../../../context/Signer';
 import { DocumentAddIcon } from '@heroicons/react/outline';
 import { ExclamationCircleIcon } from '@heroicons/react/outline';
+import PreviewBook from '../../common/PreviewBook';
+import { useLoadingContext } from '../../../context/Loading';
+import { ArrowNarrowLeftIcon } from '@heroicons/react/solid';
+import { useRouter } from 'next/router';
 
 interface Props {}
 
 const NewBook = (props: Props) => {
   const [supplyLimitBool, setSupplyLimitBool] = useState<boolean>(false);
   const [selectedBookFile, setSelectedBookFile] = useState<File>();
+  const [selectedBookLocalURL, setSelectedBookLocalURL] = useState<string>('');
   const [attemptSubmit, setAttemptSubmit] = useState<boolean>(false);
   const { signer } = useSignerContext();
+  const { setLoading } = useLoadingContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    setLoading(false);
+    return () => {
+      setLoading(true);
+    };
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -34,43 +48,61 @@ const NewBook = (props: Props) => {
 
   return (
     <section className='w-screen h-screen px-60 py-20'>
+      <p className='flex justify-center absolute right-20 top-10 cursor-pointer'>
+        <ArrowNarrowLeftIcon
+          className='w-6 h-6'
+          onClick={() => {
+            setLoading(true);
+            router.back();
+          }}
+        />
+      </p>
       <form
         className='w-full h-full flex flex-row justify-center content-center space-x-40'
         onSubmit={handleSubmit}>
-        <label className='h-full w-full flex flex-col justify-center space-y-5'>
-          <input
-            name='ebook_file'
-            type='file'
-            accept='application/pdf'
-            className='hidden'
-            onChange={(e) => {
-              setSelectedBookFile(e.target.files[0]);
-            }}
-          />
-          <div className='group bg-gray-50 relative w-full h-4/5 self-center cursor-pointer'>
-            <Image
-              src={`/undraw_add_document_re_mbjx.svg`}
-              layout='fill'
-              className='scale-95 transition duration-500 ease-in-out transform group-hover:-translate-y-1 group-hover:scale-105'
-            />
+        {selectedBookFile ? (
+          <div className='h-full w-full flex flex-col justify-center'>
+            <PreviewBook url={selectedBookLocalURL} />
           </div>
-          {!attemptSubmit && !selectedBookFile && (
-            <div className='alert alert-success'>
-              <div className='flex-1 space-x-5'>
-                <DocumentAddIcon className='w-6 h-6' />
-                <label>Click to add e-book file</label>
-              </div>
+        ) : (
+          <label className='h-full w-full flex flex-col justify-center space-y-5'>
+            <input
+              name='ebook_file'
+              type='file'
+              accept='application/pdf'
+              className='hidden'
+              onChange={(e) => {
+                setSelectedBookFile(e.target.files[0]);
+                const url = URL.createObjectURL(e.target.files[0]);
+                setSelectedBookLocalURL(url);
+              }}
+            />
+            <div className='group bg-gray-50 relative w-full h-4/5 self-center cursor-pointer'>
+              <Image
+                src={`/undraw_add_document_re_mbjx.svg`}
+                layout='fill'
+                className='scale-95 transition duration-500 ease-in-out transform group-hover:-translate-y-1 group-hover:scale-105'
+              />
             </div>
-          )}
-          {attemptSubmit && !selectedBookFile && (
-            <div className='alert alert-error'>
-              <div className='flex-1 space-x-5'>
-                <ExclamationCircleIcon className='w-6 h-6' />
-                <label>No file selected</label>
+            {!attemptSubmit && !selectedBookFile && (
+              <div className='alert alert-success'>
+                <div className='flex-1 space-x-5'>
+                  <DocumentAddIcon className='w-6 h-6' />
+                  <label>Click to add e-book file</label>
+                </div>
               </div>
-            </div>
-          )}
-        </label>
+            )}
+            {attemptSubmit && !selectedBookFile && (
+              <div className='alert alert-error'>
+                <div className='flex-1 space-x-5'>
+                  <ExclamationCircleIcon className='w-6 h-6' />
+                  <label>No file selected</label>
+                </div>
+              </div>
+            )}
+          </label>
+        )}
+
         <div className='w-full h-full flex flex-col justify-center space-y-5'>
           <h1 className='w-full text-2xl font-bold text-accent'>
             Book Details

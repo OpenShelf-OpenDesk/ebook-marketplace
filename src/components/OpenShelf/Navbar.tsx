@@ -1,9 +1,10 @@
-import { useReducer } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { SearchIcon } from '@heroicons/react/solid';
 import { BellIcon as BellIconOutline } from '@heroicons/react/outline';
 import { BellIcon as BellIconSolid } from '@heroicons/react/solid';
 import { ChevronDownIcon } from '@heroicons/react/solid';
 import Blockies from 'react-blockies-image';
+import { useSignerContext } from '../../context/Signer';
 
 interface Props {}
 
@@ -19,15 +20,26 @@ function navbarReducer(state, action) {
 }
 
 const Navbar = (props: Props) => {
+  const { signer } = useSignerContext();
+  const [signerAddress, setSignerAddress] = useState<string>(
+    '0x0000000000000000000000000000000000000000',
+  );
+
   const [navbarState, dispatch] = useReducer(navbarReducer, {
     search: false,
     notification: false,
   });
 
+  useEffect(() => {
+    if (signer) {
+      setSignerAddress(signer.address);
+    }
+  }, [signer]);
+
   return (
-    <nav className='navbar w-full text-neutral space-x-3 bg-white fixed pl-28 pr-5 z-10'>
+    <nav className='navbar w-full text-neutral space-x-3 bg-white fixed pl-28 pr-5 py-4 z-10'>
       <div className='flex-1 hidden lg:flex'>
-        <span className='text-primary text-2xl font-bold'>OpenShelf</span>
+        <span className='text-primary text-3xl font-bold'>OpenShelf</span>
       </div>
       <div className='flex-1 lg:flex-none w-3/12 h-10'>
         <div data-theme='light' className='form-control w-full'>
@@ -66,17 +78,17 @@ const Navbar = (props: Props) => {
       <div className='flex-none bg-gray-100 w-2/12 rounded-lg cursor-pointer'>
         <div className='avatar flex-none'>
           <div className='rounded-tl-lg rounded-bl-lg w-12 h-12 bg-white object-fill'>
-            <Blockies
-              seed={'sdgdoguoiydfjhgjhgfjhhgdyjhioghfioh.eth'}
-              size={48}
-              scale={8}
-            />
+            <Blockies seed={signerAddress} size={48} scale={8} />
           </div>
         </div>
         <div className='flex-1 ml-5'>
           <div className='flex flex-col truncate'>
             <p className='text-sm font-semibold'>Personal Wallet</p>
-            <p className='text-2xs'>0xB4B2C....869364b8d</p>
+            <p className='text-2xs'>
+              {signer
+                ? `${signerAddress.slice(0, 8)}.....${signerAddress.slice(-4)}`
+                : '0x0000000000000000000000000000000000000000'}
+            </p>
           </div>
         </div>
         <div className='flex-none mx-3'>

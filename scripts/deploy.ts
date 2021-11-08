@@ -38,6 +38,7 @@ export async function main() {
   // saving contract address to a file
 
   const contract_address = JSON.stringify({
+    StorageStructures: StorageStructuresContractAddress,
     eBookMarketLaunch: eBookMarketLaunchContractAddress,
     eBookExchange: eBookExchangeContractAddress,
   });

@@ -3,8 +3,9 @@ pragma solidity ^0.8.4;
 
 import "./eBookMarketLaunch.sol";
 import "./StorageStructures.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract eBookExchange {
+contract eBookExchange is ReentrancyGuard {
     StorageStructures ss;
 
     constructor(address _StorageContractAddress) {
@@ -26,20 +27,6 @@ contract eBookExchange {
         _;
     }
 
-    modifier newOnDesk(string memory _uri) {
-        for (uint256 i = 0; i < ss.getAuthorsDesk(msg.sender).length; i++) {
-            if (
-                keccak256(bytes(_uri)) ==
-                keccak256(
-                    bytes(ss.getBook(ss.getAuthorsDesk(msg.sender)[i]).uri)
-                )
-            ) {
-                revert BookAlreadyOnDesk(_uri, msg.sender);
-            }
-        }
-        _;
-    }
-
     modifier alreadyInShelf(uint256 _bookID) {
         for (uint256 i = 0; i < ss.getReadersShelf(msg.sender).length; i++) {
             if (_bookID == ss.getReadersShelf(msg.sender)[i].bookID) {
@@ -51,7 +38,7 @@ contract eBookExchange {
     }
 
     modifier bookExists(uint256 _bookId) {
-        if (ss.getBook(_bookId).contractAddress == address(0)) {
+        if (ss.getBook(_bookId).publisherAddress == address(0)) {
             revert InvalidBookId(_bookId);
         }
         _;
@@ -59,6 +46,7 @@ contract eBookExchange {
 
     function putOnSale(uint256 _bookID)
         public
+        nonReentrant
         bookExists(_bookID)
         alreadyInShelf(_bookID)
     {
@@ -81,6 +69,7 @@ contract eBookExchange {
     function purchaseSecondHand(uint256 _bookID)
         public
         payable
+        nonReentrant
         bookExists(_bookID)
         newInShelf(_bookID)
     {
@@ -89,7 +78,7 @@ contract eBookExchange {
                 ss.getOnSale(_bookID).length - 1
             ];
             require(msg.value >= eBookOnSale.price, "Insufficient funds!!");
-            eBookPublisher(ss.getBook(_bookID).contractAddress).transfer(
+            eBookPublisher(ss.getBook(_bookID).publisherAddress).transfer(
                 eBookOnSale.owner,
                 msg.sender,
                 eBookOnSale.eBookID

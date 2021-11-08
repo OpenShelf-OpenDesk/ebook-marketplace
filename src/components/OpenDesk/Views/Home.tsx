@@ -1,14 +1,32 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction, useEffect } from 'react';
 import Image from 'next/image';
 import Layout from '../../common/Layout';
 import Navbar from '../Navbar';
 import Sidebar from '../Sidebar';
+import { useRouter } from 'next/router';
+import { useLoadingContext } from '../../../context/Loading';
 
-interface Props {}
+interface Props {
+  selected: 1 | 2 | 3;
+  setSelected: Dispatch<SetStateAction<1 | 2 | 3>>;
+}
 
-const Home = (props: Props) => {
+const Home = ({ selected, setSelected }: Props) => {
+  const router = useRouter();
+  const { setLoading } = useLoadingContext();
+  useEffect(() => {
+    router.prefetch(`/OpenDesk/newbook`);
+    setLoading(false);
+    return () => {
+      setLoading(true);
+    };
+  }, []);
   return (
-    <Layout Navbar={Navbar} Sidebar={Sidebar}>
+    <Layout
+      Navbar={Navbar}
+      Sidebar={Sidebar}
+      selected={selected}
+      setSelected={setSelected}>
       <div className='rounded-t-xl overflow-hidden mb-10'>
         <div className='p-20 h-2/3 z-0 bg-green-100'>
           <div className='flex flex-row justify-evenly space-x-16'>

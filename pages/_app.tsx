@@ -1,10 +1,14 @@
 import '../styles/globals.css';
 import type { AppProps } from 'next/app';
 import SignerContext from '../src/context/Signer';
+import PreviewBookContext from '../src/context/PreviewBook';
+import LoadingContext from '../src/context/Loading';
 import { useEffect, useState } from 'react';
 import ConnectWallet from '../src/components/common/ConnectWallet';
 import { connectToWallet } from '../src/controllers/ConnectWallet';
 import { ethers } from 'ethers';
+import { eBook } from '../src/controllers/eBookMarketLaunch';
+import Loading from '../src/components/common/Loading';
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [signer, setSigner] = useState<
@@ -14,6 +18,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       }
     | undefined
   >(undefined);
+
+  const [previewBook, setPreviewBook] = useState<eBook | undefined>();
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     connectToWallet().then(async (_signer) => {
@@ -26,10 +33,17 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <SignerContext.Provider value={{ signer, setSigner }}>
-      {!signer && <ConnectWallet />}
-      <div className={`${!signer && 'filter blur-xl bg-gray-300'}`}>
-        <Component {...pageProps} />
-      </div>
+      <PreviewBookContext.Provider value={{ previewBook, setPreviewBook }}>
+        <LoadingContext.Provider value={{ loading, setLoading }}>
+          {!signer && <ConnectWallet />}
+          <div className={`${!signer && 'filter blur-xl bg-gray-300'}`}>
+            {loading && <Loading />}
+            <div className={`${loading && 'filter blur-xl bg-gray-100'}`}>
+              <Component {...pageProps} />
+            </div>
+          </div>
+        </LoadingContext.Provider>
+      </PreviewBookContext.Provider>
     </SignerContext.Provider>
   );
 }

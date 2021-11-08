@@ -1,9 +1,23 @@
+import { useRouter } from 'next/router';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect } from 'react';
+import { useLoadingContext } from '../../../context/Loading';
 
 interface Props {}
 
 const RoleSelection = (props: Props) => {
+  const router = useRouter();
+  const { setLoading } = useLoadingContext();
+
+  useEffect(() => {
+    router.prefetch(`/OpenShelf`);
+    router.prefetch(`/OpenDesk`);
+    setLoading(false);
+    return () => {
+      setLoading(true);
+    };
+  }, []);
   return (
     <section id='role-selection' className='hero min-h-screen max-h-screen'>
       <div className='hero-content w-3/4 h-3/5'>

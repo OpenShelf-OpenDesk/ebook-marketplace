@@ -3,13 +3,13 @@ require('@nomiclabs/hardhat-waffle');
 module.exports = {
   networks: {
     ganache: {
-      url: 'HTTP://127.0.0.1:8545',
+      url: 'HTTP://127.0.0.1:7545',
       accounts: {
         mnemonic:
-          'throw palm spice hurt grain govern firm damage case inquiry plug crucial',
+          'job spice hotel chunk kitchen spring enhance acoustic rent nerve cave advance',
         path: "m/44'/60'/0'/0",
         initialIndex: 0,
-        count: 20,
+        count: 10,
       },
 
       chainId: 1337,

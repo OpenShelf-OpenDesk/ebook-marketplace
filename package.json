@@ -17,13 +17,15 @@
     "nft.storage": "^3.3.0",
     "react": "17.0.2",
     "react-blockies-image": "^0.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "react-pdf": "^5.5.0"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-ganache": "^2.0.1",
     "@openzeppelin/contracts": "^4.3.2",
     "@types/react": "17.0.31",
+    "@types/react-pdf": "^5.0.8",
     "autoprefixer": "^10.3.7",
     "daisyui": "^1.16.0",
     "eslint": "8.1.0",

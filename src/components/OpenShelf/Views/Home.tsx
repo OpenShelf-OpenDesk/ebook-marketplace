@@ -1,15 +1,39 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import Image from 'next/image';
 import BookCard from '../../common/BookCard';
 import Layout from '../../common/Layout';
 import Navbar from '../Navbar';
 import Sidebar from '../Sidebar';
+import { getAllBooks } from '../../../controllers/eBookMarketLaunch';
+import { useRouter } from 'next/router';
+import { useLoadingContext } from '../../../context/Loading';
 
-interface Props {}
+interface Props {
+  selected: 1 | 2 | 3;
+  setSelected: Dispatch<SetStateAction<1 | 2 | 3>>;
+}
 
-const Home = (props: Props) => {
+const Home = ({ selected, setSelected }: Props) => {
+  const [allBooks, setAllBooks] = useState<any>([]);
+  const { setLoading } = useLoadingContext();
+  const router = useRouter();
+  useEffect(() => {
+    getAllBooks().then(async (metadataURIs) => {
+      setAllBooks(metadataURIs);
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    });
+    return () => {
+      setLoading(true);
+    };
+  }, []);
   return (
-    <Layout Navbar={Navbar} Sidebar={Sidebar}>
+    <Layout
+      Navbar={Navbar}
+      Sidebar={Sidebar}
+      selected={selected}
+      setSelected={setSelected}>
       <div className='rounded-t-xl overflow-hidden mb-10'>
         <div className='p-20 h-2/3 z-0 bg-purple-100'>
           <div className='flex flex-row justify-evenly space-x-16'>
@@ -20,7 +44,7 @@ const Home = (props: Props) => {
               layout='fixed'
             />
             <div className='text-gray-700 flex-1 flex flex-col justify-center content-evenly min-h-full px-20 pb-20'>
-              <p className='text-3xl font-bold py-5'>
+              <p className='text-3xl font-bold py-7'>
                 Welcome to the realm of digital books
               </p>
               <p className='text-lg'>
@@ -35,29 +59,15 @@ const Home = (props: Props) => {
         <div className='mt-10 mb-14 px-2'>
           <h3 className='text-2xl font-bold'>Recent Launches</h3>
           <div className='my-5 flex overscroll-x-contain overflow-scroll no-scrollbar'>
-            <BookCard color='purple' />
-            <BookCard color='purple' />
-            <BookCard color='purple' />
-            <BookCard color='purple' />
-            <BookCard color='purple' />
-            <BookCard color='purple' />
-            <BookCard color='purple' />
-            <BookCard color='purple' />
+            {allBooks.map((book, index) => {
+              return <BookCard key={index} book_metadata_uri={book} />;
+            })}
           </div>
         </div>
 
         <div className='mt-10 mb-14 px-2'>
           <h3 className='text-2xl font-bold'>Bestselling</h3>
-          <div className='my-5 flex overscroll-x-contain overflow-scroll no-scrollbar'>
-            <BookCard color='purple' />
-            <BookCard color='purple' />
-            <BookCard color='purple' />
-            <BookCard color='purple' />
-            <BookCard color='purple' />
-            <BookCard color='purple' />
-            <BookCard color='purple' />
-            <BookCard color='purple' />
-          </div>
+          <div className='my-5 flex overscroll-x-contain overflow-scroll no-scrollbar'></div>
         </div>
       </div>
     </Layout>

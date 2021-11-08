@@ -3,11 +3,13 @@ import Image from 'next/image';
 import { XIcon } from '@heroicons/react/solid';
 import { connectToWallet } from '../../controllers/ConnectWallet';
 import { useSignerContext } from '../../context/Signer';
+import { useLoadingContext } from '../../context/Loading';
 
 interface Props {}
 
 const ConnectWallet = (props: Props) => {
   const { setSigner } = useSignerContext();
+  const { setLoading } = useLoadingContext();
 
   return (
     <section className='fixed z-10 w-screen h-screen flex flex-row justify-center'>
@@ -25,6 +27,7 @@ const ConnectWallet = (props: Props) => {
             <button
               className='btn btn-outline border-gray-300 flex flex-row justify-between'
               onClick={async () => {
+                setLoading(true);
                 connectToWallet().then(async (_signer) => {
                   if (_signer) {
                     const _address = await _signer.getAddress();
