@@ -6,7 +6,7 @@ module.exports = {
       url: 'HTTP://127.0.0.1:7545',
       accounts: {
         mnemonic:
-          'job spice hotel chunk kitchen spring enhance acoustic rent nerve cave advance',
+          'rather display pelican enough wonder creek toast meat photo clip march admit',
         path: "m/44'/60'/0'/0",
         initialIndex: 0,
         count: 10,

@@ -62,7 +62,11 @@ const BookPreview = (props: Props) => {
                   className='w-full btn btn-accent btn-sm'
                   onClick={() => {
                     console.log('purchasing');
-                    purchaseFirstHand(1, 2, signer.signer);
+                    purchaseFirstHand(
+                      1,
+                      previewBook.launch_price,
+                      signer.signer,
+                    );
                   }}>
                   Buy
                 </button>

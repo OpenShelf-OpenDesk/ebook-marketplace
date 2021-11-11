@@ -13,14 +13,16 @@ contract eBookExchange is ReentrancyGuard {
     }
 
     error BookAlreadyInShelf(uint256 _bookID, address buyer);
-    error BookAlreadyOnDesk(string _uri, address author);
     error BookNotInShelf(uint256 _bookID, address seller);
     error InvalidBookId(uint256 _bookID);
     error NoOldBooksForSale(uint256 _bookID);
 
     modifier newInShelf(uint256 _bookID) {
-        for (uint256 i = 0; i < ss.getReadersShelf(msg.sender).length; i++) {
-            if (_bookID == ss.getReadersShelf(msg.sender)[i].bookID) {
+        StorageStructures.eBook[] memory _readersShelf = ss.getReadersShelf(
+            msg.sender
+        );
+        for (uint256 i = 0; i < _readersShelf.length; i++) {
+            if (_bookID == _readersShelf[i].bookID) {
                 revert BookAlreadyInShelf(_bookID, msg.sender);
             }
         }
@@ -28,8 +30,11 @@ contract eBookExchange is ReentrancyGuard {
     }
 
     modifier alreadyInShelf(uint256 _bookID) {
-        for (uint256 i = 0; i < ss.getReadersShelf(msg.sender).length; i++) {
-            if (_bookID == ss.getReadersShelf(msg.sender)[i].bookID) {
+        StorageStructures.eBook[] memory _readersShelf = ss.getReadersShelf(
+            msg.sender
+        );
+        for (uint256 i = 0; i < _readersShelf.length; i++) {
+            if (_bookID == _readersShelf[i].bookID) {
                 _;
                 return;
             }
@@ -37,30 +42,33 @@ contract eBookExchange is ReentrancyGuard {
         revert BookNotInShelf(_bookID, msg.sender);
     }
 
-    modifier bookExists(uint256 _bookId) {
-        if (ss.getBook(_bookId).publisherAddress == address(0)) {
-            revert InvalidBookId(_bookId);
-        }
-        _;
-    }
+    // modifier bookExists(uint256 _bookId) {
+    //     if (_bookId > bookIDs.current()){
+    //         revert InvalidBookId(_bookId );
+    //     }
+    //     _;
+    // }
 
     function putOnSale(uint256 _bookID)
         public
         nonReentrant
-        bookExists(_bookID)
+        // bookExists(_bookID)
         alreadyInShelf(_bookID)
     {
-        for (uint256 i = 0; i < ss.getReadersShelf(msg.sender).length; i++) {
-            if (ss.getReadersShelf(msg.sender)[i].bookID == _bookID) {
+        StorageStructures.eBook[] memory _readersShelf = ss.getReadersShelf(
+            msg.sender
+        );
+        for (uint256 i = 0; i < _readersShelf.length; i++) {
+            if (_readersShelf[i].bookID == _bookID) {
                 require(
-                    ss.getReadersShelf(msg.sender)[i].status ==
+                    _readersShelf[i].status ==
                         StorageStructures.eBookStatus.OWNED,
                     "This book is either on sale or non-transferable!!"
                 );
+                // ss.setBookStatus(msg.sender, _bookID, StorageStructures
+                //     .eBookStatus
+                //     .ON_SALE);
                 ss.addToOnSale(_bookID, ss.getReadersShelf(msg.sender)[i]);
-                ss.getReadersShelf(msg.sender)[i].status = StorageStructures
-                    .eBookStatus
-                    .ON_SALE;
                 break;
             }
         }
@@ -70,7 +78,7 @@ contract eBookExchange is ReentrancyGuard {
         public
         payable
         nonReentrant
-        bookExists(_bookID)
+        // bookExists(_bookID)
         newInShelf(_bookID)
     {
         if (ss.getOnSale(_bookID).length > 0) {
@@ -78,30 +86,16 @@ contract eBookExchange is ReentrancyGuard {
                 ss.getOnSale(_bookID).length - 1
             ];
             require(msg.value >= eBookOnSale.price, "Insufficient funds!!");
-            eBookPublisher(ss.getBook(_bookID).publisherAddress).transfer(
+            StorageStructures.Book memory _book = ss.getBook(_bookID);
+            payable(_book.author).transfer((eBookOnSale.price * 10) / 100);
+            payable(eBookOnSale.owner).transfer((eBookOnSale.price * 90) / 100);
+            eBookPublisher(_book.publisherAddress).transfer(
                 eBookOnSale.owner,
                 msg.sender,
                 eBookOnSale.eBookID
             );
-            payable(ss.getBook(_bookID).author).transfer(
-                (eBookOnSale.price * 10) / 100
-            );
-            payable(eBookOnSale.owner).transfer((eBookOnSale.price * 90) / 100);
-            for (
-                uint256 i = 0;
-                i < ss.getReadersShelf(msg.sender).length;
-                i++
-            ) {
-                if (ss.getReadersShelf(msg.sender)[i].bookID == _bookID) {
-                    ss.getReadersShelf(msg.sender)[i] = ss.getReadersShelf(
-                        msg.sender
-                    )[ss.getReadersShelf(msg.sender).length - 1];
-                    delete ss.getReadersShelf(msg.sender)[
-                        ss.getReadersShelf(msg.sender).length - 1
-                    ];
-                    break;
-                }
-            }
+            ss.transferBook(eBookOnSale.owner, msg.sender, eBookOnSale);
+            ss.removeFromOnSale(_bookID);
         } else {
             revert NoOldBooksForSale(_bookID);
         }

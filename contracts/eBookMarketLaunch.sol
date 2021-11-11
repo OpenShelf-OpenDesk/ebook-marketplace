@@ -19,7 +19,9 @@ contract eBookMarketLaunch is ReentrancyGuard {
     error InvalidBookId(uint256 _bookID);
 
     modifier newInShelf(uint256 _bookID) {
-        StorageStructures.eBook[] memory _readersShelf = ss.getReadersShelf(msg.sender);
+        StorageStructures.eBook[] memory _readersShelf = ss.getReadersShelf(
+            msg.sender
+        );
         for (uint256 i = 0; i < _readersShelf.length; i++) {
             if (_bookID == _readersShelf[i].bookID) {
                 revert BookAlreadyInShelf(_bookID, msg.sender);
@@ -28,10 +30,9 @@ contract eBookMarketLaunch is ReentrancyGuard {
         _;
     }
 
-
     modifier bookExists(uint256 _bookId) {
-        if (_bookId > bookIDs.current()){
-            revert InvalidBookId(_bookId );
+        if (_bookId > bookIDs.current()) {
+            revert InvalidBookId(_bookId);
         }
         _;
     }
@@ -74,13 +75,16 @@ contract eBookMarketLaunch is ReentrancyGuard {
         require(msg.value >= _book.price, "Insufficient funds!!");
         payable(_book.author).transfer(msg.value);
         uint256 _eBookID = _publisher.printPaidVersion(msg.sender);
-        ss.addToShelf(msg.sender, StorageStructures.eBook({
+        ss.addToShelf(
+            msg.sender,
+            StorageStructures.eBook({
                 bookID: _bookID,
                 eBookID: _eBookID,
                 bookURI: _publisher.uri(_eBookID),
                 price: _book.price,
                 owner: msg.sender,
                 status: StorageStructures.eBookStatus.OWNED
-            }));
+            })
+        );
     }
 }

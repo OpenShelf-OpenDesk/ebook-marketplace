@@ -11,10 +11,16 @@ interface Props {
 
 const PreviewBook = ({ url, height, width }: Props) => {
   return (
-    <div>
-      <Document file={url}>
-        <Page pageNumber={1} height={height} width={width} />
-      </Document>
+    <div className=''>
+      {height && width ? (
+        <Document file={url}>
+          <Page pageNumber={1} height={height} width={width} />
+        </Document>
+      ) : (
+        <Document file={url}>
+          <Page pageNumber={1} height={320} />
+        </Document>
+      )}
     </div>
   );
 };

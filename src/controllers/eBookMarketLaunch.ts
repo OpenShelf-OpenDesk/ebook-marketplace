@@ -1,6 +1,5 @@
 import { ethers } from 'ethers';
 import eBookMarketLaunch from '../../artifacts/contracts/eBookMarketLaunch.sol/eBookMarketlaunch.json';
-import StorageStructures from '../../artifacts/contracts/StorageStructures.sol/StorageStructures.json';
 import contract_address from '../../contract_address.json';
 import { NFTStorage, Blob } from 'nft.storage';
 import { pdfjs } from 'react-pdf';
@@ -94,22 +93,6 @@ export async function publish(eBook: eBook, author) {
   } catch (error) {
     console.log(error);
   }
-}
-
-export async function getAllBooks() {
-  const StorageStructuresContractAddress = contract_address.StorageStructures;
-  const provider = new ethers.providers.JsonRpcProvider(
-    `http://localhost:7545/`,
-  );
-  const contract = new ethers.Contract(
-    StorageStructuresContractAddress,
-    StorageStructures.abi,
-    provider,
-  );
-  const books = await contract.getAllBooks();
-  return books.map((book) => {
-    return book.metadataURI;
-  });
 }
 
 export async function purchaseFirstHand(bookID, price, reader) {

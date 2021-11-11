@@ -11,7 +11,7 @@ const OpenShelf: NextPage = () => {
   } else if (selected == 2) {
     return <Shelf selected={selected} setSelected={setSelected} />;
   } else if (selected == 3) {
-    return <Exchange />;
+    return <Exchange selected={selected} setSelected={setSelected} />;
   }
 };
 

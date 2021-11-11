@@ -4,7 +4,7 @@ import BookCard from '../../common/BookCard';
 import Layout from '../../common/Layout';
 import Navbar from '../Navbar';
 import Sidebar from '../Sidebar';
-import { getAllBooks } from '../../../controllers/eBookMarketLaunch';
+import { getAllBooks } from '../../../controllers/StorageStructures';
 import { useRouter } from 'next/router';
 import { useLoadingContext } from '../../../context/Loading';
 
@@ -22,7 +22,7 @@ const Home = ({ selected, setSelected }: Props) => {
       setAllBooks(metadataURIs);
       setTimeout(() => {
         setLoading(false);
-      }, 500);
+      }, 1000);
     });
     return () => {
       setLoading(true);
