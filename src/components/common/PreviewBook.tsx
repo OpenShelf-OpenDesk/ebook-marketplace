@@ -7,22 +7,35 @@ interface Props {
   url: string;
   height?: number;
   width?: number;
+  page?: number;
 }
 
-const PreviewBook = ({ url, height, width }: Props) => {
-  return (
-    <div className=''>
-      {height && width ? (
+const PreviewBook = ({ url, height, width, page = 1 }: Props) => {
+  if (height && width) {
+    return (
+      <div>
         <Document file={url}>
-          <Page pageNumber={1} height={height} width={width} />
+          <Page pageNumber={page} height={height} width={width} />
         </Document>
-      ) : (
+      </div>
+    );
+  } else if (height) {
+    return (
+      <div>
         <Document file={url}>
-          <Page pageNumber={1} height={320} />
+          <Page pageNumber={page} height={320} />
         </Document>
-      )}
-    </div>
-  );
+      </div>
+    );
+  } else {
+    return (
+      <div>
+        <Document file={url}>
+          <Page pageNumber={page} />
+        </Document>
+      </div>
+    );
+  }
 };
 
 export default PreviewBook;

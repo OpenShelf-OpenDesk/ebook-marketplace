@@ -32,7 +32,7 @@ export async function getBooksInMyShelf(reader) {
   const booksInShelf = response.map((_book) => {
     const bookInShelf = {
       bookID: Number(_book.bookID),
-      bookURI: _book.bookURI,
+      metadataURI: _book.metadataURI,
       eBookID: Number(_book.eBookID),
       owner: _book.owner,
       price: ethers.utils.formatUnits(_book.price, 'ether'),

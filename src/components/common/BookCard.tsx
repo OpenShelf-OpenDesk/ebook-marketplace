@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { usePreviewBookContext } from '../../context/PreviewBook';
 import { eBook } from '../../controllers/eBookMarketLaunch';
 import PreviewBookCoverPage from '../common/PreviewBookCoverPage';
+import LoadingCircle from '../common/LoadingCircle';
 interface Props {
   book_metadata_uri: string;
 }
@@ -29,13 +30,11 @@ const BookCard = ({ book_metadata_uri }: Props) => {
       <div className='group carousel-item w-60 h-80 rounded bg-white mr-8'>
         <div
           className={`absolute transition duration-500 ease-in-out transform group-hover:-translate-y-40 shadow-lg w-60 h-72 rounded bg-none`}>
-          <PreviewBookCoverPage
-            src={bookMetadata.ebook_cover_image}
-            height={320}
-            width={240}
-          />
+          <div className='h-full w-full bg-white'>
+            <PreviewBookCoverPage src={bookMetadata.ebook_cover_image} />
+          </div>
         </div>
-        <div className='pt-40 w-full rounded border border-transparent group-hover:border-gray-400 overscroll-none'>
+        <div className='pt-32 w-full h-72 rounded border border-transparent group-hover:border-gray-400 overscroll-none'>
           <div className='flex flex-col p-3 text-gray-700 h-full'>
             <p className='font-semibold mb-2'>{bookMetadata.title}</p>
             <p className='text-xs '>
@@ -48,7 +47,13 @@ const BookCard = ({ book_metadata_uri }: Props) => {
                 className={`px-2 text-2xs text-center font-semibold h-7 text-white p-1 btn-primary rounded self-end`}
                 onClick={() => {
                   setPreviewBook(bookMetadata);
-                  router.push(`/OpenShelf/bookpreview`);
+                  router.push(
+                    {
+                      pathname: `/OpenShelf/bookpreview`,
+                      query: { bookdata: JSON.stringify(bookMetadata) },
+                    },
+                    `/OpenShelf/bookpreview`,
+                  );
                 }}>
                 More &#10142;
               </button>
@@ -58,7 +63,9 @@ const BookCard = ({ book_metadata_uri }: Props) => {
       </div>
     </div>
   ) : (
-    <p>Unable to load metadata</p>
+    <div className='flex justify-center items-center'>
+      <LoadingCircle />
+    </div>
   );
 };
 

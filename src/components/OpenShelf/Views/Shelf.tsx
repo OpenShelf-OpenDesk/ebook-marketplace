@@ -27,7 +27,7 @@ const Shelf = ({ selected, setSelected }: Props) => {
       Promise.all(
         _booksInShelf.map((_book) => {
           // return fetchBook(_book.bookURI);
-          return `https://${_book.bookURI}.ipfs.dweb.link`;
+          return `https://${_book.metadataURI}.ipfs.dweb.link`;
         }),
       ).then((_fetchedBooks) => {
         setBooksInShelf(_fetchedBooks);
@@ -50,7 +50,9 @@ const Shelf = ({ selected, setSelected }: Props) => {
         <div className='grid grid-cols-3 gap-x-8 gap-y-12 p-5 bg-yellow-900'>
           {booksInShelf &&
             booksInShelf.map((_bookInShelf, index) => {
-              return <BookInShelfCard bookURI={_bookInShelf} key={index} />;
+              return (
+                <BookInShelfCard bookMetadataURI={_bookInShelf} key={index} />
+              );
             })}
         </div>
       </section>

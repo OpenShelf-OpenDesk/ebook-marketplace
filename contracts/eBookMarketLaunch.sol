@@ -3,7 +3,6 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "./eBookPublisher.sol";
 import "./StorageStructures.sol";
 
 contract eBookMarketLaunch is ReentrancyGuard {
@@ -44,6 +43,7 @@ contract eBookMarketLaunch is ReentrancyGuard {
         int256 _pricedBooksSupplyLimit
     ) public nonReentrant {
         bookIDs.increment();
+
         eBookPublisher neweBookPublisher = new eBookPublisher(
             bookIDs.current(),
             msg.sender,
@@ -51,7 +51,6 @@ contract eBookMarketLaunch is ReentrancyGuard {
             _eBookURI,
             _pricedBooksSupplyLimit
         );
-
         ss.addBook(
             StorageStructures.Book({
                 author: msg.sender,
@@ -71,20 +70,26 @@ contract eBookMarketLaunch is ReentrancyGuard {
         newInShelf(_bookID)
     {
         StorageStructures.Book memory _book = ss.getBook(_bookID);
-        eBookPublisher _publisher = eBookPublisher(_book.publisherAddress);
+        require(msg.sender!=_book.author, "Author can't buy own book!!");
         require(msg.value >= _book.price, "Insufficient funds!!");
-        payable(_book.author).transfer(msg.value);
+        payable(_book.author).transfer(_book.price);
+        eBookPublisher _publisher = eBookPublisher(_book.publisherAddress);
         uint256 _eBookID = _publisher.printPaidVersion(msg.sender);
         ss.addToShelf(
             msg.sender,
             StorageStructures.eBook({
                 bookID: _bookID,
                 eBookID: _eBookID,
-                bookURI: _publisher.uri(_eBookID),
+                metadataURI: _book.metadataURI,
                 price: _book.price,
                 owner: msg.sender,
                 status: StorageStructures.eBookStatus.OWNED
             })
         );
+        payable(msg.sender).transfer(msg.value - _book.price);
+    }
+    
+    function getNextBookID() public view returns(uint256) {
+        return bookIDs.current()+1;
     }
 }

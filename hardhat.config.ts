@@ -6,7 +6,7 @@ module.exports = {
       url: 'HTTP://127.0.0.1:7545',
       accounts: {
         mnemonic:
-          'rather display pelican enough wonder creek toast meat photo clip march admit',
+          'poet flat giant base pool type sand unusual patrol pilot unveil car',
         path: "m/44'/60'/0'/0",
         initialIndex: 0,
         count: 10,

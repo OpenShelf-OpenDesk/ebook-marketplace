@@ -25,7 +25,7 @@ const Layout = ({
       <Navbar />
       <div className='flex flex-row'>
         <Sidebar selected={selected} setSelected={setSelected} />
-        <div className='pt-20 pl-24 w-full bg-white min-h-screen h-full pr-5'>
+        <div className='pt-20 pl-24 w-full bg-white min-h-screen pr-5'>
           {children}
         </div>
       </div>

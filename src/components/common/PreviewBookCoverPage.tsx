@@ -13,7 +13,7 @@ const PreviewBookCoverPage = ({ src, height, width }: Props) => {
       {height && width ? (
         <Image src={src} height={height} width={width} layout='fixed' />
       ) : (
-        <Image src={src} layout='fill' objectFit='contain' />
+        <Image src={src} layout='fill' objectFit='cover' />
       )}
     </div>
   );
