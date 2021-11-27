@@ -1,5 +1,5 @@
-import React from 'react';
-import { Document, Page, pdfjs } from 'react-pdf';
+import React, { useState } from "react";
+import { Document, Page, pdfjs } from "react-pdf";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -10,7 +10,13 @@ interface Props {
   page?: number;
 }
 
-const PreviewBook = ({ url, height, width, page = 1 }: Props) => {
+const PreviewBook = ({ url, height, width, page }: Props) => {
+  const [numPages, setNumPages] = useState<number>(null);
+
+  function onDocumentLoadSuccess({ numPages }) {
+    setNumPages(numPages);
+  }
+
   if (height && width) {
     return (
       <div>
@@ -30,8 +36,10 @@ const PreviewBook = ({ url, height, width, page = 1 }: Props) => {
   } else {
     return (
       <div>
-        <Document file={url}>
-          <Page pageNumber={page} />
+        <Document file={url} onLoadSuccess={onDocumentLoadSuccess} loading={""}>
+          {Array.from(new Array(numPages), (el, index) => (
+            <Page pageNumber={index + 1} key={index} width={550} loading={""} />
+          ))}
         </Document>
       </div>
     );

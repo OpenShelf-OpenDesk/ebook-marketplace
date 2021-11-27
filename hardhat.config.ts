@@ -6,7 +6,7 @@ module.exports = {
       url: 'HTTP://127.0.0.1:7545',
       accounts: {
         mnemonic:
-          'private comic satoshi onion grunt response orient dolphin able mad file west',
+          'glimpse harvest quiz wedding foil mansion teach rally ketchup stone athlete blouse',
         path: "m/44'/60'/0'/0",
         initialIndex: 0,
         count: 10,
