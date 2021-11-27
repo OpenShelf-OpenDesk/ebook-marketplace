@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import eBookMarketLaunch from '../../artifacts/contracts/eBookMarketLaunch.sol/eBookMarketlaunch.json';
+import eBookMarketLaunch from '../../artifacts/contracts/eBookMarketLaunch.sol/eBookMarketLaunch.json';
 import contract_address from '../../contract_address.json';
 import { NFTStorage, Blob } from 'nft.storage';
 import { pdfjs } from 'react-pdf';
