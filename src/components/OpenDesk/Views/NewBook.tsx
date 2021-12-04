@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { eBook, publish } from "../../../controllers/eBookMarketLaunch";
 import { useSignerContext } from "../../../context/Signer";
-import { DocumentAddIcon } from "@heroicons/react/outline";
+import { DocumentAddIcon, DocumentRemoveIcon } from "@heroicons/react/outline";
 import { ExclamationCircleIcon } from "@heroicons/react/outline";
 import PreviewBook from "../../common/PreviewBook";
 import { useLoadingContext } from "../../../context/Loading";
@@ -35,19 +35,19 @@ const BookPublishingStatus = ({ statusCode }) => {
       <div className="flex flex-col justify-center items-start">
         <BookPublishingStatusTag
           status={statusCode >= 1}
-          tag="uploading e-book file"
+          tag="Uploading e-book file"
         />
         <BookPublishingStatusTag
           status={statusCode >= 2}
-          tag="extracting cover image"
+          tag="Extracting cover image"
         />
         <BookPublishingStatusTag
           status={statusCode >= 3}
-          tag="uploading metadata"
+          tag="Uploading metadata"
         />
         <BookPublishingStatusTag
           status={statusCode >= 4}
-          tag="awaiting transaction success"
+          tag="Awaiting transaction success"
         />
       </div>
     </section>
@@ -102,7 +102,7 @@ const NewBook = (props: Props) => {
         title: e.target.title.value,
         description: e.target.description.value,
         launch_price: e.target.launch_price.value,
-        currency: e.target.currency.value,
+        currency: "MAT",
         supply_limit_bool: supplyLimitBool,
         supply_limit: supplyLimitBool ? e.target.supply_limit.value : -1,
         ebook_file: selectedBookFile,
@@ -123,7 +123,7 @@ const NewBook = (props: Props) => {
         <BookPublishingStatus statusCode={progressStatus} />
       )}
       <div className={`${validSubmitAttempt && "filter blur-xl bg-gray-100"}`}>
-        <section className="w-screen h-screen px-60 py-20">
+        <section className="w-screen h-screen px-60 py-28">
           <p className="flex justify-center absolute right-20 top-10 cursor-pointer">
             <ArrowNarrowLeftIcon
               className="w-6 h-6"
@@ -138,8 +138,22 @@ const NewBook = (props: Props) => {
             onSubmit={handleSubmit}
           >
             {selectedBookFile ? (
-              <div className="h-full w-full overflow-scroll shadow-md">
-                <PreviewBook url={selectedBookLocalURL} />
+              <div className="h-full w-full flex flex-col space-y-5">
+                <div className="max-h-full w-full overflow-scroll shadow-md">
+                  <PreviewBook url={selectedBookLocalURL} />
+                </div>
+                <div
+                  className="alert alert-success cursor-pointer"
+                  onClick={() => {
+                    setSelectedBookFile(null);
+                    setSelectedBookLocalURL("");
+                  }}
+                >
+                  <div className="flex-1 space-x-5">
+                    <DocumentRemoveIcon className="w-6 h-6" />
+                    <label>Remove this e-book file</label>
+                  </div>
+                </div>
               </div>
             ) : (
               <label className="h-full w-full flex flex-col justify-center space-y-5">
@@ -154,7 +168,7 @@ const NewBook = (props: Props) => {
                     setSelectedBookLocalURL(url);
                   }}
                 />
-                <div className="group bg-gray-50 relative w-full h-4/5 self-center cursor-pointer">
+                <div className="group bg-gray-50 relative w-full h-full self-center cursor-pointer">
                   <Image
                     src={`/undraw_add_document_re_mbjx.svg`}
                     layout="fill"
@@ -207,13 +221,9 @@ const NewBook = (props: Props) => {
                   step="0.01"
                   required
                 />
-                <select
-                  name="currency"
-                  className="flex-0 select select-bordered border-l-0 rounded-l-none focus:ring-0"
-                >
-                  <option value="INR">INR (₹)</option>
-                  <option value="MATIC">MATIC TOKEN</option>
-                </select>
+                <div className="flex items-center px-5 border-2 border-l-0 border-gray-300 bg-gray-100 rounded-r-lg cursor-pointer">
+                  <p className="font-semibold">MATIC TOKEN</p>
+                </div>
               </div>
               <div className="flex flex-row space-x-5">
                 <div className="w-1/3 border rounded-lg border-gray-300">
