@@ -11,8 +11,10 @@
     "localhost": "npx hardhat run scripts/deploy.ts --network ganache"
   },
   "dependencies": {
+    "@ethersproject/contracts": "^5.5.0",
     "@heroicons/react": "^1.0.5",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@superfluid-finance/js-sdk": "^0.5.7",
     "next": "12",
     "nft.storage": "^3.3.0",
     "react": "17.0.2",
