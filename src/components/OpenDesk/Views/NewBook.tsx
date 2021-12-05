@@ -102,7 +102,7 @@ const NewBook = (props: Props) => {
         title: e.target.title.value,
         description: e.target.description.value,
         launch_price: e.target.launch_price.value,
-        currency: "MAT",
+        currency: "MATIC",
         supply_limit_bool: supplyLimitBool,
         supply_limit: supplyLimitBool ? e.target.supply_limit.value : -1,
         ebook_file: selectedBookFile,
@@ -143,15 +143,15 @@ const NewBook = (props: Props) => {
                   <PreviewBook url={selectedBookLocalURL} />
                 </div>
                 <div
-                  className="alert alert-success cursor-pointer"
+                  className="alert alert-error cursor-pointer"
                   onClick={() => {
                     setSelectedBookFile(null);
                     setSelectedBookLocalURL("");
                   }}
                 >
-                  <div className="flex-1 space-x-5">
+                  <div className="flex-1 space-x-5 cursor-pointer">
                     <DocumentRemoveIcon className="w-6 h-6" />
-                    <label>Remove this e-book file</label>
+                    <p>Remove this e-book file</p>
                   </div>
                 </div>
               </div>
@@ -221,8 +221,10 @@ const NewBook = (props: Props) => {
                   step="0.01"
                   required
                 />
-                <div className="flex items-center px-5 border-2 border-l-0 border-gray-300 bg-gray-100 rounded-r-lg cursor-pointer">
-                  <p className="font-semibold">MATIC TOKEN</p>
+                <div className="flex items-center px-5 border-2 border-l-0 border-gray-300 bg-gray-100 rounded-r-lg">
+                  <p className="text-sm text-gray-500 font-semibold self-center">
+                    MATIC
+                  </p>
                 </div>
               </div>
               <div className="flex flex-row space-x-5">
