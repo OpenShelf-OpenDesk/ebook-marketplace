@@ -71,6 +71,10 @@ contract StorageStructures {
         return books[_index - 1];
     }
 
+    // function getEBookFromReadersShelf(uint256 _index) external view returns (eBook memory) {
+    //     return books[_index - 1];
+    // }
+
     function getAllBooks() external view returns (Book[] memory) {
         return books;
     }
@@ -136,6 +140,20 @@ contract StorageStructures {
                     );
                 this.addToShelf(_buyer, _eBookOnSale);
                 break;
+            }
+        }
+    }
+
+    function getBookURI(
+        uint256 _bookID
+    ) public view returns (string memory bookURI) {
+        eBook[] memory readerEBooks = readersShelf[msg.sender];
+        for (uint256 i = 0; i < readerEBooks.length; i++) {
+            if (readerEBooks[i].bookID == _bookID){
+                require(readerEBooks[i].owner == address(msg.sender));
+                Book memory book = this.getBook(_bookID);
+                eBookPublisher publisher = eBookPublisher(book.publisherAddress);
+                bookURI = publisher.getBookURI();
             }
         }
     }
