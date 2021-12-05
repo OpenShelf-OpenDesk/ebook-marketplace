@@ -10,6 +10,10 @@ import {
   placeBuyOrder,
   placeSellOrder,
 } from "../../../controllers/eBookExchange";
+import {
+  getBookBuyersCount,
+  getBookSellersCount,
+} from "../../../controllers/StorageStructures";
 import { useSignerContext } from "../../../context/Signer";
 import { CheckCircleIcon } from "@heroicons/react/solid";
 import LoadingCircle from "../../common/LoadingCircle";
@@ -43,15 +47,15 @@ const BuyOrderStatus = ({ statusCode }) => {
       <div className="flex flex-col justify-center items-start">
         <OrderStatusTag
           status={statusCode >= 1}
-          tag="sending transaction request"
+          tag="Sending transaction request"
         />
         <OrderStatusTag
           status={statusCode >= 2}
-          tag="awaiting payment success"
+          tag="Awaiting payment success"
         />
         <OrderStatusTag
           status={statusCode >= 3}
-          tag="awaiting transaction success"
+          tag="Awaiting transaction success"
         />
       </div>
     </section>
@@ -64,11 +68,11 @@ const SellOrderStatus = ({ statusCode }) => {
       <div className="flex flex-col justify-center items-start">
         <OrderStatusTag
           status={statusCode >= 1}
-          tag="sending transaction request"
+          tag="Sending transaction request"
         />
         <OrderStatusTag
           status={statusCode >= 2}
-          tag="awaiting transaction success"
+          tag="Awaiting transaction success"
         />
       </div>
     </section>
@@ -84,6 +88,8 @@ const Exchange = ({
   const { setLoading } = useLoadingContext();
   const [buyState, setBuyState] = useState<boolean>(initialBuyState);
   const [selectedBook, setSelectedBook] = useState<eBook>();
+  const [buyers, setBuyers] = useState<number>(0);
+  const [sellers, setSellers] = useState<number>(0);
   const { signer } = useSignerContext();
   const [validBuyOrderPlaced, setValidBuyOrderPlaced] =
     useState<boolean>(false);
@@ -134,10 +140,21 @@ const Exchange = ({
     }, 500);
 
     return () => {
-      // setSelectedBook(undefined);
       setLoading(true);
     };
   }, []);
+
+  useEffect(() => {
+    selectedBook &&
+      getBookBuyersCount(selectedBook.book_id).then((count) => {
+        setBuyers(count);
+      });
+    selectedBook &&
+      getBookSellersCount(selectedBook.book_id).then((count) => {
+        setSellers(count);
+      });
+  }, [selectedBook]);
+
   return (
     <>
       {validBuyOrderPlaced && (
@@ -159,29 +176,65 @@ const Exchange = ({
           setSelected={setSelected}
         >
           <div className="overflow-hidden h-full pb-10">
-            <div className="flex flex-row justify-center space-x-10 h-full relative">
-              <div className="flex justify-center items-center rounded-tl-xl w-3/4 h-5/6 z-0 bg-purple-50">
-                <div className="flex flex-col justify-center items-center space-y-16">
-                  <Image
-                    src="/undraw_business_deal_re_up4u.svg"
-                    width={300 * 1.5}
-                    height={200 * 1.5}
-                    layout="fixed"
-                  />
-                  <div className="text-gray-700 text-center flex-1 flex flex-col justify-center content-evenly min-h-full px-20">
-                    <p className="text-3xl font-bold py-7">
-                      First ever online e-book exchange
-                    </p>
-                    <p className="text-lg px-20">
-                      Trustless, Peer-to-Peer network of readers to exchange
-                      books quickly and seamlessly. This platform is
-                      <i> of you, for you and by you</i>, no matter who you are,
-                      where you live and what you read...{" "}
-                      <b>We redefined privacy</b>.
-                    </p>
+            <div className="flex flex-row justify-center space-x-6 h-full relative">
+              {selectedBook ? (
+                <div className="flex justify-center items-center w-3/4 h-full z-0">
+                  <div className="flex flex-col justify-center items-center space-y-16 h-full bg-purple-50 rounded-t-xl mr-5">
+                    <div>
+                      <Image
+                        src="/undraw_business_deal_re_up4u.svg"
+                        width={300 * 1.5}
+                        height={200 * 1.5}
+                        layout="fixed"
+                      />
+                    </div>
+                    <div className="text-gray-700 text-center flex flex-col content-evenly">
+                      <p className="text-3xl font-bold pb-10">
+                        First ever online e-book exchange
+                      </p>
+                      <p className="text-lg px-5 mx-10">
+                        Trustless, Peer-to-Peer network of readers to exchange
+                        books quickly and seamlessly. This platform is
+                        <i> of you, for you and by you</i>, no matter who you
+                        are, where you live and what you read...
+                        <p>
+                          <b>We redefined privacy</b>.
+                        </p>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex justify-center items-center w-full h-full border-2 border-gray-200 rounded-tl-xl">
+                    <PreviewBookCoverPage
+                      src={selectedBook.ebook_cover_image}
+                    />
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="flex justify-center items-center rounded-tl-xl w-3/4 h-full z-0 bg-purple-50">
+                  <div className="flex flex-col justify-center items-center space-y-16">
+                    <Image
+                      src="/undraw_business_deal_re_up4u.svg"
+                      width={300 * 1.5}
+                      height={200 * 1.5}
+                      layout="fixed"
+                    />
+                    <div className="text-gray-700 text-center flex-1 flex flex-col justify-center content-evenly min-h-full px-20">
+                      <p className="text-3xl font-bold py-7">
+                        First ever online e-book exchange
+                      </p>
+                      <p className="text-lg px-20">
+                        Trustless, Peer-to-Peer network of readers to exchange
+                        books quickly and seamlessly. This platform is
+                        <i> of you, for you and by you</i>, no matter who you
+                        are, where you live and what you read...
+                        <p>
+                          <b>We redefined privacy</b>.
+                        </p>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
               <div className="w-1/4 h-full">
                 <div className="flex flex-col justify-center items-center w-full h-full">
                   <p className="font-semibold text-lg">
@@ -191,15 +244,37 @@ const Exchange = ({
               </div>
               {selectedBook && (
                 <div className="bg-white border border-gray-300 w-1/4 h-full absolute right-5 rounded-tr-xl overflow-hidden">
-                  <div className="w-full h-full flex flex-col pt-5">
+                  <div className="w-full h-full flex flex-col">
                     <div className="flex justify-center w-full h-2/5">
-                      <div className="h-full w-1/2">
-                        <PreviewBookCoverPage
-                          src={selectedBook.ebook_cover_image}
-                        />
+                      <div
+                        className={
+                          buyState
+                            ? "flex-1 border-t-4 border-red-500 py-5 bg-red-50"
+                            : "flex-1 border-t-4 border-green-500 py-5 bg-green-50"
+                        }
+                      >
+                        {buyState ? (
+                          <div className="flex flex-col justify-center items-center">
+                            <div className="font-semibold text-lg pt-7 pb-5">
+                              Total Sell Orders
+                            </div>
+                            <div className="flex w-28 h-28 rounded-md justify-center items-center text-3xl bg-red-300">
+                              {sellers}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col justify-center items-center">
+                            <div className="font-semibold text-lg  pt-7 pb-5">
+                              Total Buy Orders
+                            </div>
+                            <div className="flex w-28 h-28 rounded-md justify-center items-center text-3xl bg-green-300">
+                              {buyers}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
-                    <div className="w-full h-3/5 mt-10">
+                    <div className="w-full h-3/5">
                       <div className="flex">
                         <a
                           className={
