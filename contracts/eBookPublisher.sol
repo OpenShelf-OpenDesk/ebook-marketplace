@@ -31,7 +31,7 @@ contract eBookPublisher is ERC1155, ReentrancyGuard {
     ) ERC1155(_eBookURI) {
         bookID = _bookID;
         author = _author;
-        _setURI(_eBookURI);
+        // _setURI(_eBookURI);
         price = _price;
         pricedBooksSupplyLimit = _pricedBooksSupplyLimit;
         _mint(_author, FREE_BOOK_ID, 1, "Author's Copy");
@@ -124,4 +124,8 @@ contract eBookPublisher is ERC1155, ReentrancyGuard {
     }
 
     // function createFreeBookVoucher() external onlyAuthor
+
+    function getBookURI() external view returns (string memory bookURI) {
+        bookURI = uri(bookID);
+    }
 }

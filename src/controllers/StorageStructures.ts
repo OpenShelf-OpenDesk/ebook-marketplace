@@ -86,3 +86,15 @@ export async function getBookSellersCount(_bookID) {
   console.log(Number(bookSellersCount));
   return Number(bookSellersCount);
 }
+
+export async function getBookURI(_bookID, reader) {
+  const StorageStructuresContractAddress = contract_address.StorageStructures;
+  const contract = new ethers.Contract(
+    StorageStructuresContractAddress,
+    StorageStructures.abi,
+    reader,
+  );
+  const bookURI = await contract.getBookURI(_bookID);
+  console.log(bookURI);
+  return bookURI;
+}
