@@ -86,13 +86,17 @@ const Navbar = (props: Props) => {
         </button>
       </div>
 
-      <div className="flex-none bg-gray-100 w-2/12 rounded-lg cursor-pointer">
+      <div className="flex-none bg-gray-100 w-2/12 rounded-lg cursor-pointer hover:bg-gray-200">
         <div className="avatar flex-none">
           <div className="rounded-tl-lg rounded-bl-lg w-12 h-12 bg-white object-fill">
             <Blockies seed={signerAddress} size={48} scale={8} />
           </div>
         </div>
-        <div className="flex-1 ml-5">
+        <div
+          className="flex-1 ml-5text-left tooltip tooltip-bottom"
+          data-tip="Copy to Clipboard"
+          onClick={() => navigator.clipboard.writeText(signerAddress)}
+        >
           <div className="flex flex-col truncate">
             <p className="text-sm font-semibold">Personal Wallet</p>
             <p className="text-2xs">
