@@ -6,7 +6,7 @@ module.exports = {
       url: 'HTTP://127.0.0.1:7545',
       accounts: {
         mnemonic:
-          'glimpse harvest quiz wedding foil mansion teach rally ketchup stone athlete blouse',
+          'broccoli game flavor spin dove off novel rural river battle able hip',
         path: "m/44'/60'/0'/0",
         initialIndex: 0,
         count: 10,
