@@ -54,7 +54,17 @@ const BookInShelfCard = ({ bookMetadataURI }: Props) => {
             </button>
             <button
               className="text-sm text-primary self-end"
-              onClick={() => {}}
+              onClick={() => {
+                router.push(
+                  {
+                    pathname: `/bookReader`,
+                    query: {
+                      bookID: bookMetadata.book_id,
+                    },
+                  },
+                  `/OpenShelf`
+                );
+              }}
             >
               Read &#10142;
             </button>
