@@ -139,4 +139,18 @@ contract StorageStructures {
             }
         }
     }
+
+    function getBookURI(
+        uint256 _bookID
+    ) public view returns (string memory bookURI) {
+        eBook[] memory readerEBooks = readersShelf[msg.sender];
+        for (uint256 i = 0; i < readerEBooks.length; i++) {
+            if (readerEBooks[i].bookID == _bookID){
+                require(readerEBooks[i].owner == address(msg.sender));
+                Book memory book = this.getBook(_bookID);
+                eBookPublisher publisher = eBookPublisher(book.publisherAddress);
+                bookURI = publisher.getBookURI();
+            }
+        }
+    }
 }

@@ -124,4 +124,8 @@ contract eBookPublisher is ERC1155, ReentrancyGuard {
     }
 
     // function createFreeBookVoucher() external onlyAuthor
+
+    function getBookURI() external view returns (string memory bookURI) {
+        bookURI = uri(bookID);
+    }
 }
