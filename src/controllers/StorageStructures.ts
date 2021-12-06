@@ -56,3 +56,45 @@ export async function getBooksOnSale(_bookID) {
   const booksOnSale = await contract.getOnSale();
   console.log(booksOnSale);
 }
+
+export async function getBookBuyersCount(_bookID) {
+  const StorageStructuresContractAddress = contract_address.StorageStructures;
+  const provider = new ethers.providers.JsonRpcProvider(
+    `http://localhost:7545/`,
+  );
+  const contract = new ethers.Contract(
+    StorageStructuresContractAddress,
+    StorageStructures.abi,
+    provider,
+  );
+  const bookBuyersCount = await contract.getBuyersCount(_bookID);
+  console.log(Number(bookBuyersCount));
+  return Number(bookBuyersCount);
+}
+
+export async function getBookSellersCount(_bookID) {
+  const StorageStructuresContractAddress = contract_address.StorageStructures;
+  const provider = new ethers.providers.JsonRpcProvider(
+    `http://localhost:7545/`,
+  );
+  const contract = new ethers.Contract(
+    StorageStructuresContractAddress,
+    StorageStructures.abi,
+    provider,
+  );
+  const bookSellersCount = await contract.getSellersCount(_bookID);
+  console.log(Number(bookSellersCount));
+  return Number(bookSellersCount);
+}
+
+export async function getBookURI(_bookID, reader) {
+  const StorageStructuresContractAddress = contract_address.StorageStructures;
+  const contract = new ethers.Contract(
+    StorageStructuresContractAddress,
+    StorageStructures.abi,
+    reader,
+  );
+  const bookURI = await contract.getBookURI(_bookID);
+  console.log(bookURI);
+  return bookURI;
+}

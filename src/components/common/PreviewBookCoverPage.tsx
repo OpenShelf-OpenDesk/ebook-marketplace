@@ -1,5 +1,5 @@
-import React from 'react';
-import Image from 'next/image';
+import React from "react";
+import Image from "next/image";
 
 interface Props {
   src: string;
@@ -9,11 +9,11 @@ interface Props {
 
 const PreviewBookCoverPage = ({ src, height, width }: Props) => {
   return (
-    <div className='relative h-full w-full self-start flex-0'>
+    <div className="relative h-full w-full self-start flex-0">
       {height && width ? (
-        <Image src={src} height={height} width={width} layout='fixed' />
+        <Image src={src} height={height} width={width} layout="fixed" />
       ) : (
-        <Image src={src} layout='fill' objectFit='cover' />
+        <Image src={src} layout="fill" objectFit="contain" />
       )}
     </div>
   );

@@ -12,11 +12,11 @@ const ConnectWallet = (props: Props) => {
   const { setSigner } = useSignerContext();
   const { setLoading } = useLoadingContext();
 
-  useEffect(() => {
-    return () => {
-      setLoading(true);
-    };
-  }, []);
+  // useEffect(() => {
+  // return () => {
+  //   setLoading(true);
+  // };
+  // }, []);
 
   return (
     <section className="fixed z-10 w-screen h-screen flex flex-row justify-center">
@@ -45,7 +45,7 @@ const ConnectWallet = (props: Props) => {
                   if (_signer) {
                     const _address = await _signer.getAddress();
                     setSigner({ address: _address, signer: _signer });
-                    setTimeout(() => setLoading(false), 500);
+                    // setTimeout(() => setLoading(false), 500);
                   }
                 });
               }}

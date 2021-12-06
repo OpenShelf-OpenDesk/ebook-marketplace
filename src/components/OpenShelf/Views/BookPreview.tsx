@@ -1,28 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   eBook,
   purchaseFirstHand,
-} from '../../../controllers/eBookMarketLaunch';
-import { useSignerContext } from '../../../context/Signer';
-import PreviewBookCoverPage from '../../common/PreviewBookCoverPage';
-import { ArrowNarrowLeftIcon, CheckCircleIcon } from '@heroicons/react/solid';
-import { useRouter } from 'next/router';
-import { useLoadingContext } from '../../../context/Loading';
-import LoadingCircle from '../../common/LoadingCircle';
+} from "../../../controllers/eBookMarketLaunch";
+import { useSignerContext } from "../../../context/Signer";
+import PreviewBookCoverPage from "../../common/PreviewBookCoverPage";
+import { ArrowNarrowLeftIcon, CheckCircleIcon } from "@heroicons/react/solid";
+import { useRouter } from "next/router";
+import { useLoadingContext } from "../../../context/Loading";
+import LoadingCircle from "../../common/LoadingCircle";
 
 interface Props {}
 
 const BookPurchasingStatusTag = ({ status, tag }) => {
   return (
-    <div className='flex flex-row justify-center items-center space-x-10 text-gray-700'>
+    <div className="flex flex-row justify-center items-center space-x-10 text-gray-700">
       {status ? (
-        <div className='flex justify-center items-center h-20 w-20'>
-          <CheckCircleIcon className='h-12 w-12' />
+        <div className="flex justify-center items-center h-20 w-20">
+          <CheckCircleIcon className="h-12 w-12" />
         </div>
       ) : (
         <LoadingCircle />
       )}
-      <span className='text-2xl font-semibold text-center align-middle'>
+      <span className="text-2xl font-semibold text-center align-middle">
         {tag}
       </span>
     </div>
@@ -31,19 +31,19 @@ const BookPurchasingStatusTag = ({ status, tag }) => {
 
 const BookPurchasingStatus = ({ statusCode }) => {
   return (
-    <section className='flex justify-center fixed z-10 w-screen h-screen '>
-      <div className='flex flex-col justify-center items-start'>
+    <section className="flex justify-center fixed z-10 w-screen h-screen ">
+      <div className="flex flex-col justify-center items-start">
         <BookPurchasingStatusTag
           status={statusCode >= 1}
-          tag='sending transaction request'
+          tag="Sending transaction request"
         />
         <BookPurchasingStatusTag
           status={statusCode >= 2}
-          tag='awaiting payment success'
+          tag="Awaiting payment success"
         />
         <BookPurchasingStatusTag
           status={statusCode >= 3}
-          tag='awaiting transaction success'
+          tag="Awaiting transaction success"
         />
       </div>
     </section>
@@ -94,76 +94,78 @@ const BookPreview = (props: Props) => {
         <BookPurchasingStatus statusCode={progressStatus} />
       )}
       <div
-        className={`${validPurchaseAttempt && 'filter blur-xl bg-gray-100'}`}>
+        className={`${validPurchaseAttempt && "filter blur-xl bg-gray-100"}`}
+      >
         {bookPreviewData && (
-          <section className='w-screen h-screen py-28 px-40'>
-            <p className='flex justify-center absolute right-20 top-10 cursor-pointer'>
+          <section className="w-screen h-screen py-28 px-40">
+            <p className="flex justify-center absolute right-20 top-10 cursor-pointer">
               <ArrowNarrowLeftIcon
-                className='w-6 h-6'
+                className="w-6 h-6"
                 onClick={() => {
                   setLoading(true);
                   router.back();
                 }}
               />
             </p>
-            <div className='flex flex-row w-full h-full justify-center space-x-32'>
-              <div className='w-3/5 h-full bg-purple-100 rounded-lg'>
+            <div className="flex flex-row w-full h-full justify-center space-x-32">
+              <div className="w-3/5 h-full rounded-lg shadow-lg">
                 <PreviewBookCoverPage src={bookPreviewData.ebook_cover_image} />
               </div>
-              <div className='flex flex-col w-full h-full justify-center space-y-10'>
-                <div className='flex flex-col'>
-                  <h1 className='text-4xl font-bold text-center italic py-3'>
+              <div className="flex flex-col w-full h-full justify-center space-y-10">
+                <div className="flex flex-col">
+                  <h1 className="text-4xl font-bold text-center italic py-3">
                     {bookPreviewData.title}
                   </h1>
-                  <span className='text-xl font-semibold italic text-center w-full py-2'>
-                    {bookPreviewData.author || 'Unkown'}
+                  <span className="text-xl font-semibold italic text-center w-full py-2">
+                    {bookPreviewData.author || "Unkown"}
                   </span>
                 </div>
-                <div className='h-1/4 overflow-scroll'>
-                  <p className='italic text-justify'>
+                <div className="h-1/4 overflow-scroll">
+                  <p className="italic text-justify">
                     {bookPreviewData.description}
                   </p>
                 </div>
-                <div className='grid grid-cols-3 grid-rows-1 gap-5'>
-                  <div className='bg-green-50 rounded-lg flex flex-col p-5 space-y-1'>
-                    <span className='font-semibold'>Author's Price</span>
-                    <span className='text-3xl font-semibold'>
-                      <span className='text-xl font-bold align-top pr-1'>
-                        ₹
+                <div className="grid grid-cols-3 grid-rows-1 gap-5">
+                  <div className="bg-green-50 rounded-lg flex flex-col p-5 space-y-1">
+                    <span className="font-semibold">Author's Price</span>
+                    <span className="text-3xl font-semibold">
+                      <span className="text-xs font-bold align-top pr-1">
+                        MATIC
                       </span>
                       {bookPreviewData.launch_price}
                     </span>
-                    <div className='flex-1 flex flex-col justify-end pt-12'>
+                    <div className="flex-1 flex flex-col justify-end pt-12">
                       <button
-                        className='w-full btn btn-accent btn-sm'
+                        className="w-full btn btn-accent btn-sm"
                         onClick={async () => {
                           setValidPurchaseAttempt(true);
-                          console.log('purchasing');
+                          console.log("purchasing");
                           await purchaseFirstHand(
                             bookPreviewData.book_id,
                             bookPreviewData.launch_price,
                             signer.signer,
-                            setProgressStatusCB,
+                            setProgressStatusCB
                           );
                           setTimeout(() => {
                             router.push(`/OpenShelf`);
                           }, 500);
-                        }}>
+                        }}
+                      >
                         Buy
                       </button>
                     </div>
                   </div>
-                  <div className='bg-purple-50 rounded-lg flex flex-col p-5 space-y-1'>
-                    <span className='font-semibold'>Exchange Price</span>
-                    <span className='text-3xl font-semibold'>
-                      <span className='text-xl font-bold align-top pr-1'>
-                        ₹
+                  <div className="bg-purple-50 rounded-lg flex flex-col p-5 space-y-1">
+                    <span className="font-semibold">Exchange Price</span>
+                    <span className="text-3xl font-semibold">
+                      <span className="text-xs font-bold align-top pr-1">
+                        MATIC
                       </span>
                       {bookPreviewData.launch_price}
                     </span>
-                    <div className='flex-1 flex flex-col justify-end pt-12'>
+                    <div className="flex-1 flex flex-col justify-end pt-12">
                       <button
-                        className='w-full btn btn-primary btn-sm'
+                        className="w-full btn btn-primary btn-sm"
                         onClick={() => {
                           router.push(
                             {
@@ -173,26 +175,27 @@ const BookPreview = (props: Props) => {
                                 data: JSON.stringify(bookPreviewData),
                               },
                             },
-                            `/OpenShelf`,
+                            `/OpenShelf`
                           );
-                        }}>
+                        }}
+                      >
                         Buy
                       </button>
                     </div>
                   </div>
-                  <div className='bg-yellow-50 rounded-lg flex flex-col p-5 space-y-1'>
-                    <span className='font-semibold'>Rent Rate</span>
-                    <span className='text-3xl font-semibold'>
-                      <span className='text-xl font-bold align-top pr-1'>
-                        ₹
+                  <div className="bg-yellow-50 rounded-lg flex flex-col p-5 space-y-1">
+                    <span className="font-semibold">Rent Rate</span>
+                    <span className="text-3xl font-semibold">
+                      <span className="text-xs font-bold align-top pr-1">
+                        MATIC
                       </span>
                       31.00
-                      <span className='text-base align-bottom pl-1'>
+                      <span className="text-base align-bottom pl-1">
                         / per month
                       </span>
                     </span>
-                    <div className='flex-1 flex flex-col justify-end pt-12'>
-                      <button className='w-full btn btn-warning btn-sm'>
+                    <div className="flex-1 flex flex-col justify-end pt-12">
+                      <button className="w-full btn btn-warning btn-sm">
                         Buy
                       </button>
                     </div>
