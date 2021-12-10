@@ -17,6 +17,7 @@ module.exports = {
       backgroundColor: ['active'],
       scale: ['group-hover'],
       animation: ['group-hover'],
+      fontWeight: ['hover'],
     },
     translate: ({ after }) => after(['group-hover']),
   },
