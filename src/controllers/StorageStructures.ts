@@ -32,14 +32,14 @@ export async function getBooksInMyShelf(reader) {
   const booksInShelf = response.map((_book) => {
     const bookInShelf = {
       bookID: Number(_book.bookID),
-      metadataURI: _book.metadataURI,
+      metadataURI: `https://${_book.metadataURI}.ipfs.dweb.link`,
       eBookID: Number(_book.eBookID),
       owner: _book.owner,
       price: ethers.utils.formatUnits(_book.price, 'ether'),
       status: _book.status,
     };
     return bookInShelf;
-  });
+  });  
   return booksInShelf;
 }
 
