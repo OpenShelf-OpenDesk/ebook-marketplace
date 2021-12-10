@@ -101,6 +101,7 @@ const NewBook = (props: Props) => {
       const newBook: eBook = {
         title: e.target.title.value,
         description: e.target.description.value,
+        authorAddress: signer.address,
         launch_price: e.target.launch_price.value,
         currency: "MATIC",
         supply_limit_bool: supplyLimitBool,
@@ -173,6 +174,7 @@ const NewBook = (props: Props) => {
                     src={`/undraw_add_document_re_mbjx.svg`}
                     layout="fill"
                     className="scale-95 transition duration-500 ease-in-out transform group-hover:-translate-y-1 group-hover:scale-105"
+                    priority={true}
                   />
                 </div>
                 {!invalidSubmitAttempt && !selectedBookFile && (

@@ -1,8 +1,8 @@
-import { ethers } from 'ethers';
-import eBookMarketLaunch from '../../artifacts/contracts/eBookMarketLaunch.sol/eBookMarketLaunch.json';
-import contract_address from '../../contract_address.json';
-import { NFTStorage, Blob } from 'nft.storage';
-import { pdfjs } from 'react-pdf';
+import { ethers } from "ethers";
+import eBookMarketLaunch from "../../artifacts/contracts/eBookMarketLaunch.sol/eBookMarketLaunch.json";
+import contract_address from "../../contract_address.json";
+import { NFTStorage, Blob } from "nft.storage";
+import { pdfjs } from "react-pdf";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -10,6 +10,7 @@ export interface eBook {
   book_id?: number;
   title: string;
   author?: string;
+  authorAddress: string;
   description: string;
   launch_price: number;
   currency?: string;
@@ -35,10 +36,10 @@ const readFileData = (file) => {
 async function extractCoverImage(file) {
   const data = await readFileData(file);
   const pdf = await pdfjs.getDocument(data).promise;
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   const page = await pdf.getPage(1);
   const viewport = page.getViewport({ scale: 1 });
-  const context = canvas.getContext('2d');
+  const context = canvas.getContext("2d");
   canvas.height = viewport.height;
   canvas.width = viewport.width;
   await page.render({ canvasContext: context, viewport: viewport }).promise;
@@ -61,7 +62,7 @@ async function uploadBookMetadata(eBook: eBook) {
     token: process.env.NEXT_PUBLIC_NFT_STORAGE_API_KEY,
   });
   const metadata_cid = await client.storeBlob(
-    new Blob([JSON.stringify(eBook)]),
+    new Blob([JSON.stringify(eBook)])
   );
   console.log(`Uploaded metadata...`);
   return metadata_cid;
@@ -71,13 +72,13 @@ export async function publish(eBook: eBook, author, cb) {
   const eBookMarketLaunchContractAddress = contract_address.eBookMarketLaunch;
 
   const provider = new ethers.providers.JsonRpcProvider(
-    `http://localhost:7545/`,
+    `http://localhost:7545/`
   );
 
   const contract_temp = new ethers.Contract(
     eBookMarketLaunchContractAddress,
     eBookMarketLaunch.abi,
-    provider,
+    provider
   );
 
   const bookID = await contract_temp.getNextBookID();
@@ -85,7 +86,7 @@ export async function publish(eBook: eBook, author, cb) {
   const contract = new ethers.Contract(
     eBookMarketLaunchContractAddress,
     eBookMarketLaunch.abi,
-    author,
+    author
   );
 
   const { ebook_file, ...metadata } = eBook;
@@ -103,8 +104,8 @@ export async function publish(eBook: eBook, author, cb) {
     const transaction = await contract.publish(
       eBookURI,
       metadataURI,
-      ethers.utils.parseUnits(metadata.launch_price.toString(), 'ether'),
-      metadata.supply_limit,
+      ethers.utils.parseUnits(metadata.launch_price.toString(), "ether"),
+      metadata.supply_limit
     );
     const transactionStatus = await transaction.wait();
     console.log(transactionStatus.events[0]);
@@ -120,12 +121,12 @@ export async function purchaseFirstHand(bookID, price, reader, cb) {
   const contract = new ethers.Contract(
     eBookMarketLaunchContractAddress,
     eBookMarketLaunch.abi,
-    reader,
+    reader
   );
   try {
     cb(1);
     const transaction = await contract.purchaseFirstHand(bookID, {
-      value: ethers.utils.parseUnits(price.toString(), 'ether'),
+      value: ethers.utils.parseUnits(price.toString(), "ether"),
     });
     cb(2);
     const transactionStatus = await transaction.wait();
