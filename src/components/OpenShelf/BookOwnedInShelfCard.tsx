@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { eBook } from "../../controllers/eBookMarketLaunch";
-import PreviewBookCoverPage from "../../components/common/PreviewBookCoverPage";
+import PreviewBookCoverPage from "../common/PreviewBookCoverPage";
 import LoadingCircle from "../common/LoadingCircle";
 import { useRouter } from "next/router";
 interface Props {
   bookMetadataURI: string;
 }
 
-const BookInShelfCard = ({ bookMetadataURI }: Props) => {
+const BookOwnedInShelfCard = ({ bookMetadataURI }: Props) => {
   const router = useRouter();
   const [bookMetadata, setBookMetadata] = useState<eBook | undefined>();
   useEffect(() => {
@@ -21,17 +21,15 @@ const BookInShelfCard = ({ bookMetadataURI }: Props) => {
     });
   }, []);
   return bookMetadata ? (
-    <div className="group h-80 w-full border border-gray-300 flex flex-row space-x-5 pr-4 overflow-hidden bg-white">
-      <div className="flex-1 h-full">
+    <div className="group h-80 w-full border border-gray-300 flex flex-row space-x-5 pr-5 overflow-hidden bg-white rounded-lg">
+      <div className="flex-1 h-full w-full shadow-lg transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110">
         <PreviewBookCoverPage
           src={bookMetadata.ebook_cover_image}
           height={320}
         />
       </div>
       <div className="flex-1 h-full w-full flex flex-col justify-center items-center py-5">
-        <p className="text-center text-sm">
-          {bookMetadata.description.slice(0, 325)}...
-        </p>
+        <p className="text-sm">{bookMetadata.description.slice(0, 325)}...</p>
         <div className="flex flex-col w-full h-full pt-4 justify-end">
           <div className="flex justify-between">
             <button
@@ -79,4 +77,4 @@ const BookInShelfCard = ({ bookMetadataURI }: Props) => {
   );
 };
 
-export default BookInShelfCard;
+export default BookOwnedInShelfCard;
