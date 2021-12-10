@@ -34,7 +34,7 @@ const BookReader = () => {
 
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 3000);
   }, [bookID]);
 
   return (
@@ -57,7 +57,13 @@ const BookReader = () => {
         />
       </p>
       {loading && <Loading />}
-      <PreviewBook url={`https://${bookURI}.ipfs.dweb.link`} />
+      <div className="w-full bg-gray-50 flex justify-center">
+        <PreviewBook
+          url={`https://${bookURI}.ipfs.dweb.link`}
+          width={700}
+          height={500}
+        />
+      </div>
     </div>
   );
 };
