@@ -10,6 +10,7 @@ import { ethers } from "ethers";
 import { eBook } from "../src/controllers/eBookMarketLaunch";
 import Loading from "../src/components/common/Loading";
 import { initializeSF } from "../src/controllers/Superfluid";
+import { useRouter } from "next/router";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [signer, setSigner] = useState<
@@ -22,6 +23,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   const [previewBook, setPreviewBook] = useState<eBook | undefined>();
   const [loading, setLoading] = useState<boolean>(true);
+  const router = useRouter();
 
   useEffect(() => {
     const providerEventsCB = async (_signer, _address) => {
@@ -35,9 +37,10 @@ function MyApp({ Component, pageProps }: AppProps) {
       if (_signer) {
         const _address = await _signer.getAddress();
         setSigner({ address: _address, signer: _signer });
-        initializeSF().then((_sf) => {
-          console.log(_sf);
-        });
+        window &&
+          initializeSF().then((_sf) => {
+            console.log(_sf);
+          });
       }
     });
   }, []);
