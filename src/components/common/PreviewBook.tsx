@@ -20,16 +20,32 @@ const PreviewBook = ({ url, height, width, page }: Props) => {
   if (height && width) {
     return (
       <div>
-        <Document file={url}>
-          <Page pageNumber={page} height={height} width={width} />
+        <Document file={url} onLoadSuccess={onDocumentLoadSuccess} loading={""}>
+          {Array.from(new Array(numPages), (el, index) => (
+            <Page
+              pageNumber={index + 1}
+              key={index}
+              width={width}
+              height={height}
+              loading={""}
+            />
+          ))}
         </Document>
       </div>
     );
   } else if (height) {
     return (
       <div>
-        <Document file={url}>
-          <Page pageNumber={page} height={320} />
+        <Document file={url} onLoadSuccess={onDocumentLoadSuccess} loading={""}>
+          {Array.from(new Array(numPages), (el, index) => (
+            <Page
+              pageNumber={index + 1}
+              key={index}
+              width={550}
+              height={height}
+              loading={""}
+            />
+          ))}
         </Document>
       </div>
     );
