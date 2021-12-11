@@ -7,89 +7,89 @@ import "./StorageStructures.sol";
 
 contract eBookMarketLaunch is ReentrancyGuard {
     using Counters for Counters.Counter;
-    Counters.Counter private bookIDs;
-    StorageStructures private ss;
+    Counters.Counter private _bookIDs;
+    StorageStructures private _ss;
 
-    constructor(address _StorageContractAddress) {
-        ss = StorageStructures(_StorageContractAddress);
+    constructor(address StorageContractAddress) {
+        _ss = StorageStructures(StorageContractAddress);
     }
 
-    error BookAlreadyInShelf(uint256 _bookID, address buyer);
-    error InvalidBookId(uint256 _bookID);
+    error BookAlreadyInShelf(uint256 bookID, address buyer);
+    error InvalidBookId(uint256 bookID);
 
-    modifier newInShelf(uint256 _bookID) {
-        StorageStructures.eBook[] memory _readersShelf = ss.getReadersShelf(
+    modifier newInShelf(uint256 bookID) {
+        StorageStructures.eBook[] memory readersShelf = _ss.getReadersShelf(
             msg.sender
         );
-        for (uint256 i = 0; i < _readersShelf.length; i++) {
-            if (_bookID == _readersShelf[i].bookID) {
-                revert BookAlreadyInShelf(_bookID, msg.sender);
+        for (uint256 i = 0; i < readersShelf.length; i++) {
+            if (bookID == readersShelf[i].bookID) {
+                revert BookAlreadyInShelf(bookID, msg.sender);
             }
         }
         _;
     }
 
-    modifier bookExists(uint256 _bookId) {
-        if (_bookId > bookIDs.current()) {
-            revert InvalidBookId(_bookId);
+    modifier bookExists(uint256 bookID) {
+        if (bookID > _bookIDs.current()) {
+            revert InvalidBookId(bookID);
         }
         _;
     }
 
     function publish(
-        string memory _eBookURI,
-        string memory _metadataURI,
-        uint256 _price,
-        int256 _pricedBooksSupplyLimit
+        string memory eBookURI,
+        string memory metadataURI,
+        uint256 price,
+        int256 pricedBooksSupplyLimit
     ) public nonReentrant {
-        bookIDs.increment();
+        _bookIDs.increment();
 
         eBookPublisher neweBookPublisher = new eBookPublisher(
-            bookIDs.current(),
+            _bookIDs.current(),
             msg.sender,
-            _price,
-            _eBookURI,
-            _pricedBooksSupplyLimit
+            price,
+            eBookURI,
+            pricedBooksSupplyLimit
         );
-        ss.addBook(
+        _ss.addBook(
             StorageStructures.Book({
                 author: msg.sender,
-                metadataURI: _metadataURI,
-                price: _price,
+                metadataURI: metadataURI,
+                price: price,
                 publisherAddress: address(neweBookPublisher)
             })
         );
-        ss.addToDesk(msg.sender, bookIDs.current());
+        _ss.addToDesk(msg.sender, _bookIDs.current());
     }
 
-    function purchaseFirstHand(uint256 _bookID)
+    function purchaseFirstHand(uint256 bookID)
         public
         payable
         nonReentrant
-        bookExists(_bookID)
-        newInShelf(_bookID)
+        bookExists(bookID)
+        newInShelf(bookID)
     {
-        StorageStructures.Book memory _book = ss.getBook(_bookID);
-        require(msg.sender!=_book.author, "Author can't buy own book!!");
-        require(msg.value >= _book.price, "Insufficient funds!!");
-        payable(_book.author).transfer(_book.price);
-        eBookPublisher _publisher = eBookPublisher(_book.publisherAddress);
-        uint256 _eBookID = _publisher.printPaidVersion(msg.sender);
-        ss.addToShelf(
+        StorageStructures.Book memory book = _ss.getBook(bookID);
+        require(msg.sender != book.author, "Author can't buy own book!!");
+        require(msg.value >= book.price, "Insufficient funds!!");
+        payable(book.author).transfer(book.price);
+        eBookPublisher publisher = eBookPublisher(book.publisherAddress);
+        uint256 _eBookID = publisher.printPaidVersion(msg.sender);
+        _ss.addToShelf(
             msg.sender,
             StorageStructures.eBook({
-                bookID: _bookID,
+                bookID: bookID,
                 eBookID: _eBookID,
-                metadataURI: _book.metadataURI,
-                price: _book.price,
+                metadataURI: book.metadataURI,
+                price: book.price,
                 owner: msg.sender,
                 status: StorageStructures.eBookStatus.OWNED
             })
         );
-        payable(msg.sender).transfer(msg.value - _book.price);
+        payable(msg.sender).transfer(msg.value - book.price);
     }
-    
-    function getNextBookID() public view returns(uint256) {
-        return bookIDs.current()+1;
+
+    function getNextBookID() public view returns (uint256) {
+        return _bookIDs.current() + 1;
     }
 }
