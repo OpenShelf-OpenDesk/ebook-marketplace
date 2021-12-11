@@ -5,7 +5,7 @@ import { getPublisherAddress } from "../controllers/StorageStructures";
 const SIGNING_DOMAIN_NAME = "EBook-Voucher";
 const SIGNING_DOMAIN_VERSION = "1";
 
-class LazyMinter {
+export class eBookVoucherGenerator {
   _contract;
   _signer;
   _domain;
@@ -38,11 +38,7 @@ class LazyMinter {
     };
   }
 
-  /**
-   * @private
-   * @returns {object} the EIP-721 signing domain, tied to the chainId of the signer
-   */
-  async _signingDomain() {
+  private async _signingDomain() {
     if (this._domain != null) {
       return this._domain;
     }
@@ -56,7 +52,3 @@ class LazyMinter {
     return this._domain;
   }
 }
-
-module.exports = {
-  LazyMinter,
-};
