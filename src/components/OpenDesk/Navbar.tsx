@@ -27,6 +27,7 @@ const Navbar = (props: Props) => {
   const [signerAddress, setSignerAddress] = useState<string>(
     "0x0000000000000000000000000000000000000000"
   );
+  const [copy, setCopy] = useState<boolean>(false);
   const { setLoading } = useLoadingContext();
   const [navbarState, dispatch] = useReducer(navbarReducer, {
     search: false,
@@ -93,9 +94,22 @@ const Navbar = (props: Props) => {
           </div>
         </div>
         <div
-          className="flex-1 ml-5text-left tooltip tooltip-bottom"
-          data-tip="Copy to Clipboard"
-          onClick={() => navigator.clipboard.writeText(signerAddress)}
+          className={`flex-1 ml-5 text-left ${
+            copy
+              ? "tooltip tooltip-success tooltip-bottom"
+              : "tooltip tooltip-bottom"
+          }`}
+          data-tip={copy ? "Copied" : "Copy to Clipboard"}
+          onClick={() => {
+            navigator.clipboard.writeText(signerAddress).then(() => {
+              setCopy(true);
+            });
+          }}
+          onMouseLeave={() => {
+            setTimeout(() => {
+              setCopy(false);
+            }, 200);
+          }}
         >
           <div className="flex flex-col truncate">
             <p className="text-sm font-semibold">Personal Wallet</p>

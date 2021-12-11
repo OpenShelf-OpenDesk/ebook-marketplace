@@ -6,7 +6,7 @@ module.exports = {
       url: 'HTTP://127.0.0.1:7545',
       accounts: {
         mnemonic:
-          'amount equip close excuse animal loyal extend diesel govern allow clock note',
+          'broccoli game flavor spin dove off novel rural river battle able hip',
         path: "m/44'/60'/0'/0",
         initialIndex: 0,
         count: 10,

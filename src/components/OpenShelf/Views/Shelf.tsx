@@ -1,11 +1,13 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { useLoadingContext } from '../../../context/Loading';
-import { useSignerContext } from '../../../context/Signer';
-import { getBooksInMyShelf } from '../../../controllers/StorageStructures';
-import Layout from '../../common/Layout';
-import BookInShelfCard from '../BookInShelfCard';
-import Navbar from '../Navbar';
-import Sidebar from '../Sidebar';
+import { log } from "console";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useLoadingContext } from "../../../context/Loading";
+import { useSignerContext } from "../../../context/Signer";
+import { getBooksInMyShelf } from "../../../controllers/StorageStructures";
+import Layout from "../../common/Layout";
+import BookOwnedInShelfCard from "../BookOwnedInShelfCard";
+import Navbar from "../Navbar";
+import Image from "next/image";
+import Sidebar from "../Sidebar";
 
 interface Props {
   selected: 1 | 2 | 3;
@@ -15,46 +17,139 @@ interface Props {
 const Shelf = ({ selected, setSelected }: Props) => {
   const { setLoading } = useLoadingContext();
   const { signer } = useSignerContext();
-  const [booksInShelf, setBooksInShelf] = useState<any>();
+  const [tabSelected, setTabSelected] = useState<number>(1);
+  const [booksOwnedInShelf, setBooksOwnedInShelf] = useState<any>([]);
+  const [booksRentedInShelf, setBooksRentedInShelf] = useState<any>([]);
+  const [studentBooksCopyInShelf, setStudentBooksCopyInShelf] = useState<any>(
+    []
+  );
+
   useEffect(() => {
-    // const fetchBook = async (book_uri) => {
-    //   const response = await fetch(`https://${book_uri}.ipfs.dweb.link`);
-    //   const file = await response.blob();
-    //   console.log(file);
-    //   return file;
-    // };
-    getBooksInMyShelf(signer.address).then((_booksInShelf) => {
-      Promise.all(
+    setBooksOwnedInShelf([]);
+    getBooksInMyShelf(signer.address)
+      .then((_booksInShelf) => {
         _booksInShelf.map((_book) => {
-          // return fetchBook(_book.bookURI);
-          return `https://${_book.metadataURI}.ipfs.dweb.link`;
-        }),
-      ).then((_fetchedBooks) => {
-        setBooksInShelf(_fetchedBooks);
+          if (_book.status == 0) {
+            setBooksOwnedInShelf((state) => {
+              return [...state, _book];
+            });
+          } else if (_book.status == 1) {
+            setBooksRentedInShelf((state) => {
+              return [...state, _book];
+            });
+          } else if (_book.status == 2) {
+            setStudentBooksCopyInShelf((state) => {
+              return [...state, _book];
+            });
+          }
+        });
+      })
+      .then(() => {
         setTimeout(() => {
           setLoading(false);
         }, 1000);
       });
-    });
     return () => {
       setLoading(true);
     };
-  }, []);
+  }, [signer]);
   return (
     <Layout
       Navbar={Navbar}
       Sidebar={Sidebar}
       selected={selected}
-      setSelected={setSelected}>
-      <section className='rounded-t-xl overflow-hidden h-full w-full'>
-        <div className='grid grid-cols-3 gap-x-8 gap-y-12 p-5 bg-yellow-900'>
-          {booksInShelf &&
-            booksInShelf.map((_bookInShelf, index) => {
+      setSelected={setSelected}
+    >
+      <section className="rounded-t-xl  h-full w-full">
+        <div className="w-full mt-7 flex flex-row rounded-t-xl">
+          <div
+            className={`w-2/6 py-3 text-center cursor-pointer ${
+              tabSelected == 1
+                ? `font-bold bg-purple-100 rounded-tl-xl border-t-2 border-l-2 border-r-2 border-primary`
+                : `hover:font-semibold hover:bg-gray-50 rounded-tl-xl border-b-2 border-primary`
+            }`}
+            onClick={() => {
+              setTabSelected(1);
+            }}
+          >
+            Owned
+          </div>
+          <div
+            className={`w-2/6 py-3 text-center cursor-pointer ${
+              tabSelected == 2
+                ? `font-bold bg-purple-100 rounded-t-xl border-t-2 border-l-2 border-r-2 border-primary`
+                : `hover:font-semibold hover:bg-gray-50 border-b-2 border-primary`
+            }`}
+            onClick={() => {
+              setTabSelected(2);
+            }}
+          >
+            Rented
+          </div>
+          <div
+            className={`w-2/6 py-3 text-center cursor-pointer ${
+              tabSelected == 3
+                ? `font-bold bg-purple-100 rounded-tr-xl border-t-2 border-l-2 border-r-2 border-primary`
+                : `hover:font-semibold hover:bg-gray-50 rounded-tr-xl border-b-2 border-primary`
+            }`}
+            onClick={() => {
+              setTabSelected(3);
+            }}
+          >
+            Student Copy
+          </div>
+        </div>
+        {booksOwnedInShelf.length > 0 && tabSelected == 1 ? (
+          <div className="grid grid-cols-3 gap-x-7 gap-y-7 p-7 h-5/6 bg-purple-100 border-l-2 border-r-2 border-primary">
+            {booksOwnedInShelf.map((_bookInShelf, index) => {
               return (
-                <BookInShelfCard bookMetadataURI={_bookInShelf} key={index} />
+                <BookOwnedInShelfCard
+                  bookMetadataURI={_bookInShelf.metadataURI}
+                  key={index}
+                />
               );
             })}
-        </div>
+          </div>
+        ) : booksRentedInShelf.length > 0 && tabSelected == 2 ? (
+          <div className="grid grid-cols-3 gap-x-7 gap-y-11 p-7 h-5/6 bg-purple-100">
+            {/* {booksOwnedInShelf.map((_bookInShelf, index) => {
+              return (
+                <BookInShelfCardOwned
+                  bookMetadataURI={_bookInShelf.metadataURI}
+                  key={index}
+                />
+              );
+            })} */}
+            List of Rented Books of Reader !!
+          </div>
+        ) : studentBooksCopyInShelf.length > 0 && tabSelected == 3 ? (
+          <div className="grid grid-cols-3 gap-x-7 gap-y-11 p-7 h-5/6 bg-purple-100">
+            {/* {booksOwnedInShelf.map((_bookInShelf, index) => {
+              return (
+                <BookInShelfCardOwned
+                  bookMetadataURI={_bookInShelf.metadataURI}
+                  key={index}
+                />
+              );
+            })} */}
+            List of Student Copy Books of Reader !!
+          </div>
+        ) : (
+          <div className="w-full h-5/6 flex flex-col justify-center items-center bg-purple-100 border-l-2 border-r-2 border-primary">
+            <Image
+              src="/undraw_no_data_re_kwbl.svg"
+              width={300 * 2}
+              height={200 * 2}
+              layout="fixed"
+              className="transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-90 h-full"
+            />
+            <div className="p-10">
+              <p className="font-semibold text-2xl text-gray-700">
+                Shelf is Empty !
+              </p>
+            </div>
+          </div>
+        )}
       </section>
     </Layout>
   );
