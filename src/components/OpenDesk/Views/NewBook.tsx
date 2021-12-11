@@ -123,7 +123,7 @@ const NewBook = (props: Props) => {
         <BookPublishingStatus statusCode={progressStatus} />
       )}
       <div className={`${validSubmitAttempt && "filter blur-xl bg-gray-100"}`}>
-        <section className="w-screen h-screen px-60 py-28">
+        <section className="w-screen h-screen px-60 py-8">
           <p className="flex justify-center absolute right-20 top-10 cursor-pointer">
             <ArrowNarrowLeftIcon
               className="w-6 h-6"
@@ -138,8 +138,8 @@ const NewBook = (props: Props) => {
             onSubmit={handleSubmit}
           >
             {selectedBookFile ? (
-              <div className="h-full w-full flex flex-col space-y-5">
-                <div className="max-h-full w-full overflow-scroll shadow-md">
+              <div className="h-full w-full flex flex-col space-y-3">
+                <div className="max-h-full w-full overflow-scroll shadow-md flex justify-center">
                   <PreviewBook url={selectedBookLocalURL} />
                 </div>
                 <div
@@ -156,7 +156,7 @@ const NewBook = (props: Props) => {
                 </div>
               </div>
             ) : (
-              <label className="h-full w-full flex flex-col justify-center space-y-5">
+              <label className="h-full w-full flex flex-col justify-center space-y-3">
                 <input
                   name="ebook_file"
                   type="file"
