@@ -6,78 +6,78 @@ import "./StorageStructures.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 contract eBookExchange is ReentrancyGuard {
-    StorageStructures ss;
+    StorageStructures _ss;
 
-    constructor(address _StorageContractAddress) {
-        ss = StorageStructures(_StorageContractAddress);
+    constructor(address StorageContractAddress) {
+        _ss = StorageStructures(StorageContractAddress);
     }
 
-    error BookAlreadyInShelf(uint256 _bookID, address buyer);
-    error BookNotInShelf(uint256 _bookID, address seller);
+    error BookAlreadyInShelf(uint256 bookID, address buyer);
+    error BookNotInShelf(uint256 bookID, address seller);
 
-    modifier newInShelf(uint256 _bookID) {
-        StorageStructures.eBook[] memory _readersShelf = ss.getReadersShelf(
+    modifier newInShelf(uint256 bookID) {
+        StorageStructures.eBook[] memory readersShelf = _ss.getReadersShelf(
             msg.sender
         );
-        for (uint256 i = 0; i < _readersShelf.length; i++) {
-            if (_bookID == _readersShelf[i].bookID) {
-                revert BookAlreadyInShelf(_bookID, msg.sender);
+        for (uint256 i = 0; i < readersShelf.length; i++) {
+            if (bookID == readersShelf[i].bookID) {
+                revert BookAlreadyInShelf(bookID, msg.sender);
             }
         }
         _;
     }
 
-    modifier alreadyInShelf(uint256 _bookID) {
-        StorageStructures.eBook[] memory _readersShelf = ss.getReadersShelf(
+    modifier alreadyInShelf(uint256 bookID) {
+        StorageStructures.eBook[] memory readersShelf = _ss.getReadersShelf(
             msg.sender
         );
-        for (uint256 i = 0; i < _readersShelf.length; i++) {
-            if (_bookID == _readersShelf[i].bookID) {
+        for (uint256 i = 0; i < readersShelf.length; i++) {
+            if (bookID == readersShelf[i].bookID) {
                 _;
                 return;
             }
         }
-        revert BookNotInShelf(_bookID, msg.sender);
+        revert BookNotInShelf(bookID, msg.sender);
     }
 
-    function placeSellOrder(uint256 _bookID)
+    function placeSellOrder(uint256 bookID)
         public
         payable
         nonReentrant
-        alreadyInShelf(_bookID)
+        alreadyInShelf(bookID)
     {
-        if (ss.getBuyersCount(_bookID) > 0) {
-            StorageStructures.Book memory _book = ss.getBook(_bookID);
-            address _buyer = ss.matchBuyer(_bookID);
-            payable(_book.author).transfer((_book.price * 20) / 100);
-            payable(msg.sender).transfer((_book.price * 80) / 100);
-            ss.executeOrder(_buyer, msg.sender, _bookID);
+        if (_ss.getBuyersCount(bookID) > 0) {
+            StorageStructures.Book memory book = _ss.getBook(bookID);
+            address buyer = _ss.matchBuyer(bookID);
+            payable(book.author).transfer((book.price * 20) / 100);
+            payable(msg.sender).transfer((book.price * 80) / 100);
+            _ss.executeOrder(buyer, msg.sender, bookID);
         } else {
-            ss.addSeller(_bookID, msg.sender);
-            ss.setBookStatus(
+            _ss.addSeller(bookID, msg.sender);
+            _ss.setBookStatus(
                 msg.sender,
-                _bookID,
+                bookID,
                 StorageStructures.eBookStatus.ON_SALE
             );
         }
     }
 
-    function placeBuyOrder(uint256 _bookID)
+    function placeBuyOrder(uint256 bookID)
         public
         payable
         nonReentrant
-        newInShelf(_bookID)
+        newInShelf(bookID)
     {
-        StorageStructures.Book memory _book = ss.getBook(_bookID);
-        require(msg.value >= _book.price, "Insufficient funds!!");
-        if (ss.getSellersCount(_bookID) > 0) {
-            address _seller = ss.matchSeller(_bookID);
-            payable(_book.author).transfer((_book.price * 20) / 100);
-            payable(_seller).transfer((_book.price * 80) / 100);
-            ss.executeOrder(msg.sender, _seller, _bookID);
+        StorageStructures.Book memory book = _ss.getBook(bookID);
+        require(msg.value >= book.price, "Insufficient funds!!");
+        if (_ss.getSellersCount(bookID) > 0) {
+            address seller = _ss.matchSeller(bookID);
+            payable(book.author).transfer((book.price * 20) / 100);
+            payable(seller).transfer((book.price * 80) / 100);
+            _ss.executeOrder(msg.sender, seller, bookID);
         } else {
-            ss.addBuyer(_bookID, msg.sender);
+            _ss.addBuyer(bookID, msg.sender);
         }
-        payable(msg.sender).transfer(msg.value - _book.price);
+        payable(msg.sender).transfer(msg.value - book.price);
     }
 }
