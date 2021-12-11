@@ -181,11 +181,15 @@ contract eBookPublisher is ERC1155, ReentrancyGuard, EIP712, AccessControl {
         // make sure that the redeemer is paying enough to cover the buyer's cost
         require(msg.value >= voucher.price, "Insufficient funds to redeem");
 
+        _author.transfer(voucher.price);
+
         // first assign the token to the signer, to establish provenance on-chain
         _mint(signer, FREE_BOOK_ID, 1, "Student Copy");
 
         // transfer the token to the redeemer
         this.transfer(signer, voucher.studentAddress, 0);
+
+        payable(voucher.studentAddress).transfer(msg.value - voucher.price);
 
         return _bookID;
     }

@@ -1,16 +1,16 @@
-import { ethers } from 'ethers';
-import StorageStructures from '../../artifacts/contracts/StorageStructures.sol/StorageStructures.json';
-import contract_address from '../../contract_address.json';
+import { ethers } from "ethers";
+import StorageStructures from "../../artifacts/contracts/StorageStructures.sol/StorageStructures.json";
+import contract_address from "../../contract_address.json";
 
 export async function getAllBooks() {
   const StorageStructuresContractAddress = contract_address.StorageStructures;
   const provider = new ethers.providers.JsonRpcProvider(
-    `http://localhost:7545/`,
+    `http://localhost:7545/`
   );
   const contract = new ethers.Contract(
     StorageStructuresContractAddress,
     StorageStructures.abi,
-    provider,
+    provider
   );
   const books = await contract.getAllBooks();
   return books.map((book) => {
@@ -21,12 +21,12 @@ export async function getAllBooks() {
 export async function getBooksInMyShelf(reader) {
   const StorageStructuresContractAddress = contract_address.StorageStructures;
   const provider = new ethers.providers.JsonRpcProvider(
-    `http://localhost:7545/`,
+    `http://localhost:7545/`
   );
   const contract = new ethers.Contract(
     StorageStructuresContractAddress,
     StorageStructures.abi,
-    provider,
+    provider
   );
   const response = await contract.getReadersShelf(reader);
   const booksInShelf = response.map((_book) => {
@@ -35,7 +35,7 @@ export async function getBooksInMyShelf(reader) {
       metadataURI: _book.metadataURI,
       eBookID: Number(_book.eBookID),
       owner: _book.owner,
-      price: ethers.utils.formatUnits(_book.price, 'ether'),
+      price: ethers.utils.formatUnits(_book.price, "ether"),
       status: _book.status,
     };
     return bookInShelf;
@@ -46,12 +46,12 @@ export async function getBooksInMyShelf(reader) {
 export async function getBooksOnSale(_bookID) {
   const StorageStructuresContractAddress = contract_address.StorageStructures;
   const provider = new ethers.providers.JsonRpcProvider(
-    `http://localhost:7545/`,
+    `http://localhost:7545/`
   );
   const contract = new ethers.Contract(
     StorageStructuresContractAddress,
     StorageStructures.abi,
-    provider,
+    provider
   );
   const booksOnSale = await contract.getOnSale();
   console.log(booksOnSale);
@@ -60,12 +60,12 @@ export async function getBooksOnSale(_bookID) {
 export async function getBookBuyersCount(_bookID) {
   const StorageStructuresContractAddress = contract_address.StorageStructures;
   const provider = new ethers.providers.JsonRpcProvider(
-    `http://localhost:7545/`,
+    `http://localhost:7545/`
   );
   const contract = new ethers.Contract(
     StorageStructuresContractAddress,
     StorageStructures.abi,
-    provider,
+    provider
   );
   const bookBuyersCount = await contract.getBuyersCount(_bookID);
   console.log(Number(bookBuyersCount));
@@ -75,12 +75,12 @@ export async function getBookBuyersCount(_bookID) {
 export async function getBookSellersCount(_bookID) {
   const StorageStructuresContractAddress = contract_address.StorageStructures;
   const provider = new ethers.providers.JsonRpcProvider(
-    `http://localhost:7545/`,
+    `http://localhost:7545/`
   );
   const contract = new ethers.Contract(
     StorageStructuresContractAddress,
     StorageStructures.abi,
-    provider,
+    provider
   );
   const bookSellersCount = await contract.getSellersCount(_bookID);
   console.log(Number(bookSellersCount));
@@ -92,9 +92,33 @@ export async function getBookURI(_bookID, reader) {
   const contract = new ethers.Contract(
     StorageStructuresContractAddress,
     StorageStructures.abi,
-    reader,
+    reader
   );
   const bookURI = await contract.getBookURI(_bookID);
   console.log(bookURI);
   return bookURI;
+}
+
+export async function getPublisherAddress(_bookID, signer) {
+  const StorageStructuresContractAddress = contract_address.StorageStructures;
+  const contract = new ethers.Contract(
+    StorageStructuresContractAddress,
+    StorageStructures.abi,
+    signer
+  );
+  const publisherAddres = await contract.getPublisherAddress(_bookID);
+  console.log(publisherAddres);
+  return publisherAddres;
+}
+
+export async function redeem(student, voucher) {
+  const StorageStructuresContractAddress = contract_address.StorageStructures;
+  const contract = new ethers.Contract(
+    StorageStructuresContractAddress,
+    StorageStructures.abi,
+    student
+  );
+  const bookID = await contract.redeem(voucher);
+  console.log(bookID);
+  return bookID;
 }

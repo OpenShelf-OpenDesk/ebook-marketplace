@@ -77,13 +77,9 @@ contract StorageStructures {
         _authorsDesk[_author].push(bookID);
     }
 
-    function getBook(uint256 _index) external view returns (Book memory) {
-        return books[_index - 1];
+    function getBook(uint256 bookID) external view returns (Book memory) {
+        return books[bookID - 1];
     }
-
-    // function getEBookFromReadersShelf(uint256 _index) external view returns (eBook memory) {
-    //     return books[_index - 1];
-    // }
 
     function getAllBooks() external view returns (Book[] memory) {
         return books;
@@ -210,6 +206,14 @@ contract StorageStructures {
                 eBookStatus.LOCKED
             )
         );
+    }
+
+    function getPublisherAddress(uint256 bookID)
+        external
+        view
+        returns (address)
+    {
+        return this.getBook(bookID).publisherAddress;
     }
 
     // -------------------------------------------------------------------------
