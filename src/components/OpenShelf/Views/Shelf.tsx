@@ -1,4 +1,3 @@
-import { log } from "console";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useLoadingContext } from "../../../context/Loading";
 import { useSignerContext } from "../../../context/Signer";
@@ -60,7 +59,7 @@ const Shelf = ({ selected, setSelected }: Props) => {
       selected={selected}
       setSelected={setSelected}
     >
-      <section className="rounded-t-xl  h-full w-full">
+      <section className="rounded-t-xl h-full w-full">
         <div className="w-full mt-7 flex flex-row rounded-t-xl">
           <div
             className={`w-2/6 py-3 text-center cursor-pointer ${
@@ -100,7 +99,7 @@ const Shelf = ({ selected, setSelected }: Props) => {
           </div>
         </div>
         {booksOwnedInShelf.length > 0 && tabSelected == 1 ? (
-          <div className="grid grid-cols-3 gap-x-7 gap-y-7 p-7 h-5/6 bg-purple-100 border-l-2 border-r-2 border-primary">
+          <div className="grid grid-cols-3 gap-x-7 gap-y-7 p-7 h-5/6 bg-purple-100 border-l-2 border-r-2 border-primary overflow-y-scroll">
             {booksOwnedInShelf.map((_bookInShelf, index) => {
               return (
                 <BookOwnedInShelfCard

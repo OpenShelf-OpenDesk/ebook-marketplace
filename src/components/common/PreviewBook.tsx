@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
+import { useLoadingContext } from "../../context/Loading";
+import Loading from "./Loading";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -12,6 +14,18 @@ interface Props {
 
 const PreviewBook = ({ url, height, width, page }: Props) => {
   const [numPages, setNumPages] = useState<number>(null);
+  const { loading, setLoading } = useLoadingContext();
+
+  useEffect(() => {
+    setLoading(true);
+  }, []);
+
+  function onDocumentFullLoadSuccess({ numPages }) {
+    setNumPages(numPages);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+  }
 
   function onDocumentLoadSuccess({ numPages }) {
     setNumPages(numPages);
@@ -20,7 +34,12 @@ const PreviewBook = ({ url, height, width, page }: Props) => {
   if (height && width) {
     return (
       <div>
-        <Document file={url} onLoadSuccess={onDocumentLoadSuccess} loading={""}>
+        {loading && <Loading />}
+        <Document
+          file={url}
+          onLoadSuccess={onDocumentFullLoadSuccess}
+          loading={""}
+        >
           {Array.from(new Array(numPages), (el, index) => (
             <Page
               pageNumber={index + 1}
@@ -36,7 +55,12 @@ const PreviewBook = ({ url, height, width, page }: Props) => {
   } else if (height) {
     return (
       <div>
-        <Document file={url} onLoadSuccess={onDocumentLoadSuccess} loading={""}>
+        {loading && <Loading />}
+        <Document
+          file={url}
+          onLoadSuccess={onDocumentFullLoadSuccess}
+          loading={""}
+        >
           {Array.from(new Array(numPages), (el, index) => (
             <Page
               pageNumber={index + 1}
@@ -52,6 +76,7 @@ const PreviewBook = ({ url, height, width, page }: Props) => {
   } else {
     return (
       <div>
+        {setLoading(false)}
         <Document file={url} onLoadSuccess={onDocumentLoadSuccess} loading={""}>
           {Array.from(new Array(numPages), (el, index) => (
             <Page pageNumber={index + 1} key={index} width={550} loading={""} />
