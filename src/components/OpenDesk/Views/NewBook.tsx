@@ -101,6 +101,7 @@ const NewBook = (props: Props) => {
       const newBook: eBook = {
         title: e.target.title.value,
         description: e.target.description.value,
+        authorAddress: signer.address,
         launch_price: e.target.launch_price.value,
         currency: "MATIC",
         supply_limit_bool: supplyLimitBool,
@@ -123,7 +124,7 @@ const NewBook = (props: Props) => {
         <BookPublishingStatus statusCode={progressStatus} />
       )}
       <div className={`${validSubmitAttempt && "filter blur-xl bg-gray-100"}`}>
-        <section className="w-screen h-screen px-60 py-28">
+        <section className="w-screen h-screen px-60 py-8">
           <p className="flex justify-center absolute right-20 top-10 cursor-pointer">
             <ArrowNarrowLeftIcon
               className="w-6 h-6"
@@ -138,8 +139,8 @@ const NewBook = (props: Props) => {
             onSubmit={handleSubmit}
           >
             {selectedBookFile ? (
-              <div className="h-full w-full flex flex-col space-y-5">
-                <div className="max-h-full w-full overflow-scroll shadow-md">
+              <div className="h-full w-full flex flex-col space-y-3">
+                <div className="max-h-full w-full overflow-scroll shadow-md flex justify-center">
                   <PreviewBook url={selectedBookLocalURL} />
                 </div>
                 <div
@@ -156,7 +157,7 @@ const NewBook = (props: Props) => {
                 </div>
               </div>
             ) : (
-              <label className="h-full w-full flex flex-col justify-center space-y-5">
+              <label className="h-full w-full flex flex-col justify-center space-y-3">
                 <input
                   name="ebook_file"
                   type="file"
@@ -173,6 +174,7 @@ const NewBook = (props: Props) => {
                     src={`/undraw_add_document_re_mbjx.svg`}
                     layout="fill"
                     className="scale-95 transition duration-500 ease-in-out transform group-hover:-translate-y-1 group-hover:scale-105"
+                    priority={true}
                   />
                 </div>
                 {!invalidSubmitAttempt && !selectedBookFile && (

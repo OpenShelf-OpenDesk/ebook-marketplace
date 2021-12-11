@@ -13,7 +13,8 @@ contract StorageStructures {
     enum eBookStatus {
         OWNED,
         ON_SALE,
-        LOCKED
+        LOCKED,
+        RENTED
     }
 
     struct eBook {
@@ -26,54 +27,59 @@ contract StorageStructures {
     }
 
     Book[] private books;
-    mapping(address => uint256[]) private authorsDesk;
-    mapping(address => eBook[]) private readersShelf;
-    mapping(uint256 => address[]) private buyers;
-    mapping(uint256 => address[]) private sellers;
+    mapping(address => uint256[]) private _authorsDesk;
+    mapping(address => eBook[]) private _readersShelf;
+    mapping(uint256 => address[]) private _buyers;
+    mapping(uint256 => address[]) private _sellers;
+    mapping(uint256 => address[]) private _rentors;
 
     function getReadersShelf(address _reader)
         external
         view
         returns (eBook[] memory)
     {
-        return readersShelf[_reader];
+        return _readersShelf[_reader];
     }
 
     function setBookStatus(
         address _reader,
-        uint256 _bookID,
+        uint256 bookID,
         eBookStatus _status
     ) external {
-        for (uint256 i = 0; i < readersShelf[_reader].length; i++) {
-            if (readersShelf[_reader][i].bookID == _bookID) {
-                readersShelf[_reader][i].status = _status;
+        for (uint256 i = 0; i < _readersShelf[_reader].length; i++) {
+            if (_readersShelf[_reader][i].bookID == bookID) {
+                _readersShelf[_reader][i].status = _status;
             }
         }
     }
 
     function addToShelf(address _reader, eBook memory _eBook) external {
-        readersShelf[_reader].push(_eBook);
+        _readersShelf[_reader].push(_eBook);
     }
 
-    function getAuthorsDesk(address _author)
+    function getAuthorsDesk(address author)
         external
         view
-        returns (uint256[] memory)
+        returns (Book[] memory)
     {
-        return authorsDesk[_author];
+        Book[] memory authorsPublishedBooks = new Book[](
+            _authorsDesk[author].length
+        );
+        uint256[] memory booksAddress = _authorsDesk[author];
+        for (uint256 i = 0; i < booksAddress.length; i++) {
+            Book memory book = this.getBook(booksAddress[i]);
+            authorsPublishedBooks[i] = book;
+        }
+        return authorsPublishedBooks;
     }
 
-    function addToDesk(address _author, uint256 _bookID) external {
-        authorsDesk[_author].push(_bookID);
+    function addToDesk(address _author, uint256 bookID) external {
+        _authorsDesk[_author].push(bookID);
     }
 
-    function getBook(uint256 _index) external view returns (Book memory) {
-        return books[_index - 1];
+    function getBook(uint256 bookID) external view returns (Book memory) {
+        return books[bookID - 1];
     }
-
-    // function getEBookFromReadersShelf(uint256 _index) external view returns (eBook memory) {
-    //     return books[_index - 1];
-    // }
 
     function getAllBooks() external view returns (Book[] memory) {
         return books;
@@ -83,78 +89,146 @@ contract StorageStructures {
         books.push(_book);
     }
 
-    function getBuyersCount(uint256 _bookID) external view returns (uint256) {
-        return buyers[_bookID].length;
+    function getBuyersCount(uint256 bookID) external view returns (uint256) {
+        return _buyers[bookID].length;
     }
 
-    function getSellersCount(uint256 _bookID) external view returns (uint256) {
-        return sellers[_bookID].length;
+    function getSellersCount(uint256 bookID) external view returns (uint256) {
+        return _sellers[bookID].length;
     }
 
-    function addBuyer(uint256 _bookID, address _buyer) external {
-        buyers[_bookID].push(_buyer);
+    function addBuyer(uint256 bookID, address buyer) external {
+        _buyers[bookID].push(buyer);
     }
 
-    function addSeller(uint256 _bookID, address _seller) external {
-        sellers[_bookID].push(_seller);
+    function addSeller(uint256 bookID, address seller) external {
+        _sellers[bookID].push(seller);
     }
 
-    function matchBuyer(uint256 _bookID) external returns (address) {
-        address _buyer = buyers[_bookID][0];
-        for (uint256 i = 0; i < buyers[_bookID].length - 1; i++) {
-            buyers[_bookID][i] = buyers[_bookID][i + 1];
+    function matchBuyer(uint256 bookID) external returns (address) {
+        address buyer = _buyers[bookID][0];
+        for (uint256 i = 0; i < _buyers[bookID].length - 1; i++) {
+            _buyers[bookID][i] = _buyers[bookID][i + 1];
         }
-        buyers[_bookID].pop();
-        return _buyer;
+        _buyers[bookID].pop();
+        return buyer;
     }
 
-    function matchSeller(uint256 _bookID) external returns (address) {
-        address _seller = sellers[_bookID][0];
-        for (uint256 i = 0; i < sellers[_bookID].length - 1; i++) {
-            sellers[_bookID][i] = sellers[_bookID][i + 1];
+    function matchSeller(uint256 bookID) external returns (address) {
+        address seller = _sellers[bookID][0];
+        for (uint256 i = 0; i < _sellers[bookID].length - 1; i++) {
+            _sellers[bookID][i] = _sellers[bookID][i + 1];
         }
-        sellers[_bookID].pop();
-        return _seller;
+        _sellers[bookID].pop();
+        return seller;
     }
 
     function executeOrder(
-        address _buyer,
-        address _seller,
-        uint256 _bookID
+        address buyer,
+        address seller,
+        uint256 bookID
     ) external {
-        for (uint256 i = 0; i < readersShelf[_seller].length; i++) {
-            if (readersShelf[_seller][i].bookID == _bookID) {
-                eBook memory _eBookOnSale = readersShelf[_seller][i];
-                _eBookOnSale.owner = _buyer;
-                _eBookOnSale.status = eBookStatus.OWNED;
+        for (uint256 i = 0; i < _readersShelf[seller].length; i++) {
+            if (_readersShelf[seller][i].bookID == bookID) {
+                eBook memory eBookOnSale = _readersShelf[seller][i];
+                eBookOnSale.owner = buyer;
+                eBookOnSale.status = eBookStatus.OWNED;
 
-                readersShelf[_seller][i] = readersShelf[_seller][
-                    readersShelf[_seller].length - 1
+                _readersShelf[seller][i] = _readersShelf[seller][
+                    _readersShelf[seller].length - 1
                 ];
-                readersShelf[_seller].pop();
+                _readersShelf[seller].pop();
 
-                eBookPublisher(this.getBook(_bookID).publisherAddress).transfer(
-                        _seller,
-                        _buyer,
-                        _eBookOnSale.eBookID
-                    );
-                this.addToShelf(_buyer, _eBookOnSale);
+                eBookPublisher(this.getBook(bookID).publisherAddress).transfer(
+                    seller,
+                    buyer,
+                    eBookOnSale.eBookID
+                );
+                this.addToShelf(buyer, eBookOnSale);
                 break;
             }
         }
     }
 
-    function getBookURI(
-        uint256 _bookID
-    ) public view returns (string memory bookURI) {
-        eBook[] memory readerEBooks = readersShelf[msg.sender];
+    function getBookURI(uint256 bookID)
+        public
+        view
+        returns (string memory bookURI)
+    {
+        eBook[] memory readerEBooks = _readersShelf[msg.sender];
         for (uint256 i = 0; i < readerEBooks.length; i++) {
-            if (readerEBooks[i].bookID == _bookID){
-                require(readerEBooks[i].owner == address(msg.sender));
-                Book memory book = this.getBook(_bookID);
-                eBookPublisher publisher = eBookPublisher(book.publisherAddress);
+            if (readerEBooks[i].bookID == bookID) {
+                require(
+                    readerEBooks[i].owner == address(msg.sender),
+                    "Only owner can access the book!!"
+                );
+                Book memory book = this.getBook(bookID);
+                eBookPublisher publisher = eBookPublisher(
+                    book.publisherAddress
+                );
                 bookURI = publisher.getBookURI();
             }
         }
+    }
+
+    function getRentorsCount(uint256 bookID) external view returns (uint256) {
+        return _rentors[bookID].length;
+    }
+
+    function addRentor(uint256 bookID, address rentor) external {
+        _rentors[bookID].push(rentor);
+        this.setBookStatus(rentor, bookID, eBookStatus.RENTED);
+    }
+
+    function matchRentor(uint256 bookID) external returns (address) {
+        address rentor = _rentors[bookID][0];
+        for (uint256 i = 0; i < _rentors[bookID].length - 1; i++) {
+            _rentors[bookID][i] = _rentors[bookID][i + 1];
+        }
+        _rentors[bookID].pop();
+        return rentor;
+    }
+
+    function redeemStudentBookVoucher(
+        eBookPublisher.eBookVoucher calldata voucher
+    ) external {
+        Book memory book = this.getBook(voucher.bookID);
+        eBookPublisher publisher = eBookPublisher(book.publisherAddress);
+        publisher.redeem(msg.sender, voucher);
+        this.addToShelf(
+            msg.sender,
+            eBook(
+                voucher.bookID,
+                0,
+                voucher.price,
+                book.metadataURI,
+                msg.sender,
+                eBookStatus.LOCKED
+            )
+        );
+    }
+
+    function getPublisherAddress(uint256 bookID)
+        external
+        view
+        returns (address)
+    {
+        return this.getBook(bookID).publisherAddress;
+    }
+
+    // -------------------------------------------------------------------------
+
+    error BookNotOwnedInShelf(uint256 bookID, address reader);
+
+    modifier ownedInShelf(address msgSender, uint256 bookID) {
+        for (uint256 i = 0; i < _readersShelf[msgSender].length; i++) {
+            if (bookID == _readersShelf[msgSender][i].bookID) {
+                if (_readersShelf[msgSender][i].status == eBookStatus.OWNED) {
+                    _;
+                }
+                return;
+            }
+        }
+        revert BookNotOwnedInShelf(bookID, msgSender);
     }
 }

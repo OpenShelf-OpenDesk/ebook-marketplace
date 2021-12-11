@@ -9,11 +9,11 @@ interface Props {
 
 const PreviewBookCoverPage = ({ src, height, width }: Props) => {
   return (
-    <div className="relative h-full w-full self-start flex-0">
+    <div className="relative h-full w-full self-start flex items-center">
       {height && width ? (
         <Image src={src} height={height} width={width} layout="fixed" />
       ) : (
-        <Image src={src} layout="fill" objectFit="contain" />
+        <Image src={src} layout="fill" objectFit="cover" />
       )}
     </div>
   );
