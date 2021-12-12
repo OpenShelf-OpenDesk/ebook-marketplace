@@ -25,7 +25,7 @@ const Shelf = ({ selected, setSelected }: Props) => {
 
   useEffect(() => {
     setBooksOwnedInShelf([]);
-    getBooksInMyShelf(signer.address)
+    getBooksInMyShelf(signer.signer, signer.address)
       .then((_booksInShelf) => {
         _booksInShelf.map((_book) => {
           if (_book.status == 0) {

@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "./StorageStructures.sol";
+import {StorageStructures, ReentrancyGuard, eBookPublisher, Counters} from "./StorageStructures.sol";
 
 contract eBookMarketLaunch is ReentrancyGuard {
     using Counters for Counters.Counter;
@@ -49,7 +47,8 @@ contract eBookMarketLaunch is ReentrancyGuard {
             msg.sender,
             price,
             eBookURI,
-            pricedBooksSupplyLimit
+            pricedBooksSupplyLimit,
+            _ss.getDonatorAddress()
         );
         _ss.addBook(
             StorageStructures.Book({
@@ -73,6 +72,7 @@ contract eBookMarketLaunch is ReentrancyGuard {
         require(msg.sender != book.author, "Author can't buy own book!!");
         require(msg.value >= book.price, "Insufficient funds!!");
         payable(book.author).transfer(book.price);
+        _ss.addToAuthorsRevenue(book.author, bookID, book.price);
         eBookPublisher publisher = eBookPublisher(book.publisherAddress);
         uint256 _eBookID = publisher.printPaidVersion(msg.sender);
         _ss.addToShelf(

@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.4;
-import "./eBookPublisher.sol";
+
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import {eBookPublisher, Counters} from "./eBookPublisher.sol";
+import {eBookDonator} from "./eBookDonator.sol";
 
 contract StorageStructures {
     struct Book {
@@ -28,10 +31,17 @@ contract StorageStructures {
 
     Book[] private books;
     mapping(address => uint256[]) private _authorsDesk;
+    mapping(address => mapping(uint256 => uint256)) private _authorsRevenue;
     mapping(address => eBook[]) private _readersShelf;
     mapping(uint256 => address[]) private _buyers;
     mapping(uint256 => address[]) private _sellers;
     mapping(uint256 => address[]) private _rentors;
+
+    eBookDonator private _donator;
+
+    constructor(address donatorAddress) {
+        _donator = eBookDonator(donatorAddress);
+    }
 
     function getReadersShelf(address _reader)
         external
@@ -190,11 +200,11 @@ contract StorageStructures {
     }
 
     function redeemStudentBookVoucher(
-        eBookPublisher.eBookVoucher calldata voucher
+        eBookDonator.eBookVoucher calldata voucher
     ) external {
         Book memory book = this.getBook(voucher.bookID);
-        eBookPublisher publisher = eBookPublisher(book.publisherAddress);
-        publisher.redeem(msg.sender, voucher);
+        // eBookPublisher publisher = eBookPublisher(book.publisherAddress);
+        _donator.redeem(book.publisherAddress, msg.sender, voucher);
         this.addToShelf(
             msg.sender,
             eBook(
@@ -216,19 +226,61 @@ contract StorageStructures {
         return this.getBook(bookID).publisherAddress;
     }
 
+    function getDonatorAddress() external view returns (address) {
+        return address(_donator);
+    }
+
+    function getPricedBooksPrinted(uint256 bookID)
+        external
+        view
+        returns (uint256)
+    {
+        Book memory book = this.getBook(bookID);
+        eBookPublisher publisher = eBookPublisher(book.publisherAddress);
+        return publisher.getPricedBooksPrinted();
+    }
+
+    function getFreeBooksPrinted(uint256 bookID)
+        external
+        view
+        returns (uint256)
+    {
+        Book memory book = this.getBook(bookID);
+        eBookPublisher publisher = eBookPublisher(book.publisherAddress);
+        return publisher.getFreeBooksPrinted();
+    }
+
+    function addToAuthorsRevenue(
+        address author,
+        uint256 bookID,
+        uint256 revenue
+    ) external {
+        _authorsRevenue[author][bookID] =
+            _authorsRevenue[author][bookID] +
+            revenue;
+    }
+
+    function getAuthorsRevenueForBook(uint256 bookID)
+        external
+        view
+        returns (uint256)
+    {
+        return _authorsRevenue[msg.sender][bookID];
+    }
+
     // -------------------------------------------------------------------------
 
-    error BookNotOwnedInShelf(uint256 bookID, address reader);
+    // error BookNotOwnedInShelf(uint256 bookID, address reader);
 
-    modifier ownedInShelf(address msgSender, uint256 bookID) {
-        for (uint256 i = 0; i < _readersShelf[msgSender].length; i++) {
-            if (bookID == _readersShelf[msgSender][i].bookID) {
-                if (_readersShelf[msgSender][i].status == eBookStatus.OWNED) {
-                    _;
-                }
-                return;
-            }
-        }
-        revert BookNotOwnedInShelf(bookID, msgSender);
-    }
+    // modifier ownedInShelf(address msgSender, uint256 bookID) {
+    //     for (uint256 i = 0; i < _readersShelf[msgSender].length; i++) {
+    //         if (bookID == _readersShelf[msgSender][i].bookID) {
+    //             if (_readersShelf[msgSender][i].status == eBookStatus.OWNED) {
+    //                 _;
+    //             }
+    //             return;
+    //         }
+    //     }
+    //     revert BookNotOwnedInShelf(bookID, msgSender);
+    // }
 }
