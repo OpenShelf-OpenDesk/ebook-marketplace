@@ -6,6 +6,11 @@ import LoadingCircle from "../common/LoadingCircle";
 import { useRouter } from "next/router";
 import { eBookVoucherGenerator } from "../../utils/eBookVoucherGenerator";
 import { DuplicateIcon } from "@heroicons/react/outline";
+import {
+  getAuthorsRevenueForBook,
+  getFreeBooksPrinted,
+  getPricedBooksPrinted,
+} from "../../controllers/StorageStructures";
 interface Props {
   bookMetadataURI: string;
 }
@@ -17,6 +22,9 @@ const BookPublishedDeskCard = ({ bookMetadataURI }: Props) => {
   const [voucherLoading, setVoucherLoading] = useState<boolean>(false);
   const [voucherGenerated, setVoucherGenerated] = useState<any | undefined>();
   const [validSubmission, setValidSubmission] = useState<boolean>(true);
+  const [pricedBooksPrinted, setPricedBooksPrinted] = useState<number>(0);
+  const [freeBooksPrinted, setFreeBooksPrinted] = useState<number>(0);
+  const [totalAuthorsRevenue, setTotalAuthorsRevenue] = useState<string>();
 
   useEffect(() => {
     const fetchMetadata = async () => {
@@ -29,27 +37,44 @@ const BookPublishedDeskCard = ({ bookMetadataURI }: Props) => {
     });
   }, []);
 
-  const handleSubmitVoucher = async (e) => {
+  useEffect(() => {
+    bookMetadata &&
+      getPricedBooksPrinted(bookMetadata.book_id, signer.signer).then(
+        (booksPrinted) => {
+          setPricedBooksPrinted(booksPrinted);
+        }
+      );
+    bookMetadata &&
+      getFreeBooksPrinted(bookMetadata.book_id, signer.signer).then(
+        (booksPrinted) => {
+          setFreeBooksPrinted(booksPrinted);
+        }
+      );
+    bookMetadata &&
+      getAuthorsRevenueForBook(bookMetadata.book_id, signer.signer).then(
+        (booksPrinted) => {
+          setTotalAuthorsRevenue(booksPrinted);
+        }
+      );
+  }, [bookMetadata]);
+
+  const handleCreateVoucher = async (e) => {
     e.preventDefault();
     if (e.target.studentAddress.value.length > 0) {
       setVoucherLoading(true);
       setValidSubmission(true);
-      // const voucherGenerator = new eBookVoucherGenerator({
-      //   bookID: bookMetadata.book_id,
-      //   author: signer.signer,
-      // });
-      // voucherGenerator
-      //   .createVoucher(bookMetadata.book_id, e.target.studentAddress.value, 0)
-      //   .then((voucher) => {
-      //     setVoucherGenerated(voucher);
-      //   });
-      setVoucherGenerated({
-        signature:
-          "0xa5a16697a4d349b2ac00fbb7d13517fe7a1f6ff3b6d8312a7819adca1461f33a52a2df199c6ab752a7b76a2438c5e2d8b1eb15e540d964730bfe586b021e14591c",
+      const voucherGenerator = new eBookVoucherGenerator({
+        bookID: bookMetadata.book_id,
+        author: signer.signer,
       });
-      setTimeout(() => {
-        setVoucherLoading(false);
-      }, 1000);
+      voucherGenerator
+        .createVoucher(e.target.studentAddress.value, 0)
+        .then((voucher) => {
+          setVoucherGenerated(voucher);
+          setTimeout(() => {
+            setVoucherLoading(false);
+          }, 1000);
+        });
     } else {
       setValidSubmission(false);
     }
@@ -100,8 +125,8 @@ const BookPublishedDeskCard = ({ bookMetadataURI }: Props) => {
           </div>
           <div className="stats">
             <div className="stat">
-              <div className="stat-title">Students Copies</div>
-              <div className="stat-value">2</div>
+              <div className="stat-title">Donated Books</div>
+              <div className="stat-value">{freeBooksPrinted}</div>
               <div className="stat-desc">Books</div>
             </div>
           </div>
@@ -109,15 +134,15 @@ const BookPublishedDeskCard = ({ bookMetadataURI }: Props) => {
         <div className="flex justify-center space-x-11 pb-5">
           <div className="stats">
             <div className="stat">
-              <div className="stat-title">Total Sales</div>
-              <div className="stat-value">3</div>
+              <div className="stat-title">Book Sales</div>
+              <div className="stat-value">{pricedBooksPrinted}</div>
               <div className="stat-desc">Books</div>
             </div>
           </div>
           <div className="stats">
             <div className="stat">
               <div className="stat-title">Total Revenue</div>
-              <div className="stat-value">{bookMetadata.launch_price * 3}</div>
+              <div className="stat-value">{totalAuthorsRevenue}</div>
               <div className="stat-desc">{bookMetadata.currency}</div>
             </div>
           </div>
@@ -164,17 +189,17 @@ const BookPublishedDeskCard = ({ bookMetadataURI }: Props) => {
         </div>
       ) : (
         <div className="h-full w-2/5 flex flex-col justify-evenly py-20 px-9 rounded-r-lg border-l-8 border-green-100">
-          <p className="text-center text-lg font-semibold text-accent py-14">
-            Create Student Voucher
+          <p className="text-center text-xl font-semibold text-accent py-14">
+            Create Free Book Voucher
           </p>
           <form
             className="form-control"
             onSubmit={(e) => {
-              handleSubmitVoucher(e);
+              handleCreateVoucher(e);
             }}
           >
             <label className="label">
-              <span className="label-text">Student's Wallet Address</span>
+              <span className="label-text">Receiver's Wallet Address</span>
             </label>
             <input
               type="text"
@@ -191,8 +216,8 @@ const BookPublishedDeskCard = ({ bookMetadataURI }: Props) => {
                 !validSubmission && `input-error`
               }`}
             />
-            <div className="flex justify-center py-7">
-              <button type="submit" className="btn btn-accent">
+            <div className="flex justify-center w-full py-7">
+              <button type="submit" className="btn btn-accent w-full">
                 Create Voucher
               </button>
             </div>
