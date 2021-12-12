@@ -60,6 +60,7 @@ const BookPreview = (props: Props) => {
   const [bookPreviewData, setBookPreviewData] = useState<eBook>();
   const [validRedeemSubmission, setValidRedeemSubmission] =
     useState<boolean>(true);
+
   const [validPurchaseAttempt, setValidPurchaseAttempt] =
     useState<boolean>(false);
   const [progressStatus, setProgressStatus] = useState<number>(0);
@@ -79,7 +80,7 @@ const BookPreview = (props: Props) => {
 
   const handleRedeemSubmit = (e) => {
     e.preventDefault();
-    if (e.target.eBookVoucherSignature.value === 132) {
+    if (e.target.eBookVoucherSignature.value.length === 132) {
       setValidRedeemSubmission(true);
       const voucher = {
         bookID: bookPreviewData.book_id,
