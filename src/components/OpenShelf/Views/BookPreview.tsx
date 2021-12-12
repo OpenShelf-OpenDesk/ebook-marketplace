@@ -59,8 +59,7 @@ const BookPreview = (props: Props) => {
   const { signer } = useSignerContext();
   const [bookPreviewData, setBookPreviewData] = useState<eBook>();
   const [validRedeemSubmission, setValidRedeemSubmission] =
-    useState<boolean>(false);
-  const [validVoucher, setValidVoucher] = useState<boolean>(true);
+    useState<boolean>(true);
   const [validPurchaseAttempt, setValidPurchaseAttempt] =
     useState<boolean>(false);
   const [progressStatus, setProgressStatus] = useState<number>(0);
@@ -80,13 +79,18 @@ const BookPreview = (props: Props) => {
 
   const handleRedeemSubmit = (e) => {
     e.preventDefault();
-    // if (e.target.eBookVoucherSignature.value.length > 0) {
-    //   setValidRedeemSubmission(true);
-
-    //   setTimeout(() => {}, 1000);
-    // } else {
-    //   setValidRedeemSubmission(false);
-    // }
+    if (e.target.eBookVoucherSignature.value === 132) {
+      setValidRedeemSubmission(true);
+      const voucher = {
+        bookID: bookPreviewData.book_id,
+        price: 0,
+        studentAddress: signer.address,
+        signature: e.target.eBookVoucherSignature.value,
+      };
+      redeem(signer.signer, voucher);
+    } else {
+      setValidRedeemSubmission(false);
+    }
   };
 
   const setProgressStatusCB = (statusCode) => {
@@ -213,18 +217,7 @@ const BookPreview = (props: Props) => {
                       </span>
                     </span>
                     <div className="flex-1 flex flex-col justify-end pt-12">
-                      <button
-                        className="w-full btn btn-warning btn-sm"
-                        onClick={() => {
-                          redeem(signer.signer, {
-                            bookID: bookPreviewData.book_id,
-                            price: 0,
-                            studentAddress: signer.address,
-                            signature:
-                              "0xc5109f32c172a1cf853e1bb513a4fbed75f5c52849fdd98ad63fba3af05123402b81d51d4472f6fcd1d8cb019b0f3724c3b847690a5ed4fe8d93067d875750311c",
-                          });
-                        }}
-                      >
+                      <button className="w-full btn btn-warning btn-sm">
                         Buy
                       </button>
                     </div>
@@ -243,15 +236,13 @@ const BookPreview = (props: Props) => {
                       placeholder="Voucher Signature"
                       onChange={(e) => {
                         if (e.target.value.length == 132) {
-                          setValidVoucher(true);
                           setValidRedeemSubmission(true);
                         } else {
-                          setValidVoucher(false);
                           setValidRedeemSubmission(false);
                         }
                       }}
                       className={`input input-bordered input-sm w-full ${
-                        !validVoucher && `input-error`
+                        !validRedeemSubmission && `input-error`
                       }`}
                     />
                     <button
@@ -259,7 +250,7 @@ const BookPreview = (props: Props) => {
                       className={`flex btn btn-outline btn-sm px-5 space-x-2 opacity-70`}
                     >
                       <p className="pt-1 text-sm font-medium">
-                        Get Student Copy
+                        Redeem Book Voucher
                       </p>
                       <AcademicCapIcon className="h-4 w-4" />
                     </button>
