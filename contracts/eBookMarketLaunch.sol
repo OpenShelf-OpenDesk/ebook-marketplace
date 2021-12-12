@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "./StorageStructures.sol";
+import {StorageStructures, ReentrancyGuard, eBookPublisher, Counters} from "./StorageStructures.sol";
 
 contract eBookMarketLaunch is ReentrancyGuard {
     using Counters for Counters.Counter;

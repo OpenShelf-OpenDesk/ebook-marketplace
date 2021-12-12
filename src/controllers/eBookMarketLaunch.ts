@@ -70,47 +70,39 @@ async function uploadBookMetadata(eBook: eBook) {
 
 export async function publish(eBook: eBook, author, cb) {
   const eBookMarketLaunchContractAddress = contract_address.eBookMarketLaunch;
-
-  const provider = new ethers.providers.JsonRpcProvider(
-    `http://localhost:7545/`
-  );
-
-  const contract_temp = new ethers.Contract(
-    eBookMarketLaunchContractAddress,
-    eBookMarketLaunch.abi,
-    provider
-  );
-
-  const bookID = await contract_temp.getNextBookID();
-
   const contract = new ethers.Contract(
     eBookMarketLaunchContractAddress,
     eBookMarketLaunch.abi,
     author
   );
 
-  const { ebook_file, ...metadata } = eBook;
-  const eBookURI = await uploadBook(ebook_file);
-  cb(1);
-  const eBookCoverImage = await extractCoverImage(ebook_file);
-  cb(2);
-  const metadataURI = await uploadBookMetadata({
-    book_id: Number(bookID),
-    ...metadata,
-    ebook_cover_image: eBookCoverImage,
-  });
-  cb(3);
   try {
-    const transaction = await contract.publish(
-      eBookURI,
-      metadataURI,
-      ethers.utils.parseUnits(metadata.launch_price.toString(), "ether"),
-      metadata.supply_limit
-    );
-    const transactionStatus = await transaction.wait();
-    console.log(transactionStatus.events[0]);
-    cb(4);
-    return metadataURI;
+    const bookID = await contract.getNextBookID();
+    const { ebook_file, ...metadata } = eBook;
+    const eBookURI = await uploadBook(ebook_file);
+    cb(1);
+    const eBookCoverImage = await extractCoverImage(ebook_file);
+    cb(2);
+    const metadataURI = await uploadBookMetadata({
+      book_id: Number(bookID),
+      ...metadata,
+      ebook_cover_image: eBookCoverImage,
+    });
+    cb(3);
+    try {
+      const transaction = await contract.publish(
+        eBookURI,
+        metadataURI,
+        ethers.utils.parseUnits(metadata.launch_price.toString(), "ether"),
+        metadata.supply_limit
+      );
+      const transactionStatus = await transaction.wait();
+      console.log(transactionStatus.events[0]);
+      cb(4);
+      return metadataURI;
+    } catch (error) {
+      console.log(error);
+    }
   } catch (error) {
     console.log(error);
   }

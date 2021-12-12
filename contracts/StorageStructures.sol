@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.4;
-import "./eBookPublisher.sol";
+
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import {eBookPublisher, Counters} from "./eBookPublisher.sol";
+import {eBookDonator} from "./eBookDonator.sol";
 
 contract StorageStructures {
     struct Book {
@@ -32,6 +35,12 @@ contract StorageStructures {
     mapping(uint256 => address[]) private _buyers;
     mapping(uint256 => address[]) private _sellers;
     mapping(uint256 => address[]) private _rentors;
+
+    eBookDonator private _donator;
+
+    constructor(address donatorAddress) {
+        _donator = eBookDonator(donatorAddress);
+    }
 
     function getReadersShelf(address _reader)
         external
@@ -190,11 +199,11 @@ contract StorageStructures {
     }
 
     function redeemStudentBookVoucher(
-        eBookPublisher.eBookVoucher calldata voucher
+        eBookDonator.eBookVoucher calldata voucher
     ) external {
         Book memory book = this.getBook(voucher.bookID);
-        eBookPublisher publisher = eBookPublisher(book.publisherAddress);
-        publisher.redeem(msg.sender, voucher);
+        // eBookPublisher publisher = eBookPublisher(book.publisherAddress);
+        _donator.redeem(book.publisherAddress, msg.sender, voucher);
         this.addToShelf(
             msg.sender,
             eBook(

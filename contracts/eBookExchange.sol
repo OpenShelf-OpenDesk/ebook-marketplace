@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.4;
 
-import "./eBookMarketLaunch.sol";
-import "./StorageStructures.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import {StorageStructures, ReentrancyGuard} from "./StorageStructures.sol";
 
 contract eBookExchange is ReentrancyGuard {
     StorageStructures _ss;

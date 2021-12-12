@@ -103,7 +103,7 @@ export async function redeem(student, voucher) {
     StorageStructures.abi,
     student
   );
-  const bookID = await contract.redeem(voucher);
+  const bookID = await contract.redeemStudentBookVoucher(voucher);
   console.log(bookID);
   return bookID;
 }

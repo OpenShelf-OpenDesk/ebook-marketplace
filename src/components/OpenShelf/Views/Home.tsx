@@ -7,6 +7,7 @@ import Sidebar from "../Sidebar";
 import { getAllBooks } from "../../../controllers/StorageStructures";
 import { useRouter } from "next/router";
 import { useLoadingContext } from "../../../context/Loading";
+import { useSignerContext } from "../../../context/Signer";
 
 interface Props {
   selected: 1 | 2 | 3;
@@ -16,18 +17,20 @@ interface Props {
 const Home = ({ selected, setSelected }: Props) => {
   const [allBooks, setAllBooks] = useState<any>([]);
   const { setLoading } = useLoadingContext();
+  const { signer } = useSignerContext();
   const router = useRouter();
   useEffect(() => {
-    getAllBooks().then(async (metadataURIs) => {
-      setAllBooks(metadataURIs);
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000);
-    });
+    signer &&
+      getAllBooks(signer.signer).then(async (metadataURIs) => {
+        setAllBooks(metadataURIs);
+        setTimeout(() => {
+          setLoading(false);
+        }, 1000);
+      });
     return () => {
       setLoading(true);
     };
-  }, []);
+  }, [signer]);
   return (
     <Layout
       Navbar={Navbar}

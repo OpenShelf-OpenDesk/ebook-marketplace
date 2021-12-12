@@ -9,6 +9,8 @@ import { ArrowNarrowLeftIcon, CheckCircleIcon } from "@heroicons/react/solid";
 import { useRouter } from "next/router";
 import { useLoadingContext } from "../../../context/Loading";
 import LoadingCircle from "../../common/LoadingCircle";
+import { eBookVoucherGenerator } from "../../../utils/eBookVoucherGenerator";
+import { redeem } from "../../../controllers/StorageStructures";
 
 interface Props {}
 
@@ -70,6 +72,19 @@ const BookPreview = (props: Props) => {
       setLoading(true);
     };
   }, []);
+
+  // useEffect(() => {
+  //   if (bookPreviewData) {
+  //     const vocherGenerator = new eBookVoucherGenerator({
+  //       bookID: bookPreviewData.book_id,
+  //       author: signer.signer,
+  //     });
+
+  //     vocherGenerator
+  //       .createVoucher("0xd9ee55ea7332a2948Fdd0c63bcB216B6b5f1327F")
+  //       .then((voucher) => console.log(voucher));
+  //   }
+  // }, [bookPreviewData]);
 
   const setProgressStatusCB = (statusCode) => {
     switch (statusCode) {
@@ -195,7 +210,18 @@ const BookPreview = (props: Props) => {
                       </span>
                     </span>
                     <div className="flex-1 flex flex-col justify-end pt-12">
-                      <button className="w-full btn btn-warning btn-sm">
+                      <button
+                        className="w-full btn btn-warning btn-sm"
+                        onClick={() => {
+                          redeem(signer.signer, {
+                            bookID: bookPreviewData.book_id,
+                            price: 0,
+                            studentAddress: signer.address,
+                            signature:
+                              "0xc5109f32c172a1cf853e1bb513a4fbed75f5c52849fdd98ad63fba3af05123402b81d51d4472f6fcd1d8cb019b0f3724c3b847690a5ed4fe8d93067d875750311c",
+                          });
+                        }}
+                      >
                         Buy
                       </button>
                     </div>
