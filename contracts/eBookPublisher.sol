@@ -15,13 +15,15 @@ contract eBookPublisher is ERC1155, ReentrancyGuard {
     int256 private _pricedBooksSupplyLimit; // -1 for unlimited supply
     uint256 private FREE_BOOK_ID = 0;
     Counters.Counter private PRICED_BOOK_ID;
+    address private immutable _donator;
 
     constructor(
         uint256 bookID,
         address author,
         uint256 price,
         string memory eBookURI,
-        int256 pricedBooksSupplyLimit
+        int256 pricedBooksSupplyLimit,
+        address donator
     ) ERC1155(eBookURI) {
         _bookID = bookID;
         _author = payable(author);
@@ -29,6 +31,7 @@ contract eBookPublisher is ERC1155, ReentrancyGuard {
         _pricedBooksSupplyLimit = pricedBooksSupplyLimit;
         _mint(author, FREE_BOOK_ID, 1, "Author's Copy");
         _freeBooksPrinted += 1;
+        _donator = donator;
     }
 
     struct eBookVoucher {
@@ -86,6 +89,7 @@ contract eBookPublisher is ERC1155, ReentrancyGuard {
     }
 
     function printFreeVersion(address to) external {
+        require(msg.sender == _donator, "Unauthorized request!");
         _mint(_author, FREE_BOOK_ID, 1, "Student Copy");
         transfer(_author, to, 0);
         _freeBooksPrinted += 1;
@@ -115,5 +119,13 @@ contract eBookPublisher is ERC1155, ReentrancyGuard {
 
     function getAuthor() external view returns (address) {
         return _author;
+    }
+
+    function getPricedBooksPrinted() external view returns (uint256) {
+        return _pricedBooksPrinted;
+    }
+
+    function getFreeBooksPrinted() external view returns (uint256) {
+        return _freeBooksPrinted;
     }
 }

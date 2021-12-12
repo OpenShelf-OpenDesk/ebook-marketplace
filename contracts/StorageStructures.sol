@@ -31,6 +31,7 @@ contract StorageStructures {
 
     Book[] private books;
     mapping(address => uint256[]) private _authorsDesk;
+    mapping(address => mapping(uint256 => uint256)) private _authorsRevenue;
     mapping(address => eBook[]) private _readersShelf;
     mapping(uint256 => address[]) private _buyers;
     mapping(uint256 => address[]) private _sellers;
@@ -223,6 +224,48 @@ contract StorageStructures {
         returns (address)
     {
         return this.getBook(bookID).publisherAddress;
+    }
+
+    function getDonatorAddress() external view returns (address) {
+        return address(_donator);
+    }
+
+    function getPricedBooksPrinted(uint256 bookID)
+        external
+        view
+        returns (uint256)
+    {
+        Book memory book = this.getBook(bookID);
+        eBookPublisher publisher = eBookPublisher(book.publisherAddress);
+        return publisher.getPricedBooksPrinted();
+    }
+
+    function getFreeBooksPrinted(uint256 bookID)
+        external
+        view
+        returns (uint256)
+    {
+        Book memory book = this.getBook(bookID);
+        eBookPublisher publisher = eBookPublisher(book.publisherAddress);
+        return publisher.getFreeBooksPrinted();
+    }
+
+    function addToAuthorsRevenue(
+        address author,
+        uint256 bookID,
+        uint256 revenue
+    ) external {
+        _authorsRevenue[author][bookID] =
+            _authorsRevenue[author][bookID] +
+            revenue;
+    }
+
+    function getAuthorsRevenueForBook(uint256 bookID)
+        external
+        view
+        returns (uint256)
+    {
+        return _authorsRevenue[msg.sender][bookID];
     }
 
     // -------------------------------------------------------------------------
