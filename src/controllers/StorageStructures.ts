@@ -26,7 +26,7 @@ export async function getBooksInMyShelf(reader, readerAddress) {
   const booksInShelf = response.map((book) => {
     const bookInShelf = {
       bookID: Number(book.bookID),
-      metadataURI: book.metadataURI,
+      metadataURI: `https://${book.metadataURI}.ipfs.dweb.link`,
       eBookID: Number(book.eBookID),
       owner: book.owner,
       price: ethers.utils.formatUnits(book.price, "ether"),
@@ -129,7 +129,7 @@ export async function getPricedBooksPrinted(bookID, signer) {
   );
   const pricedBooksPrinted = await contract.getPricedBooksPrinted(bookID);
   console.log(pricedBooksPrinted);
-  return pricedBooksPrinted;
+  return Number(pricedBooksPrinted);
 }
 
 export async function getFreeBooksPrinted(bookID, signer) {
@@ -141,7 +141,7 @@ export async function getFreeBooksPrinted(bookID, signer) {
   );
   const freeBooksPrinted = await contract.getFreeBooksPrinted(bookID);
   console.log(freeBooksPrinted);
-  return freeBooksPrinted;
+  return Number(freeBooksPrinted);
 }
 
 export async function getAuthorsRevenueForBook(bookID, author) {
@@ -153,5 +153,5 @@ export async function getAuthorsRevenueForBook(bookID, author) {
   );
   const revenue = await contract.getAuthorsRevenueForBook(bookID);
   console.log(revenue);
-  return revenue;
+  return ethers.utils.formatUnits(revenue, "ether");
 }
