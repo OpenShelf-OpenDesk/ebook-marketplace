@@ -10,7 +10,7 @@ export async function main() {
 
   await eBookDonator.deployed();
   const eBookDonatorContractAddress = eBookDonator.address;
-  console.log(`eBookDonator deployed to : ${eBookDonatorContractAddress}'`);
+  console.log(`eBookDonator deployed to : ${eBookDonatorContractAddress}`);
 
   // StorageStructures -------------------------------------------------------
   const StorageStructuresContract = await hre.ethers.getContractFactory(
@@ -22,7 +22,7 @@ export async function main() {
   await StorageStructures.deployed();
   const StorageStructuresContractAddress = StorageStructures.address;
   console.log(
-    `StorageStructures deployed to : ${StorageStructuresContractAddress}'`
+    `StorageStructures deployed to : ${StorageStructuresContractAddress}`
   );
 
   // eBookMarketLaunch -------------------------------------------------------
@@ -34,7 +34,7 @@ export async function main() {
   );
   const eBookMarketLaunchContractAddress = eBookMarketLaunch.address;
   console.log(
-    `eBookMarketLaunch deployed to : ${eBookMarketLaunchContractAddress}'`
+    `eBookMarketLaunch deployed to : ${eBookMarketLaunchContractAddress}`
   );
 
   // eBookExchange ------------------------------------------------------
@@ -45,7 +45,7 @@ export async function main() {
     StorageStructuresContractAddress
   );
   const eBookExchangeContractAddress = eBookExchange.address;
-  console.log(`eBookExchange deployed to : ${eBookExchangeContractAddress}'`);
+  console.log(`eBookExchange deployed to : ${eBookExchangeContractAddress}`);
 
   // saving contract address to a file
 
