@@ -270,17 +270,17 @@ contract StorageStructures {
 
     // -------------------------------------------------------------------------
 
-    error BookNotOwnedInShelf(uint256 bookID, address reader);
+    // error BookNotOwnedInShelf(uint256 bookID, address reader);
 
-    modifier ownedInShelf(address msgSender, uint256 bookID) {
-        for (uint256 i = 0; i < _readersShelf[msgSender].length; i++) {
-            if (bookID == _readersShelf[msgSender][i].bookID) {
-                if (_readersShelf[msgSender][i].status == eBookStatus.OWNED) {
-                    _;
-                }
-                return;
-            }
-        }
-        revert BookNotOwnedInShelf(bookID, msgSender);
-    }
+    // modifier ownedInShelf(address msgSender, uint256 bookID) {
+    //     for (uint256 i = 0; i < _readersShelf[msgSender].length; i++) {
+    //         if (bookID == _readersShelf[msgSender][i].bookID) {
+    //             if (_readersShelf[msgSender][i].status == eBookStatus.OWNED) {
+    //                 _;
+    //             }
+    //             return;
+    //         }
+    //     }
+    //     revert BookNotOwnedInShelf(bookID, msgSender);
+    // }
 }

@@ -119,3 +119,39 @@ export async function getAuthorsDesk(author, authorAddress) {
   console.log(authorsDesk);
   return authorsDesk;
 }
+
+export async function getPricedBooksPrinted(bookID, signer) {
+  const StorageStructuresContractAddress = contract_address.StorageStructures;
+  const contract = new ethers.Contract(
+    StorageStructuresContractAddress,
+    StorageStructures.abi,
+    signer
+  );
+  const pricedBooksPrinted = await contract.getPricedBooksPrinted(bookID);
+  console.log(pricedBooksPrinted);
+  return pricedBooksPrinted;
+}
+
+export async function getFreeBooksPrinted(bookID, signer) {
+  const StorageStructuresContractAddress = contract_address.StorageStructures;
+  const contract = new ethers.Contract(
+    StorageStructuresContractAddress,
+    StorageStructures.abi,
+    signer
+  );
+  const freeBooksPrinted = await contract.getFreeBooksPrinted(bookID);
+  console.log(freeBooksPrinted);
+  return freeBooksPrinted;
+}
+
+export async function getAuthorsRevenueForBook(bookID, author) {
+  const StorageStructuresContractAddress = contract_address.StorageStructures;
+  const contract = new ethers.Contract(
+    StorageStructuresContractAddress,
+    StorageStructures.abi,
+    author
+  );
+  const revenue = await contract.getAuthorsRevenueForBook(bookID);
+  console.log(revenue);
+  return revenue;
+}
