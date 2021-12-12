@@ -1,43 +1,56 @@
-const hre = require('hardhat');
-const fs = require('fs');
+const hre = require("hardhat");
+const fs = require("fs");
 
 export async function main() {
+  // eBookDonator -------------------------------------------------------
+  const eBookDonatorContract = await hre.ethers.getContractFactory(
+    "eBookDonator"
+  );
+  const eBookDonator = await eBookDonatorContract.deploy();
+
+  await eBookDonator.deployed();
+  const eBookDonatorContractAddress = eBookDonator.address;
+  console.log(`eBookDonator deployed to : ${eBookDonatorContractAddress}`);
+
   // StorageStructures -------------------------------------------------------
   const StorageStructuresContract = await hre.ethers.getContractFactory(
-    'StorageStructures',
+    "StorageStructures"
   );
-  const StorageStructures = await StorageStructuresContract.deploy();
+  const StorageStructures = await StorageStructuresContract.deploy(
+    eBookDonatorContractAddress
+  );
   await StorageStructures.deployed();
   const StorageStructuresContractAddress = StorageStructures.address;
   console.log(
-    `StorageStructures deployed to : ${StorageStructuresContractAddress}'`,
+    `StorageStructures deployed to : ${StorageStructuresContractAddress}`
   );
 
   // eBookMarketLaunch -------------------------------------------------------
   const eBookMarketLaunchContract = await hre.ethers.getContractFactory(
-    'eBookMarketLaunch',
+    "eBookMarketLaunch"
   );
   const eBookMarketLaunch = await eBookMarketLaunchContract.deploy(
-    StorageStructuresContractAddress,
+    StorageStructuresContractAddress
   );
   const eBookMarketLaunchContractAddress = eBookMarketLaunch.address;
   console.log(
-    `eBookMarketLaunch deployed to : ${eBookMarketLaunchContractAddress}'`,
+    `eBookMarketLaunch deployed to : ${eBookMarketLaunchContractAddress}`
   );
 
   // eBookExchange ------------------------------------------------------
   const eBookExchangeContract = await hre.ethers.getContractFactory(
-    'eBookExchange',
+    "eBookExchange"
   );
   const eBookExchange = await eBookExchangeContract.deploy(
-    StorageStructuresContractAddress,
+    StorageStructuresContractAddress
   );
   const eBookExchangeContractAddress = eBookExchange.address;
-  console.log(`eBookExchange deployed to : ${eBookExchangeContractAddress}'`);
+  console.log(`eBookExchange deployed to : ${eBookExchangeContractAddress}`);
 
   // saving contract address to a file
 
   const contract_address = JSON.stringify({
+    eBookDonator: eBookDonatorContractAddress,
     StorageStructures: StorageStructuresContractAddress,
     eBookMarketLaunch: eBookMarketLaunchContractAddress,
     eBookExchange: eBookExchangeContractAddress,

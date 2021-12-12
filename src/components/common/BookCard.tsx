@@ -44,7 +44,7 @@ const BookCard = ({ book_metadata_uri }: Props) => {
             </p>
             <p className="text-xs ">
               {bookMetadata.description.length > 110
-                ? `${bookMetadata.description.substring(0, 110)}...`
+                ? `${bookMetadata.description.substring(0, 90)}...`
                 : bookMetadata.description}
             </p>
             <div className="flex w-full h-full justify-end">
