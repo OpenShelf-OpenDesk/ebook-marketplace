@@ -6,6 +6,7 @@ import {
 import { useSignerContext } from "../../../context/Signer";
 import PreviewBookCoverPage from "../../common/PreviewBookCoverPage";
 import { ArrowNarrowLeftIcon, CheckCircleIcon } from "@heroicons/react/solid";
+import { AcademicCapIcon } from "@heroicons/react/outline";
 import { useRouter } from "next/router";
 import { useLoadingContext } from "../../../context/Loading";
 import LoadingCircle from "../../common/LoadingCircle";
@@ -55,9 +56,13 @@ const BookPreview = (props: Props) => {
   const router = useRouter();
   const { signer } = useSignerContext();
   const [bookPreviewData, setBookPreviewData] = useState<eBook>();
+  const [validRedeemSubmission, setValidRedeemSubmission] =
+    useState<boolean>(false);
+  const [validVoucher, setValidVoucher] = useState<boolean>(true);
   const [validPurchaseAttempt, setValidPurchaseAttempt] =
     useState<boolean>(false);
   const [progressStatus, setProgressStatus] = useState<number>(0);
+
   useEffect(() => {
     if (!router.query.bookdata) {
       router.push(`/OpenShelf`);
@@ -70,6 +75,17 @@ const BookPreview = (props: Props) => {
       setLoading(true);
     };
   }, []);
+
+  const handleRedeemSubmit = (e) => {
+    e.preventDefault();
+    // if (e.target.eBookVoucherSignature.value.length > 0) {
+    //   setValidRedeemSubmission(true);
+
+    //   setTimeout(() => {}, 1000);
+    // } else {
+    //   setValidRedeemSubmission(false);
+    // }
+  };
 
   const setProgressStatusCB = (statusCode) => {
     switch (statusCode) {
@@ -111,8 +127,8 @@ const BookPreview = (props: Props) => {
               <div className="w-3/5 h-full rounded-lg shadow-lg">
                 <PreviewBookCoverPage src={bookPreviewData.ebook_cover_image} />
               </div>
-              <div className="flex flex-col w-full h-full justify-center space-y-10">
-                <div className="flex flex-col">
+              <div className="flex flex-col w-full h-full justify-start space-y-5">
+                <div className="flex flex-col pb-5">
                   <h1 className="text-4xl font-bold text-center italic py-3">
                     {bookPreviewData.title}
                   </h1>
@@ -125,7 +141,7 @@ const BookPreview = (props: Props) => {
                     {bookPreviewData.description}
                   </p>
                 </div>
-                <div className="grid grid-cols-3 grid-rows-1 gap-5">
+                <div className="grid grid-cols-3 grid-rows-1 gap-5 pt-14">
                   <div className="bg-green-50 rounded-lg flex flex-col p-5 space-y-1">
                     <span className="font-semibold">Author's Price</span>
                     <span className="text-3xl font-semibold">
@@ -200,6 +216,41 @@ const BookPreview = (props: Props) => {
                       </button>
                     </div>
                   </div>
+                </div>
+                <div className="w-full flex">
+                  <form
+                    className="flex flex-row w-full justify-between space-x-5 form-control px-5"
+                    onSubmit={(e) => {
+                      handleRedeemSubmit(e);
+                    }}
+                  >
+                    <input
+                      type="text"
+                      name="eBookVoucherSignature"
+                      placeholder="Voucher Signature"
+                      onChange={(e) => {
+                        if (e.target.value.length == 132) {
+                          setValidVoucher(true);
+                          setValidRedeemSubmission(true);
+                        } else {
+                          setValidVoucher(false);
+                          setValidRedeemSubmission(false);
+                        }
+                      }}
+                      className={`input input-bordered input-sm w-full ${
+                        !validVoucher && `input-error`
+                      }`}
+                    />
+                    <button
+                      type="submit"
+                      className={`flex btn btn-outline btn-sm px-5 space-x-2 opacity-70`}
+                    >
+                      <p className="pt-1 text-sm font-medium">
+                        Get Student Copy
+                      </p>
+                      <AcademicCapIcon className="h-4 w-4" />
+                    </button>
+                  </form>
                 </div>
               </div>
             </div>
