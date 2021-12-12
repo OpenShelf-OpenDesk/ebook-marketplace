@@ -7,6 +7,7 @@ import BookOwnedInShelfCard from "../BookOwnedInShelfCard";
 import Navbar from "../Navbar";
 import Image from "next/image";
 import Sidebar from "../Sidebar";
+import StudentCopyBookInShelfCard from "../StudentCopyBookInShelfCard";
 
 interface Props {
   selected: 1 | 2 | 3;
@@ -32,11 +33,11 @@ const Shelf = ({ selected, setSelected }: Props) => {
             setBooksOwnedInShelf((state) => {
               return [...state, _book];
             });
-          } else if (_book.status == 1) {
+          } else if (_book.status == 3) {
             setBooksRentedInShelf((state) => {
               return [...state, _book];
             });
-          } else if (_book.status == 2) {
+          } else if (_book.eBookID == 0) {
             setStudentBooksCopyInShelf((state) => {
               return [...state, _book];
             });
@@ -100,6 +101,7 @@ const Shelf = ({ selected, setSelected }: Props) => {
         </div>
         {booksOwnedInShelf.length > 0 && tabSelected == 1 ? (
           <div className="grid grid-cols-3 gap-x-7 gap-y-7 p-7 h-5/6 bg-purple-100 border-l-2 border-r-2 border-primary overflow-y-scroll">
+            {console.log(booksOwnedInShelf)}
             {booksOwnedInShelf.map((_bookInShelf, index) => {
               return (
                 <BookOwnedInShelfCard
@@ -119,19 +121,17 @@ const Shelf = ({ selected, setSelected }: Props) => {
                 />
               );
             })} */}
-            List of Rented Books of Reader !!
           </div>
         ) : studentBooksCopyInShelf.length > 0 && tabSelected == 3 ? (
           <div className="grid grid-cols-3 gap-x-7 gap-y-11 p-7 h-5/6 bg-purple-100">
-            {/* {booksOwnedInShelf.map((_bookInShelf, index) => {
+            {studentBooksCopyInShelf.map((_bookInShelf, index) => {
               return (
-                <BookInShelfCardOwned
+                <StudentCopyBookInShelfCard
                   bookMetadataURI={_bookInShelf.metadataURI}
                   key={index}
                 />
               );
-            })} */}
-            List of Student Copy Books of Reader !!
+            })}
           </div>
         ) : (
           <div className="w-full h-5/6 flex flex-col justify-center items-center bg-purple-100 border-l-2 border-r-2 border-primary">
