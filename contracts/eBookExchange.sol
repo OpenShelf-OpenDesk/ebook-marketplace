@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.4;
 
-import "./eBookMarketLaunch.sol";
-import "./StorageStructures.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import {StorageStructures, ReentrancyGuard} from "./StorageStructures.sol";
 
 contract eBookExchange is ReentrancyGuard {
     StorageStructures _ss;
@@ -50,6 +48,11 @@ contract eBookExchange is ReentrancyGuard {
             StorageStructures.Book memory book = _ss.getBook(bookID);
             address buyer = _ss.matchBuyer(bookID);
             payable(book.author).transfer((book.price * 20) / 100);
+            _ss.addToAuthorsRevenue(
+                book.author,
+                bookID,
+                (book.price * 20) / 100
+            );
             payable(msg.sender).transfer((book.price * 80) / 100);
             _ss.executeOrder(buyer, msg.sender, bookID);
         } else {
@@ -73,6 +76,11 @@ contract eBookExchange is ReentrancyGuard {
         if (_ss.getSellersCount(bookID) > 0) {
             address seller = _ss.matchSeller(bookID);
             payable(book.author).transfer((book.price * 20) / 100);
+            _ss.addToAuthorsRevenue(
+                book.author,
+                bookID,
+                (book.price * 20) / 100
+            );
             payable(seller).transfer((book.price * 80) / 100);
             _ss.executeOrder(msg.sender, seller, bookID);
         } else {

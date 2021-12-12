@@ -146,11 +146,11 @@ const Exchange = ({
 
   useEffect(() => {
     selectedBook &&
-      getBookBuyersCount(selectedBook.book_id).then((count) => {
+      getBookBuyersCount(selectedBook.book_id, signer.signer).then((count) => {
         setBuyers(count);
       });
     selectedBook &&
-      getBookSellersCount(selectedBook.book_id).then((count) => {
+      getBookSellersCount(selectedBook.book_id, signer.signer).then((count) => {
         setSellers(count);
       });
   }, [selectedBook]);
