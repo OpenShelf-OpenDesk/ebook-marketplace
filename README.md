@@ -1,6 +1,4 @@
-![OpenShelf | OpenDesk]("./public/logo.png")
-
-# <center>**eBook-Marketplace**</center>
+<img src="./public/logo.png" alt="OpenShelf | OpenDesk" />
 
 A NFT marketplace for e-Book. Here, Authors can self publish books. Readers can buy or sell books while compensating the author on every exchange transaction.
 
@@ -37,7 +35,7 @@ Readers can buy directly from Authors. As the books are being self-published, au
 
 ## **Technologies Used**
 
-<center>
+<div align="center">
 <img src="./public/nextJS.svg" width="70px" height="50px"/>
 &nbsp;&nbsp;&nbsp;
 <img src="./public/tailwindcss.svg" width="200px" height="50px"/>
@@ -60,12 +58,10 @@ Readers can buy directly from Authors. As the books are being self-published, au
 &nbsp;&nbsp;&nbsp;
 <img src="./public/vercel.svg" width="120px" height="40px"/>
 &nbsp;&nbsp;&nbsp;
-</center>
+</div>
 
 ## **Developer Team**
 
 - [Raghav Goyal](https://github.com/rg12301)
 - [Nonit Mittal](https://github.com/NonitMittal)
 - [Ishita Gupta](https://github.com/ishitagupta03)
-
----
