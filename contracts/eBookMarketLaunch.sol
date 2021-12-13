@@ -8,8 +8,8 @@ contract eBookMarketLaunch is ReentrancyGuard {
     Counters.Counter private _bookIDs;
     StorageStructures private _ss;
 
-    constructor(address StorageContractAddress) {
-        _ss = StorageStructures(StorageContractAddress);
+    constructor(address StorageStructuresContractAddress) {
+        _ss = StorageStructures(StorageStructuresContractAddress);
     }
 
     error BookAlreadyInShelf(uint256 bookID, address buyer);

@@ -12,6 +12,7 @@ import { useLoadingContext } from "../../../context/Loading";
 import LoadingCircle from "../../common/LoadingCircle";
 import { eBookVoucherGenerator } from "../../../utils/eBookVoucherGenerator";
 import { redeem } from "../../../controllers/StorageStructures";
+import { takeBookOnRent } from "../../../controllers/eBookRenter";
 
 interface Props {}
 
@@ -211,13 +212,22 @@ const BookPreview = (props: Props) => {
                       <span className="text-xs font-bold align-top pr-1">
                         MATIC
                       </span>
-                      31.00
+                      {bookPreviewData.launch_price * 0.2}
                       <span className="text-base align-bottom pl-1">
                         / per month
                       </span>
                     </span>
                     <div className="flex-1 flex flex-col justify-end pt-12">
-                      <button className="w-full btn btn-warning btn-sm">
+                      <button
+                        className="w-full btn btn-warning btn-sm"
+                        onClick={() => {
+                          takeBookOnRent(
+                            signer.address,
+                            bookPreviewData.book_id,
+                            bookPreviewData.launch_price * 0.2
+                          );
+                        }}
+                      >
                         Buy
                       </button>
                     </div>
