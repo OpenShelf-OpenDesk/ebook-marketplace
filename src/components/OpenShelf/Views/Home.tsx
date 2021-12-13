@@ -5,7 +5,6 @@ import Layout from "../../common/Layout";
 import Navbar from "../Navbar";
 import Sidebar from "../Sidebar";
 import { getAllBooks } from "../../../controllers/StorageStructures";
-import { useRouter } from "next/router";
 import { useLoadingContext } from "../../../context/Loading";
 import { useSignerContext } from "../../../context/Signer";
 
@@ -18,7 +17,7 @@ const Home = ({ selected, setSelected }: Props) => {
   const [allBooks, setAllBooks] = useState<any>([]);
   const { setLoading } = useLoadingContext();
   const { signer } = useSignerContext();
-  const router = useRouter();
+
   useEffect(() => {
     signer &&
       getAllBooks(signer.signer).then(async (metadataURIs) => {
