@@ -5,9 +5,10 @@ import LoadingCircle from "../common/LoadingCircle";
 import { useRouter } from "next/router";
 interface Props {
   bookMetadataURI: string;
+  status: number;
 }
 
-const BookOwnedInShelfCard = ({ bookMetadataURI }: Props) => {
+const BookOwnedInShelfCard = ({ bookMetadataURI, status }: Props) => {
   const router = useRouter();
   const [bookMetadata, setBookMetadata] = useState<eBook | undefined>();
   useEffect(() => {
@@ -22,7 +23,7 @@ const BookOwnedInShelfCard = ({ bookMetadataURI }: Props) => {
   }, []);
   return bookMetadata ? (
     <div className="group h-80 w-full border border-gray-300 flex flex-row space-x-5 pr-5 overflow-hidden bg-white rounded-lg">
-      <div className="flex-1 h-full w-full shadow-lg transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110">
+      <div className="flex-1 h-full w-full shadow-lg transition duration-500 ease-in-out transform hover:-translate-y-1 group-hover:scale-110">
         <PreviewBookCoverPage
           src={bookMetadata.ebook_cover_image}
           height={320}
@@ -33,7 +34,10 @@ const BookOwnedInShelfCard = ({ bookMetadataURI }: Props) => {
         <div className="flex flex-col w-full h-full pt-4 justify-end">
           <div className="flex justify-between">
             <button
-              className="text-sm text-red-500 font-semibold"
+              disabled={status == 0 ? false : true}
+              className={`text-sm font-semibold ${
+                status == 0 ? "text-red-500" : `text-red-300 cursor-default`
+              }`}
               onClick={() => {
                 router.push(
                   {
@@ -48,7 +52,7 @@ const BookOwnedInShelfCard = ({ bookMetadataURI }: Props) => {
                 );
               }}
             >
-              Place Sell Order
+              {status == 0 ? `Place Sell Order` : `On Sale`}
             </button>
             <button
               className="text-sm text-primary self-end"

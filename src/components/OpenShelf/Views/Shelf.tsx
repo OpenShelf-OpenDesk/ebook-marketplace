@@ -29,7 +29,7 @@ const Shelf = ({ selected, setSelected }: Props) => {
     getBooksInMyShelf(signer.signer, signer.address)
       .then((_booksInShelf) => {
         _booksInShelf.map((_book) => {
-          if (_book.status == 0) {
+          if (_book.status == 0 || _book.status == 1) {
             setBooksOwnedInShelf((state) => {
               return [...state, _book];
             });
@@ -106,6 +106,7 @@ const Shelf = ({ selected, setSelected }: Props) => {
               return (
                 <BookOwnedInShelfCard
                   bookMetadataURI={_bookInShelf.metadataURI}
+                  status={_bookInShelf.status}
                   key={index}
                 />
               );

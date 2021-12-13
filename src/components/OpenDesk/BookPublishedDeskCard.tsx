@@ -81,8 +81,8 @@ const BookPublishedDeskCard = ({ bookMetadataURI }: Props) => {
   };
 
   return bookMetadata ? (
-    <div className="w-full border border-gray-300 flex flex-row space-x-5 bg-white rounded-lg">
-      <div className="h-full shadow-lg transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-105 bg-white">
+    <div className="group w-full border border-gray-300 flex flex-row space-x-5 bg-white rounded-lg">
+      <div className="h-full shadow-lg transition duration-500 ease-in-out transform group-hover:scale-105 bg-white">
         <PreviewBookCoverPage
           src={bookMetadata.ebook_cover_image}
           width={400}
@@ -125,7 +125,7 @@ const BookPublishedDeskCard = ({ bookMetadataURI }: Props) => {
           </div>
           <div className="stats">
             <div className="stat">
-              <div className="stat-title">Donated Books</div>
+              <div className="stat-title">Distributed</div>
               <div className="stat-value">{freeBooksPrinted}</div>
               <div className="stat-desc">Books</div>
             </div>
@@ -134,7 +134,7 @@ const BookPublishedDeskCard = ({ bookMetadataURI }: Props) => {
         <div className="flex justify-center space-x-11 pb-5">
           <div className="stats">
             <div className="stat">
-              <div className="stat-title">Book Sales</div>
+              <div className="stat-title">Sales</div>
               <div className="stat-value">{pricedBooksPrinted}</div>
               <div className="stat-desc">Books</div>
             </div>

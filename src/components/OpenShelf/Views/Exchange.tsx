@@ -308,23 +308,42 @@ const Exchange = ({
                               <div>
                                 <p className="flex justify-between">
                                   <span>Seller Receives</span>
-                                  <span>
-                                    ₹ {selectedBook.launch_price * 0.8}
-                                  </span>
+                                  <div className="flex space-x-2">
+                                    <p className="text-right">
+                                      {(
+                                        selectedBook.launch_price * 0.8
+                                      ).toFixed(3)}
+                                    </p>
+                                    <p className="text-xs font-bold align-top">
+                                      {selectedBook.currency}
+                                    </p>
+                                  </div>
                                 </p>
                                 <p className="flex justify-between">
                                   <span>Author Receives (20%)</span>
-                                  <span className="text-right">
-                                    ₹ {selectedBook.launch_price * 0.2}
-                                  </span>
+                                  <div className="flex space-x-2">
+                                    <p className="text-right">
+                                      {(
+                                        selectedBook.launch_price * 0.2
+                                      ).toFixed(3)}
+                                    </p>
+                                    <p className="text-xs font-bold align-top">
+                                      {selectedBook.currency}
+                                    </p>
+                                  </div>
                                 </p>
                               </div>
                               <div>
                                 <p className="flex justify-between py-2">
                                   <span>Total Payment</span>
-                                  <span className="text-right">
-                                    ₹ {selectedBook.launch_price}
-                                  </span>
+                                  <div className="flex space-x-2">
+                                    <p className="text-right">
+                                      {selectedBook.launch_price}
+                                    </p>
+                                    <p className="text-xs font-bold align-top">
+                                      {selectedBook.currency}
+                                    </p>
+                                  </div>
                                 </p>
                               </div>
                             </div>
@@ -353,21 +372,42 @@ const Exchange = ({
                               <div>
                                 <p className="flex justify-between">
                                   <span>Buyer Pays</span>
-                                  <span>₹ {selectedBook.launch_price}</span>
+                                  <div className="flex space-x-2">
+                                    <p className="text-right">
+                                      {selectedBook.launch_price}
+                                    </p>
+                                    <p className="text-xs font-bold align-top">
+                                      {selectedBook.currency}
+                                    </p>
+                                  </div>
                                 </p>
                                 <p className="flex justify-between">
                                   <span>Author Receives (20%)</span>
-                                  <span className="text-right">
-                                    ₹ {selectedBook.launch_price * 0.2}
-                                  </span>
+                                  <div className="flex space-x-2">
+                                    <p className="text-right">
+                                      {(
+                                        selectedBook.launch_price * 0.2
+                                      ).toFixed(3)}
+                                    </p>
+                                    <p className="text-xs font-bold align-top">
+                                      {selectedBook.currency}
+                                    </p>
+                                  </div>
                                 </p>
                               </div>
                               <div>
                                 <p className="flex justify-between py-2">
                                   <span>Total Received</span>
-                                  <span className="text-right">
-                                    ₹ {selectedBook.launch_price * 0.8}
-                                  </span>
+                                  <div className="flex space-x-2">
+                                    <p className="text-right">
+                                      {(
+                                        selectedBook.launch_price * 0.8
+                                      ).toFixed(3)}
+                                    </p>
+                                    <p className="text-xs font-bold align-top">
+                                      {selectedBook.currency}
+                                    </p>
+                                  </div>
                                 </p>
                               </div>
                             </div>
