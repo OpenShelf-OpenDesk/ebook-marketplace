@@ -5,7 +5,11 @@ import {
 } from "../../../controllers/eBookMarketLaunch";
 import { useSignerContext } from "../../../context/Signer";
 import PreviewBookCoverPage from "../../common/PreviewBookCoverPage";
-import { ArrowNarrowLeftIcon, CheckCircleIcon } from "@heroicons/react/solid";
+import {
+  ArrowNarrowLeftIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+} from "@heroicons/react/solid";
 import { AcademicCapIcon } from "@heroicons/react/outline";
 import { useRouter } from "next/router";
 import { useLoadingContext } from "../../../context/Loading";
@@ -15,13 +19,19 @@ import { redeem } from "../../../controllers/StorageStructures";
 
 interface Props {}
 
-const BookPurchasingStatusTag = ({ status, tag }) => {
+const StatusTag = ({ status, tag, error = false }) => {
   return (
     <div className="flex flex-row justify-center items-center space-x-10 text-gray-700">
       {status ? (
-        <div className="flex justify-center items-center h-20 w-20">
-          <CheckCircleIcon className="h-12 w-12" />
-        </div>
+        error ? (
+          <div className="flex justify-center items-center h-20 w-20">
+            <XCircleIcon className="h-12 w-12" />
+          </div>
+        ) : (
+          <div className="flex justify-center items-center h-20 w-20">
+            <CheckCircleIcon className="h-12 w-12" />
+          </div>
+        )
       ) : (
         <LoadingCircle />
       )}
@@ -36,17 +46,30 @@ const BookPurchasingStatus = ({ statusCode }) => {
   return (
     <section className="flex justify-center fixed z-10 w-screen h-screen ">
       <div className="flex flex-col justify-center items-start">
-        <BookPurchasingStatusTag
-          status={statusCode >= 1}
-          tag="Sending transaction request"
-        />
-        <BookPurchasingStatusTag
-          status={statusCode >= 2}
-          tag="Awaiting payment success"
-        />
-        <BookPurchasingStatusTag
+        <StatusTag status={statusCode >= 1} tag="Sending transaction request" />
+        <StatusTag status={statusCode >= 2} tag="Awaiting payment success" />
+        <StatusTag
           status={statusCode >= 3}
           tag="Awaiting transaction success"
+        />
+      </div>
+    </section>
+  );
+};
+
+const VoucherRedeemingStatus = ({ statusCode, errorCode = 0 }) => {
+  return (
+    <section className="flex justify-center fixed z-10 w-screen h-screen ">
+      <div className="flex flex-col justify-center items-start">
+        <StatusTag
+          status={statusCode >= 1}
+          tag="Awaiting transaction success"
+          error={Math.abs(errorCode) == 1}
+        />
+        <StatusTag
+          status={statusCode >= 2}
+          tag="Validating voucher signature"
+          error={Math.abs(errorCode) == 2}
         />
       </div>
     </section>
@@ -60,10 +83,12 @@ const BookPreview = (props: Props) => {
   const [bookPreviewData, setBookPreviewData] = useState<eBook>();
   const [validRedeemSubmission, setValidRedeemSubmission] =
     useState<boolean>(true);
-
+  const [validRedeemAttempt, setValidRedeemAttempt] = useState<boolean>(false);
   const [validPurchaseAttempt, setValidPurchaseAttempt] =
     useState<boolean>(false);
-  const [progressStatus, setProgressStatus] = useState<number>(0);
+  const [progressBuyStatus, setProgressBuyStatus] = useState<number>(0);
+  const [redeemProgressStatus, setRedeemProgressStatus] = useState<number>(0);
+  const [errorCode, setErrorCode] = useState<number>(0);
 
   useEffect(() => {
     if (!router.query.bookdata) {
@@ -78,46 +103,84 @@ const BookPreview = (props: Props) => {
     };
   }, []);
 
+  const setProgressBuyStatusCB = (statusCode) => {
+    switch (statusCode) {
+      case 1:
+        setProgressBuyStatus(1);
+        break;
+      case 2:
+        setProgressBuyStatus(2);
+        break;
+      case 3:
+        setProgressBuyStatus(3);
+        break;
+      default:
+        setProgressBuyStatus(0);
+        break;
+    }
+  };
+
+  const setRedeemProgressStatusCB = (statusCode) => {
+    switch (statusCode) {
+      case 1:
+        setRedeemProgressStatus(1);
+        break;
+      case 2:
+        setRedeemProgressStatus(2);
+        break;
+      case -2:
+        setErrorCode(-2);
+        break;
+      default:
+        setProgressBuyStatus(0);
+        break;
+    }
+  };
+
   const handleRedeemSubmit = (e) => {
     e.preventDefault();
     if (e.target.eBookVoucherSignature.value.length === 132) {
       setValidRedeemSubmission(true);
+      setValidRedeemAttempt(true);
       const voucher = {
         bookID: bookPreviewData.book_id,
         price: 0,
         studentAddress: signer.address,
         signature: e.target.eBookVoucherSignature.value,
       };
-      redeem(signer.signer, voucher);
+      redeem(signer.signer, voucher, setRedeemProgressStatusCB);
+      setTimeout(() => {
+        router.push(
+          {
+            pathname: `/OpenShelf`,
+            query: {
+              selected: 2,
+            },
+          },
+          `/OpenShelf`
+        );
+      });
     } else {
       setValidRedeemSubmission(false);
-    }
-  };
-
-  const setProgressStatusCB = (statusCode) => {
-    switch (statusCode) {
-      case 1:
-        setProgressStatus(1);
-        break;
-      case 2:
-        setProgressStatus(2);
-        break;
-      case 3:
-        setProgressStatus(3);
-        break;
-      default:
-        setProgressStatus(0);
-        break;
+      setValidRedeemAttempt(false);
     }
   };
 
   return (
     <>
       {validPurchaseAttempt && (
-        <BookPurchasingStatus statusCode={progressStatus} />
+        <BookPurchasingStatus statusCode={progressBuyStatus} />
+      )}
+      {validRedeemAttempt && (
+        <VoucherRedeemingStatus
+          statusCode={redeemProgressStatus}
+          errorCode={errorCode}
+        />
       )}
       <div
-        className={`${validPurchaseAttempt && "filter blur-xl bg-gray-100"}`}
+        className={`${validPurchaseAttempt && "filter blur-xl bg-gray-100"} ${
+          validRedeemAttempt && "filter blur-xl bg-gray-100"
+        }`}
       >
         {bookPreviewData && (
           <section className="w-screen h-screen py-28 px-40">
@@ -148,7 +211,7 @@ const BookPreview = (props: Props) => {
                     {bookPreviewData.description}
                   </p>
                 </div>
-                <div className="grid grid-cols-3 grid-rows-1 gap-5 pt-14">
+                <div className="grid grid-cols-3 grid-rows-1 gap-5 pt-14 pb-3">
                   <div className="bg-green-50 rounded-lg flex flex-col p-5 space-y-1">
                     <span className="font-semibold">Author's Price</span>
                     <span className="text-3xl font-semibold">
@@ -167,7 +230,7 @@ const BookPreview = (props: Props) => {
                             bookPreviewData.book_id,
                             bookPreviewData.launch_price,
                             signer.signer,
-                            setProgressStatusCB
+                            setProgressBuyStatusCB
                           );
                           setTimeout(() => {
                             router.push(`/OpenShelf`);
