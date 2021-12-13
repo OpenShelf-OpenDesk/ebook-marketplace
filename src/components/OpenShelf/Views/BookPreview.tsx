@@ -148,17 +148,18 @@ const BookPreview = (props: Props) => {
         studentAddress: signer.address,
         signature: e.target.eBookVoucherSignature.value,
       };
-      redeem(signer.signer, voucher, setRedeemProgressStatusCB);
-      setTimeout(() => {
-        router.push(
-          {
-            pathname: `/OpenShelf`,
-            query: {
-              selected: 2,
+      redeem(signer.signer, voucher, setRedeemProgressStatusCB).then(() => {
+        setTimeout(() => {
+          router.push(
+            {
+              pathname: `/OpenShelf`,
+              query: {
+                selected: 2,
+              },
             },
-          },
-          `/OpenShelf`
-        );
+            `/OpenShelf`
+          );
+        });
       });
     } else {
       setValidRedeemSubmission(false);
