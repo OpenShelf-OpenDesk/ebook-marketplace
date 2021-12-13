@@ -7,7 +7,7 @@ module.exports = {
       url: "HTTP://127.0.0.1:7545",
       accounts: {
         mnemonic:
-          "feature mushroom junk smart leaf merry manual ball waste lunar toddler decrease",
+          "tag palace accident hidden delay escape involve fetch mushroom corn settle doctor",
         path: "m/44'/60'/0'/0",
         initialIndex: 0,
         count: 10,

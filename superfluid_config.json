@@ -1,0 +1,11 @@
+{
+  "sf": {
+    "network": {
+      "polytest": {
+        "host": "0xEB796bdb90fFA0f28255275e16936D25d3418603",
+        "cfa": "0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873",
+        "acceptedToken": "0x96B82B65ACF7072eFEb00502F45757F254c2a0D4"
+      }
+    }
+  }
+}

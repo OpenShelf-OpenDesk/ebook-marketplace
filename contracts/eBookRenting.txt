@@ -2,73 +2,55 @@
 pragma solidity ^0.8.4;
 pragma abicoder v2;
 
+import {StorageStructures} from "./StorageStructures.sol";
+
 import {ISuperfluid, ISuperToken, ISuperApp, ISuperAgreement, SuperAppDefinitions} from "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluid.sol";
-
 import {IConstantFlowAgreementV1} from "@superfluid-finance/ethereum-contracts/contracts/interfaces/agreements/IConstantFlowAgreementV1.sol";
-
 import {SuperAppBase} from "@superfluid-finance/ethereum-contracts/contracts/apps/SuperAppBase.sol";
 
-import "./StorageStructures.sol";
-
 contract eBookRenting is SuperAppBase {
+    StorageStructures private _ss;
     ISuperfluid private _host; // host
     IConstantFlowAgreementV1 private _cfa; // the stored constant flow agreement class address
     ISuperToken private _acceptedToken; // accepted token
-    StorageStructures private _ss;
+    bool private _onlyOnce = true;
+
+    struct RenteeRenterPair {
+        address renter;
+        int256 outflow;
+    }
+    mapping(uint256 => mapping(address => RenteeRenterPair))
+        private rentee_renter_pairs;
 
     constructor(
+        // address StorageStructuresContractAddress,
         ISuperfluid host,
         IConstantFlowAgreementV1 cfa,
-        ISuperToken acceptedToken,
-        address receiver,
-        StorageStructures ss
+        ISuperToken acceptedToken
     ) {
+        // _ss = StorageStructures(StorageStructuresContractAddress);
+
         require(address(host) != address(0), "host is zero address");
         require(address(cfa) != address(0), "cfa is zero address");
         require(
             address(acceptedToken) != address(0),
             "acceptedToken is zero address"
         );
-        require(address(receiver) != address(0), "receiver is zero address");
-        require(!host.isApp(ISuperApp(receiver)), "receiver is an app");
 
         _host = host;
         _cfa = cfa;
         _acceptedToken = acceptedToken;
-        _ss = ss;
 
         uint256 configWord = SuperAppDefinitions.APP_LEVEL_FINAL |
-            SuperAppDefinitions.BEFORE_AGREEMENT_CREATED_NOOP |
             SuperAppDefinitions.BEFORE_AGREEMENT_UPDATED_NOOP |
-            SuperAppDefinitions.BEFORE_AGREEMENT_TERMINATED_NOOP;
+            SuperAppDefinitions.AFTER_AGREEMENT_UPDATED_NOOP |
+            SuperAppDefinitions.AFTER_AGREEMENT_TERMINATED_NOOP;
 
         _host.registerApp(configWord);
     }
 
-    // function currentReceiver()
-    //     external
-    //     view
-    //     returns (
-    //         uint256 startTime,
-    //         address receiver,
-    //         int96 flowRate
-    //     )
-    // {
-    //     if (_receiver != address(0)) {
-    //         (startTime, flowRate, , ) = _cfa.getFlow(
-    //             _acceptedToken,
-    //             address(this),
-    //             _receiver
-    //         );
-    //         receiver = _receiver;
-    //     }
-    // }
-
-    /**************************************************************************
-     * eBook Renting Logic
-     *************************************************************************/
-
     error BookNotOwnedInShelf(uint256 bookID, address reader);
+    error BookNotRentedInShelf(uint256 bookID, address reader);
 
     modifier ownedInShelf(address msgSender, uint256 bookID) {
         StorageStructures.eBook[] memory readersShelf = _ss.getReadersShelf(
@@ -88,6 +70,30 @@ contract eBookRenting is SuperAppBase {
         revert BookNotOwnedInShelf(bookID, msgSender);
     }
 
+    modifier rentedInShelf(address msgSender, uint256 bookID) {
+        StorageStructures.eBook[] memory readersShelf = _ss.getReadersShelf(
+            msg.sender
+        );
+        for (uint256 i = 0; i < readersShelf.length; i++) {
+            if (bookID == readersShelf[i].bookID) {
+                if (
+                    readersShelf[i].status ==
+                    StorageStructures.eBookStatus.ON_RENT
+                ) {
+                    _;
+                }
+                return;
+            }
+        }
+        revert BookNotRentedInShelf(bookID, msgSender);
+    }
+
+    function _setSS(address StorageStructuresContractAddress) external {
+        require(_onlyOnce, "Unauthorised request!");
+        _ss = StorageStructures(StorageStructuresContractAddress);
+        _onlyOnce = false;
+    }
+
     function putBookForRent(uint256 bookID)
         external
         ownedInShelf(msg.sender, bookID)
@@ -95,195 +101,143 @@ contract eBookRenting is SuperAppBase {
         _ss.addRentor(bookID, msg.sender);
     }
 
-    function takeBookOnRent(uint256 bookID) external {
-        if (_ss.getRentorsCount(bookID) > 0) {
-            address rentor = _ss.matchRentor(bookID);
-        }
+    function removeBookFromRent(uint256 bookID)
+        external
+        rentedInShelf(msg.sender, bookID)
+    {
+        _ss.removeRentor(bookID, msg.sender);
     }
-
-    // event ReceiverChanged(address receiver); //what is this?
-
-    // /// @dev If a new stream is opened, or an existing one is opened
-    // function _updateOutflow(bytes calldata ctx)
-    //     private
-    //     returns (bytes memory newCtx)
-    // {
-    //     newCtx = ctx;
-    //     // @dev This will give me the new flowRate, as it is called in after callbacks
-    //     int96 netFlowRate = _cfa.getNetFlow(_acceptedToken, address(this));
-    //     (, int96 outFlowRate, , ) = _cfa.getFlow(
-    //         _acceptedToken,
-    //         address(this),
-    //         _receiver
-    //     ); // CHECK: unclear what happens if flow doesn't exist.
-    //     int96 inFlowRate = netFlowRate + outFlowRate;
-
-    //     // @dev If inFlowRate === 0, then delete existing flow.
-    //     if (inFlowRate == int96(0)) {
-    //         // @dev if inFlowRate is zero, delete outflow.
-    //         (newCtx, ) = _host.callAgreementWithContext(
-    //             _cfa,
-    //             abi.encodeWithSelector(
-    //                 _cfa.deleteFlow.selector,
-    //                 _acceptedToken,
-    //                 address(this),
-    //                 _receiver,
-    //                 new bytes(0) // placeholder
-    //             ),
-    //             "0x",
-    //             newCtx
-    //         );
-    //     } else if (outFlowRate != int96(0)) {
-    //         (newCtx, ) = _host.callAgreementWithContext(
-    //             _cfa,
-    //             abi.encodeWithSelector(
-    //                 _cfa.updateFlow.selector,
-    //                 _acceptedToken,
-    //                 _receiver,
-    //                 inFlowRate,
-    //                 new bytes(0) // placeholder
-    //             ),
-    //             "0x",
-    //             newCtx
-    //         );
-    //     } else {
-    //         // @dev If there is no existing outflow, then create new flow to equal inflow
-    //         (newCtx, ) = _host.callAgreementWithContext(
-    //             _cfa,
-    //             abi.encodeWithSelector(
-    //                 _cfa.createFlow.selector,
-    //                 _acceptedToken,
-    //                 _receiver,
-    //                 inFlowRate,
-    //                 new bytes(0) // placeholder
-    //             ),
-    //             "0x",
-    //             newCtx
-    //         );
-    //     }
-    // }
-
-    // @dev Change the Receiver of the total flow
-    // function _changeReceiver(address newReceiver) internal {
-    //     require(newReceiver != address(0), "New receiver is zero address");
-    //     // @dev because our app is registered as final, we can't take downstream apps
-    //     require(
-    //         !_host.isApp(ISuperApp(newReceiver)),
-    //         "New receiver can not be a superApp"
-    //     );
-    //     if (newReceiver == _receiver) return;
-    //     // @dev delete flow to old receiver
-    //     (, int96 outFlowRate, , ) = _cfa.getFlow(
-    //         _acceptedToken,
-    //         address(this),
-    //         _receiver
-    //     ); //CHECK: unclear what happens if flow doesn't exist.
-    //     if (outFlowRate > 0) {
-    //         _host.callAgreement(
-    //             _cfa,
-    //             abi.encodeWithSelector(
-    //                 _cfa.deleteFlow.selector,
-    //                 _acceptedToken,
-    //                 address(this),
-    //                 _receiver,
-    //                 new bytes(0)
-    //             ),
-    //             "0x"
-    //         );
-    //         // @dev create flow to new receiver
-    //         _host.callAgreement(
-    //             _cfa,
-    //             abi.encodeWithSelector(
-    //                 _cfa.createFlow.selector,
-    //                 _acceptedToken,
-    //                 newReceiver,
-    //                 _cfa.getNetFlow(_acceptedToken, address(this)),
-    //                 new bytes(0)
-    //             ),
-    //             "0x"
-    //         );
-    //     }
-    //     // @dev set global receiver to new receiver
-    //     _receiver = newReceiver;
-
-    //     emit ReceiverChanged(_receiver);
-    // }
 
     /**************************************************************************
      * SuperApp callbacks
      *************************************************************************/
 
-    // function afterAgreementCreated(
-    //     ISuperToken _superToken,
-    //     address _agreementClass,
-    //     bytes32, // _agreementId,
-    //     bytes calldata, /*_agreementData*/
-    //     bytes calldata, // _cbdata,
-    //     bytes calldata _ctx
-    // )
-    //     external
-    //     override
-    //     onlyExpected(_superToken, _agreementClass)
-    //     onlyHost
-    //     returns (bytes memory newCtx)
-    // {
-    //     return _updateOutflow(_ctx);
-    // }
+    function beforeAgreementCreated(
+        ISuperToken _superToken,
+        address _agreementClass,
+        bytes32, // _agreementId,
+        bytes calldata, /*_agreementData*/
+        bytes calldata, // _cbdata,
+        bytes calldata _ctx
+    )
+        external
+        view
+        onlyExpected(_superToken, _agreementClass)
+        onlyHost
+        returns (bytes memory newCtx)
+    {
+        ISuperfluid.Context memory context = _host.decodeCtx(_ctx);
+        uint256 bookID = abi.decode(context.userData, (uint256));
+        require(_ss.getRentorsCount(bookID) > 0, "Renter not available!");
+        newCtx = _ctx;
+    }
 
-    // function afterAgreementUpdated(
-    //     ISuperToken _superToken,
-    //     address _agreementClass,
-    //     bytes32, //_agreementId,
-    //     bytes calldata agreementData,
-    //     bytes calldata, //_cbdata,
-    //     bytes calldata _ctx
-    // )
-    //     external
-    //     override
-    //     onlyExpected(_superToken, _agreementClass)
-    //     onlyHost
-    //     returns (bytes memory newCtx)
-    // {
-    //     return _updateOutflow(_ctx);
-    // }
+    function afterAgreementCreated(
+        ISuperToken _superToken,
+        address _agreementClass,
+        bytes32, // _agreementId,
+        bytes calldata, /*_agreementData*/
+        bytes calldata, // _cbdata,
+        bytes calldata _ctx
+    )
+        external
+        override
+        onlyExpected(_superToken, _agreementClass)
+        onlyHost
+        returns (bytes memory newCtx)
+    {
+        ISuperfluid.Context memory context = _host.decodeCtx(_ctx);
+        (, int96 outFlowRate, , ) = _cfa.getFlow(
+            _acceptedToken,
+            context.msgSender,
+            address(this)
+        );
+        uint256 bookID = abi.decode(context.userData, (uint256));
+        uint256 price = _ss.getBookPrice(bookID);
+        if (
+            outFlowRate >=
+            rentee_renter_pairs[bookID][context.msgSender].outflow +
+                (int256(price) / 5)
+        ) {
+            address renter = _ss.matchRentor(bookID);
+            (newCtx, ) = _host.callAgreementWithContext(
+                _cfa,
+                abi.encodeWithSelector(
+                    _cfa.createFlow.selector,
+                    _acceptedToken,
+                    renter,
+                    outFlowRate,
+                    new bytes(0) // placeholder
+                ),
+                "0x",
+                _ctx
+            );
+            _ss.addRentedBookToShelf(bookID, renter, context.msgSender);
+            rentee_renter_pairs[bookID][context.msgSender].renter = renter;
+            rentee_renter_pairs[bookID][context.msgSender]
+                .outflow = outFlowRate;
+        }
+    }
 
-    // function afterAgreementTerminated(
-    //     ISuperToken _superToken,
-    //     address _agreementClass,
-    //     bytes32, //_agreementId,
-    //     bytes calldata, /*_agreementData*/
-    //     bytes calldata, //_cbdata,
-    //     bytes calldata _ctx
-    // ) external override onlyHost returns (bytes memory newCtx) {
-    //     // According to the app basic law, we should never revert in a termination callback
-    //     if (!_isSameToken(_superToken) || !_isCFAv1(_agreementClass))
-    //         return _ctx;
-    //     return _updateOutflow(_ctx);
-    // }
+    function beforeAgreementTerminated(
+        ISuperToken _superToken,
+        address _agreementClass,
+        bytes32, //_agreementId,
+        bytes calldata, /*_agreementData*/
+        bytes calldata, //_cbdata,
+        bytes calldata _ctx
+    ) external onlyHost returns (bytes memory newCtx) {
+        // According to the app basic law, we should never revert in a termination callback
+        ISuperfluid.Context memory context = _host.decodeCtx(_ctx);
+        uint256 bookID = abi.decode(context.userData, (uint256));
+        (newCtx, ) = _host.callAgreementWithContext(
+            _cfa,
+            abi.encodeWithSelector(
+                _cfa.deleteFlow.selector,
+                _acceptedToken,
+                address(this),
+                rentee_renter_pairs[bookID][context.msgSender].renter,
+                new bytes(0)
+            ),
+            "0x",
+            _ctx
+        );
+        _ss.removeRentedBookFromShelf(
+            bookID,
+            rentee_renter_pairs[bookID][context.msgSender].renter,
+            context.msgSender
+        );
+        rentee_renter_pairs[bookID][context.msgSender].renter = address(0);
+        rentee_renter_pairs[bookID][context.msgSender].outflow = 0;
 
-    // function _isSameToken(ISuperToken superToken) private view returns (bool) {
-    //     return address(superToken) == address(_acceptedToken);
-    // }
+        if (!_isSameToken(_superToken) || !_isCFAv1(_agreementClass))
+            return _ctx;
+        // return _updateOutflow(_ctx);
+    }
 
-    // function _isCFAv1(address agreementClass) private view returns (bool) {
-    //     return
-    //         ISuperAgreement(agreementClass).agreementType() ==
-    //         keccak256(
-    //             "org.superfluid-finance.agreements.ConstantFlowAgreement.v1"
-    //         );
-    // }
+    function _isSameToken(ISuperToken superToken) private view returns (bool) {
+        return address(superToken) == address(_acceptedToken);
+    }
 
-    // modifier onlyHost() {
-    //     require(
-    //         msg.sender == address(_host),
-    //         "RedirectAll: support only one host"
-    //     );
-    //     _;
-    // }
+    function _isCFAv1(address agreementClass) private view returns (bool) {
+        return
+            ISuperAgreement(agreementClass).agreementType() ==
+            keccak256(
+                "org.superfluid-finance.agreements.ConstantFlowAgreement.v1"
+            );
+    }
 
-    // modifier onlyExpected(ISuperToken superToken, address agreementClass) {
-    //     require(_isSameToken(superToken), "RedirectAll: not accepted token");
-    //     require(_isCFAv1(agreementClass), "RedirectAll: only CFAv1 supported");
-    //     _;
-    // }
+    modifier onlyHost() {
+        require(
+            msg.sender == address(_host),
+            "RedirectAll: support only one host"
+        );
+        _;
+    }
+
+    modifier onlyExpected(ISuperToken superToken, address agreementClass) {
+        require(_isSameToken(superToken), "RedirectAll: not accepted token");
+        require(_isCFAv1(agreementClass), "RedirectAll: only CFAv1 supported");
+        _;
+    }
 }

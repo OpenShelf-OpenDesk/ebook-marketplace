@@ -21,10 +21,16 @@ export function createUser(_walletAddress: string) {
   return newUser;
 }
 
-export async function createFlow(_sender, _recipient, _flowrate: number) {
+export async function createFlow(
+  _sender,
+  _recipient,
+  _flowrate: number,
+  userData
+) {
   const tx = await _sender.flow({
     recipient: _recipient,
     flowRate: String(calculateFlowrateInSeconds(_flowrate)),
+    userData: userData,
   });
   return tx;
 }
