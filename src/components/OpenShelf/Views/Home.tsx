@@ -4,7 +4,10 @@ import BookCard from "../../common/BookCard";
 import Layout from "../../common/Layout";
 import Navbar from "../Navbar";
 import Sidebar from "../Sidebar";
-import { getAllBooks } from "../../../controllers/StorageStructures";
+import {
+  getRecentLaunches,
+  getBestSellers,
+} from "../../../controllers/StorageStructures";
 import { useLoadingContext } from "../../../context/Loading";
 import { useSignerContext } from "../../../context/Signer";
 
@@ -14,18 +17,27 @@ interface Props {
 }
 
 const Home = ({ selected, setSelected }: Props) => {
-  const [allBooks, setAllBooks] = useState<any>([]);
+  const [recentBooks, setRecentBooks] = useState<any>([]);
+  const [bestSellerBooks, setBestSellerBooks] = useState<any>([]);
   const { setLoading } = useLoadingContext();
   const { signer } = useSignerContext();
 
   useEffect(() => {
     signer &&
-      getAllBooks(signer.signer).then(async (metadataURIs) => {
-        setAllBooks(metadataURIs);
-        setTimeout(() => {
-          setLoading(false);
-        }, 1000);
-      });
+      getRecentLaunches(signer.signer).then(
+        async (recentLaunchesMetadataURIs) => {
+          setRecentBooks(recentLaunchesMetadataURIs);
+          getBestSellers(signer.signer)
+            .then(async (bestSellersMetadataURIs) => {
+              setBestSellerBooks(bestSellersMetadataURIs);
+            })
+            .then(() => {
+              setTimeout(() => {
+                setLoading(false);
+              }, 1000);
+            });
+        }
+      );
     return () => {
       setLoading(true);
     };
@@ -63,7 +75,7 @@ const Home = ({ selected, setSelected }: Props) => {
         <div className="mt-10 mb-14 px-2">
           <h3 className="text-2xl font-bold">Recent Launches</h3>
           <div className="my-5 flex overscroll-x-contain overflow-scroll no-scrollbar">
-            {allBooks.map((book, index) => {
+            {recentBooks.map((book, index) => {
               return <BookCard key={index} book_metadata_uri={book} />;
             })}
           </div>
@@ -71,7 +83,11 @@ const Home = ({ selected, setSelected }: Props) => {
 
         <div className="mt-10 mb-14 px-2">
           <h3 className="text-2xl font-bold">Bestselling</h3>
-          <div className="my-5 flex overscroll-x-contain overflow-scroll no-scrollbar"></div>
+          <div className="my-5 flex overscroll-x-contain overflow-scroll no-scrollbar">
+            {bestSellerBooks.map((book, index) => {
+              return <BookCard key={index} book_metadata_uri={book} />;
+            })}
+          </div>
         </div>
       </div>
     </Layout>
