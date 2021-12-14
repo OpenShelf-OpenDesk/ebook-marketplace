@@ -4,18 +4,9 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {eBookPublisher, Counters} from "./eBookPublisher.sol";
 import {eBookDonator} from "./eBookDonator.sol";
-
-// import {ISuperfluid, ISuperToken, ISuperApp, ISuperAgreement, SuperAppDefinitions} from "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluid.sol";
-// import {IConstantFlowAgreementV1} from "@superfluid-finance/ethereum-contracts/contracts/interfaces/agreements/IConstantFlowAgreementV1.sol";
-// import {eBookRenter} from "./eBookRenter.sol";
 import {eBookRenting} from "./eBookRenting.sol";
 
 contract StorageStructures {
-
-    // ISuperfluid private _host; // host
-    // IConstantFlowAgreementV1 private _cfa; // the stored constant flow agreement class address
-    // ISuperToken private _acceptedToken; // accepted token
-
     struct Book {
         string metadataURI;
         address author;
@@ -48,44 +39,16 @@ contract StorageStructures {
     mapping(uint256 => address[]) private _buyers;
     mapping(uint256 => address[]) private _sellers;
     mapping(uint256 => address[]) private _rentors;
-    // mapping(uint256 => address) private _rentingContracts;
+    uint256[10] private _bestSellers;
 
     eBookDonator private _donator;
     eBookRenting private _renter;
 
-    constructor(
-        // ISuperfluid host,
-        // IConstantFlowAgreementV1 cfa,
-        // ISuperToken acceptedToken,
-        address donatorAddress,
-        address renterAddress
-        ) {
-        // require(address(host) != address(0), "host is zero address");
-        // require(address(cfa) != address(0), "cfa is zero address");
-        // require(
-        //     address(acceptedToken) != address(0),
-        //     "acceptedToken is zero address"
-        // );
-
-        // _host = host;
-        // _cfa = cfa;
-        // _acceptedToken = acceptedToken;
+    constructor(address donatorAddress, address renterAddress) {
         _donator = eBookDonator(donatorAddress);
         _renter = eBookRenting(renterAddress);
         _renter._setSS(address(this));
     }
-
-    // function getHost()external view returns (ISuperfluid){
-    //     return _host;
-    // }
-
-    // function getCFA()external view returns (IConstantFlowAgreementV1){
-    //     return _cfa;
-    // }
-
-    // function getAcceptedToken()external view returns (ISuperToken){
-    //     return _acceptedToken;
-    // }
 
     function getReadersShelf(address _reader)
         external
@@ -135,17 +98,54 @@ contract StorageStructures {
         return books[bookID - 1];
     }
 
-    function getAllBooks() external view returns (Book[] memory) {
-        return books;
+    // function getAllBooks() external view returns (Book[] memory) {
+    //     return books;
+    // }
+
+    function getRecentLaunches() external view returns (Book[] memory) {
+        if (books.length > 15) {
+            Book[] memory recentLaunches = new Book[](15);
+            for (uint256 i = 1; i <= 15; i++) {
+                recentLaunches[i-1] = books[books.length - i];
+            }
+            return recentLaunches;
+        } else {
+            return books;
+        }
+    }
+
+    function getBestSellers() external view returns(Book[] memory){
+        Book[] memory bestSellers = new Book[](_bestSellers.length);
+        for(uint256 i=0; i<_bestSellers.length; i++){
+            bestSellers[i] = this.getBook(_bestSellers[i]);
+        }
+        return bestSellers;
+    }
+
+    function updateBestSellers(uint256 bookID) external {
+        uint256 bookSales = this.getPricedBooksPrinted(bookID);
+        require(bookSales > 0, "Invalid call request!");
+        for(uint256 i=0; i<_bestSellers.length; i++){
+            if(_bestSellers[i] == 0){
+                    _bestSellers[i] == bookID;
+                    break;
+            }else{
+                if(_bestSellers[i] == bookID){
+                    if(this.getPricedBooksPrinted(_bestSellers[i-1]) < bookSales){
+                        _bestSellers[i] = _bestSellers[i-1];
+                        _bestSellers[i-1] = bookID;
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     function addBook(Book memory book) external {
         books.push(book);
-        // eBookRenter renter = new eBookRenter(books.length, book.price, _host, _cfa, _acceptedToken, address(this));
-        // _rentingContracts[books.length] = address(renter);
     }
 
-    function getBookPrice(uint256 bookID) external view returns(uint256) {
+    function getBookPrice(uint256 bookID) external view returns (uint256) {
         return this.getBook(bookID).price;
     }
 
@@ -235,25 +235,40 @@ contract StorageStructures {
         return _rentors[bookID].length;
     }
 
-    modifier onlyRenter(address msgSender){
+    modifier onlyRenter(address msgSender) {
         require(msgSender == address(_renter), "Unauthorized request!");
         _;
     }
 
-    function addRentor(uint256 bookID, address rentor) external onlyRenter(msg.sender){
+    function addRentor(uint256 bookID, address rentor)
+        external
+        onlyRenter(msg.sender)
+    {
         _rentors[bookID].push(rentor);
         this.setBookStatus(rentor, bookID, eBookStatus.ON_RENT);
     }
 
-    function removeRentor(uint256 bookID, address rentor) external onlyRenter(msg.sender) {
+    function removeRentor(uint256 bookID, address rentor)
+        external
+        onlyRenter(msg.sender)
+    {
         for (uint256 i = 0; i < _rentors[bookID].length - 1; i++) {
-            _rentors[bookID][i] = _rentors[bookID][i + 1];
+            if(_rentors[bookID][i] == rentor){
+                for (uint256 j = i; j < _rentors[bookID].length - 1; j++) {
+                    _rentors[bookID][j] = _rentors[bookID][j + 1];
+                }
+            _rentors[bookID].pop();
+            break;
+            }
         }
-        _rentors[bookID].pop();
         this.setBookStatus(rentor, bookID, eBookStatus.OWNED);
     }
 
-    function matchRentor(uint256 bookID) external onlyRenter(msg.sender) returns (address) {
+    function matchRentor(uint256 bookID)
+        external
+        onlyRenter(msg.sender)
+        returns (address)
+    {
         address rentor = _rentors[bookID][0];
         for (uint256 i = 0; i < _rentors[bookID].length - 1; i++) {
             _rentors[bookID][i] = _rentors[bookID][i + 1];

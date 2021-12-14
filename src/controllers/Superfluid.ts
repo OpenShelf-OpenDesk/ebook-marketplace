@@ -35,8 +35,12 @@ export async function createFlow(
   return tx;
 }
 
-export async function deleteFlow(_sender, _recipient) {
-  const tx = await _sender.flow({ recipient: _recipient, flowRate: 0 });
+export async function deleteFlow(_sender, _recipient, userData) {
+  const tx = await _sender.flow({
+    recipient: _recipient,
+    flowRate: 0,
+    userData,
+  });
   return tx;
 }
 
@@ -52,8 +56,8 @@ export function formatPrice(_price: number) {
   return (Math.round(_price * 100) / 100).toFixed(2);
 }
 
-export function calculateFlowrateInSeconds(_monthlyFlowrate) {
-  const _frm = new BigNumber(_monthlyFlowrate).shiftedBy(18);
-  const _frs = _frm / (86400 * 30);
-  return Math.floor(_frs);
+export function calculateFlowrateInSeconds(monthlyFlowrate) {
+  const frm = new BigNumber(monthlyFlowrate).shiftedBy(18);
+  const frs = Number(frm) / (86400 * 30);
+  return Math.floor(frs);
 }

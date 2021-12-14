@@ -2,15 +2,28 @@ import { ethers } from "ethers";
 import StorageStructures from "../../artifacts/contracts/StorageStructures.sol/StorageStructures.json";
 import contract_address from "../../contract_address.json";
 
-export async function getAllBooks(reader) {
+export async function getRecentLaunches(reader) {
   const StorageStructuresContractAddress = contract_address.StorageStructures;
   const contract = new ethers.Contract(
     StorageStructuresContractAddress,
     StorageStructures.abi,
     reader
   );
-  const books = await contract.getAllBooks();
-  return books.map((book) => {
+  const recentlyLaunchedBooks = await contract.getRecentLaunches();
+  return recentlyLaunchedBooks.map((book) => {
+    return book.metadataURI;
+  });
+}
+
+export async function getBestSellers(reader) {
+  const StorageStructuresContractAddress = contract_address.StorageStructures;
+  const contract = new ethers.Contract(
+    StorageStructuresContractAddress,
+    StorageStructures.abi,
+    reader
+  );
+  const bestSellers = await contract.getBestSellers();
+  return bestSellers.map((book) => {
     return book.metadataURI;
   });
 }

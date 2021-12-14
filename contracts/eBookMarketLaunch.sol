@@ -86,6 +86,7 @@ contract eBookMarketLaunch is ReentrancyGuard {
                 status: StorageStructures.eBookStatus.OWNED
             })
         );
+        _ss.updateBestSellers(bookID);
         payable(msg.sender).transfer(msg.value - book.price);
     }
 

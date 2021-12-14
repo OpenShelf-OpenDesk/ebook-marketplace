@@ -9,7 +9,7 @@ import { connectToWallet } from "../src/controllers/ConnectWallet";
 import { ethers } from "ethers";
 import { eBook } from "../src/controllers/eBookMarketLaunch";
 import Loading from "../src/components/common/Loading";
-// import { initializeSF } from "../src/controllers/Superfluid";
+import { initializeSF } from "../src/controllers/Superfluid";
 import { useRouter } from "next/router";
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -37,10 +37,10 @@ function MyApp({ Component, pageProps }: AppProps) {
       if (_signer) {
         const _address = await _signer.getAddress();
         setSigner({ address: _address, signer: _signer });
-        // window &&
-        //   initializeSF().then((_sf) => {
-        //     console.log(_sf);
-        //   });
+        window &&
+          initializeSF().then((_sf) => {
+            console.log(_sf);
+          });
       }
     });
   }, []);
