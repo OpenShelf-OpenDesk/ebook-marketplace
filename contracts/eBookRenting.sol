@@ -44,7 +44,7 @@ contract eBookRenting is SuperAppBase {
         uint256 configWord = SuperAppDefinitions.APP_LEVEL_FINAL |
             SuperAppDefinitions.BEFORE_AGREEMENT_UPDATED_NOOP |
             SuperAppDefinitions.AFTER_AGREEMENT_UPDATED_NOOP |
-            SuperAppDefinitions.AFTER_AGREEMENT_TERMINATED_NOOP;
+            SuperAppDefinitions.BEFORE_AGREEMENT_TERMINATED_NOOP;
 
         _host.registerApp(configWord);
     }
@@ -117,11 +117,11 @@ contract eBookRenting is SuperAppBase {
         address _agreementClass,
         bytes32, // _agreementId,
         bytes calldata, /*_agreementData*/
-        bytes calldata, // _cbdata,
         bytes calldata _ctx
     )
         external
         view
+        override
         onlyExpected(_superToken, _agreementClass)
         onlyHost
         returns (bytes memory newCtx)
@@ -153,7 +153,7 @@ contract eBookRenting is SuperAppBase {
             address(this)
         );
         uint256 bookID = abi.decode(context.userData, (uint256));
-        uint256 price = _ss.getBookPrice(bookID);
+        uint256 price = _ss.getBookPrice(bookID) / 2592000;
         if (
             outFlowRate >=
             rentee_renter_pairs[bookID][context.msgSender].outflow +
@@ -166,7 +166,7 @@ contract eBookRenting is SuperAppBase {
                     _cfa.createFlow.selector,
                     _acceptedToken,
                     renter,
-                    outFlowRate,
+                    int256(price) / 5,
                     new bytes(0) // placeholder
                 ),
                 "0x",
@@ -179,25 +179,31 @@ contract eBookRenting is SuperAppBase {
         }
     }
 
-    function beforeAgreementTerminated(
+    function afterAgreementTerminated(
         ISuperToken _superToken,
         address _agreementClass,
-        bytes32, //_agreementId,
+        bytes32, // _agreementId,
         bytes calldata, /*_agreementData*/
-        bytes calldata, //_cbdata,
+        bytes calldata, // _cbdata,
         bytes calldata _ctx
-    ) external onlyHost returns (bytes memory newCtx) {
-        // According to the app basic law, we should never revert in a termination callback
+    )
+        external
+        override
+        onlyExpected(_superToken, _agreementClass)
+        onlyHost
+        returns (bytes memory newCtx)
+    {
         ISuperfluid.Context memory context = _host.decodeCtx(_ctx);
         uint256 bookID = abi.decode(context.userData, (uint256));
+        uint256 price = _ss.getBookPrice(bookID) / 2592000;
         (newCtx, ) = _host.callAgreementWithContext(
             _cfa,
             abi.encodeWithSelector(
-                _cfa.deleteFlow.selector,
+                _cfa.updateFlow.selector,
                 _acceptedToken,
-                address(this),
                 rentee_renter_pairs[bookID][context.msgSender].renter,
-                new bytes(0)
+                rentee_renter_pairs[bookID][context.msgSender].outflow - int256(price) / 5,
+                new bytes(0) // placeholder
             ),
             "0x",
             _ctx
@@ -208,11 +214,7 @@ contract eBookRenting is SuperAppBase {
             context.msgSender
         );
         rentee_renter_pairs[bookID][context.msgSender].renter = address(0);
-        rentee_renter_pairs[bookID][context.msgSender].outflow = 0;
-
-        if (!_isSameToken(_superToken) || !_isCFAv1(_agreementClass))
-            return _ctx;
-        // return _updateOutflow(_ctx);
+        rentee_renter_pairs[bookID][context.msgSender].outflow = rentee_renter_pairs[bookID][context.msgSender].outflow - int256(price) / 5;
     }
 
     function _isSameToken(ISuperToken superToken) private view returns (bool) {
