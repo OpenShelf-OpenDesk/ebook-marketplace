@@ -106,7 +106,7 @@ contract StorageStructures {
         if (books.length > 15) {
             Book[] memory recentLaunches = new Book[](15);
             for (uint256 i = 1; i <= 15; i++) {
-                recentLaunches[i-1] = books[books.length - i];
+                recentLaunches[i - 1] = books[books.length - i];
             }
             return recentLaunches;
         } else {
@@ -114,9 +114,12 @@ contract StorageStructures {
         }
     }
 
-    function getBestSellers() external view returns(Book[] memory){
+    function getBestSellers() external view returns (Book[] memory) {
         Book[] memory bestSellers = new Book[](_bestSellers.length);
-        for(uint256 i=0; i<_bestSellers.length; i++){
+        for (uint256 i = 0; i < _bestSellers.length; i++) {
+            if (_bestSellers[i] == 0) {
+                break;
+            }
             bestSellers[i] = this.getBook(_bestSellers[i]);
         }
         return bestSellers;
@@ -125,15 +128,18 @@ contract StorageStructures {
     function updateBestSellers(uint256 bookID) external {
         uint256 bookSales = this.getPricedBooksPrinted(bookID);
         require(bookSales > 0, "Invalid call request!");
-        for(uint256 i=0; i<_bestSellers.length; i++){
-            if(_bestSellers[i] == 0){
-                    _bestSellers[i] == bookID;
-                    break;
-            }else{
-                if(_bestSellers[i] == bookID){
-                    if(this.getPricedBooksPrinted(_bestSellers[i-1]) < bookSales){
-                        _bestSellers[i] = _bestSellers[i-1];
-                        _bestSellers[i-1] = bookID;
+        for (uint256 i = 0; i < _bestSellers.length; i++) {
+            if (_bestSellers[i] == 0) {
+                _bestSellers[i] == bookID;
+                break;
+            } else {
+                if (_bestSellers[i] == bookID) {
+                    if (
+                        this.getPricedBooksPrinted(_bestSellers[i - 1]) <
+                        bookSales
+                    ) {
+                        _bestSellers[i] = _bestSellers[i - 1];
+                        _bestSellers[i - 1] = bookID;
                     }
                     break;
                 }
@@ -253,12 +259,12 @@ contract StorageStructures {
         onlyRenter(msg.sender)
     {
         for (uint256 i = 0; i < _rentors[bookID].length - 1; i++) {
-            if(_rentors[bookID][i] == rentor){
+            if (_rentors[bookID][i] == rentor) {
                 for (uint256 j = i; j < _rentors[bookID].length - 1; j++) {
                     _rentors[bookID][j] = _rentors[bookID][j + 1];
                 }
-            _rentors[bookID].pop();
-            break;
+                _rentors[bookID].pop();
+                break;
             }
         }
         this.setBookStatus(rentor, bookID, eBookStatus.OWNED);

@@ -18,8 +18,6 @@ export async function main() {
   const eBookRenterContract = await hre.ethers.getContractFactory(
     "eBookRenting"
   );
-
-  console.log(sf);
   const eBookRenter = await eBookRenterContract.deploy(
     sf.network.polytest.host,
     sf.network.polytest.cfa,
