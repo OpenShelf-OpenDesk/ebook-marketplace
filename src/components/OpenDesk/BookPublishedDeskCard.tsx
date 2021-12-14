@@ -205,6 +205,7 @@ const BookPublishedDeskCard = ({ bookMetadataURI }: Props) => {
               type="text"
               placeholder="Address"
               name="studentAddress"
+              autoComplete="off"
               onChange={(e) => {
                 if (e.target.value.length > 0) {
                   setValidSubmission(true);
