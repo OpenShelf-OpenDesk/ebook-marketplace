@@ -1,88 +1,80 @@
 import React, { useEffect, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
-import { useLoadingContext } from "../../context/Loading";
-import Loading from "./Loading";
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 interface Props {
   url: string;
   height?: number;
   width?: number;
+  setNumOfPages?: React.Dispatch<React.SetStateAction<number>>;
   page?: number;
+  scale?: number;
+  setLoadingState?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const PreviewBook = ({ url, height, width, page }: Props) => {
+const PreviewBook = ({
+  url,
+  height,
+  width,
+  setNumOfPages,
+  page,
+  scale,
+  setLoadingState,
+}: Props) => {
   const [numPages, setNumPages] = useState<number>(null);
-  const { loading, setLoading } = useLoadingContext();
-
-  useEffect(() => {
-    setLoading(true);
-  }, []);
 
   function onDocumentFullLoadSuccess({ numPages }) {
-    setNumPages(numPages);
+    setNumOfPages(numPages);
     setTimeout(() => {
-      setLoading(false);
-    }, 2000);
+      setLoadingState(false);
+    }, 1000);
   }
 
   function onDocumentLoadSuccess({ numPages }) {
     setNumPages(numPages);
   }
 
-  if (height && width) {
+  if (height && width && setNumOfPages && scale && page) {
     return (
-      <div>
-        {loading && <Loading />}
-        <Document
-          file={url}
-          onLoadSuccess={onDocumentFullLoadSuccess}
+      <Document
+        file={url}
+        options={{ workerSrc: "/pdf.worker.min.js" }}
+        onLoadSuccess={onDocumentFullLoadSuccess}
+        loading={""}
+        renderMode="svg"
+      >
+        <Page
+          pageNumber={page}
+          width={width}
+          height={height}
+          scale={scale}
           loading={""}
-        >
-          {Array.from(new Array(numPages), (el, index) => (
-            <Page
-              pageNumber={index + 1}
-              key={index}
-              width={width}
-              height={height}
-              loading={""}
-            />
-          ))}
-        </Document>
-      </div>
-    );
-  } else if (height) {
-    return (
-      <div>
-        {loading && <Loading />}
-        <Document
-          file={url}
-          onLoadSuccess={onDocumentFullLoadSuccess}
-          loading={""}
-        >
-          {Array.from(new Array(numPages), (el, index) => (
-            <Page
-              pageNumber={index + 1}
-              key={index}
-              width={550}
-              height={height}
-              loading={""}
-            />
-          ))}
-        </Document>
-      </div>
+          renderMode="svg"
+          renderAnnotationLayer={false}
+          renderTextLayer={false}
+        />
+      </Document>
     );
   } else {
     return (
-      <div>
-        {setLoading(false)}
-        <Document file={url} onLoadSuccess={onDocumentLoadSuccess} loading={""}>
-          {Array.from(new Array(numPages), (el, index) => (
-            <Page pageNumber={index + 1} key={index} width={550} loading={""} />
-          ))}
-        </Document>
-      </div>
+      <Document
+        file={url}
+        options={{ workerSrc: "/pdf.worker.min.js" }}
+        onLoadSuccess={onDocumentLoadSuccess}
+        loading={""}
+      >
+        {Array.from(new Array(numPages), (el, index) => (
+          <Page
+            pageNumber={index + 1}
+            key={index}
+            width={550}
+            loading={""}
+            renderAnnotationLayer={false}
+            renderTextLayer={false}
+          />
+        ))}
+      </Document>
     );
   }
 };

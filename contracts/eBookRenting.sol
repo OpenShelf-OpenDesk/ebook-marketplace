@@ -202,7 +202,9 @@ contract eBookRenting is SuperAppBase {
                 _cfa.updateFlow.selector,
                 _acceptedToken,
                 rentee_renter_pairs[bookID][context.msgSender].renter,
-                rentee_renter_pairs[bookID][context.msgSender].outflow - int256(price) / 5,
+                rentee_renter_pairs[bookID][context.msgSender].outflow -
+                    int256(price) /
+                    5,
                 new bytes(0) // placeholder
             ),
             "0x",
@@ -214,7 +216,10 @@ contract eBookRenting is SuperAppBase {
             context.msgSender
         );
         rentee_renter_pairs[bookID][context.msgSender].renter = address(0);
-        rentee_renter_pairs[bookID][context.msgSender].outflow = rentee_renter_pairs[bookID][context.msgSender].outflow - int256(price) / 5;
+        rentee_renter_pairs[bookID][context.msgSender].outflow =
+            rentee_renter_pairs[bookID][context.msgSender].outflow -
+            int256(price) /
+            5;
     }
 
     function _isSameToken(ISuperToken superToken) private view returns (bool) {

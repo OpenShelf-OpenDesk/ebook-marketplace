@@ -8,6 +8,7 @@ import Navbar from "../Navbar";
 import Image from "next/image";
 import Sidebar from "../Sidebar";
 import StudentCopyBookInShelfCard from "../StudentCopyBookInShelfCard";
+import BookRentedInShelfCard from "../BookRentedInShelfCard";
 
 interface Props {
   selected: 1 | 2 | 3;
@@ -26,10 +27,12 @@ const Shelf = ({ selected, setSelected }: Props) => {
 
   useEffect(() => {
     setBooksOwnedInShelf([]);
+    setStudentBooksCopyInShelf([]);
+    setBooksRentedInShelf([]);
     getBooksInMyShelf(signer.signer, signer.address)
       .then((_booksInShelf) => {
         _booksInShelf.map((_book) => {
-          if (_book.status == 0) {
+          if (_book.status == 0 || _book.status == 1) {
             setBooksOwnedInShelf((state) => {
               return [...state, _book];
             });
@@ -106,24 +109,25 @@ const Shelf = ({ selected, setSelected }: Props) => {
               return (
                 <BookOwnedInShelfCard
                   bookMetadataURI={_bookInShelf.metadataURI}
+                  status={_bookInShelf.status}
                   key={index}
                 />
               );
             })}
           </div>
-        ) : booksRentedInShelf.length > 0 && tabSelected == 2 ? (
-          <div className="grid grid-cols-3 gap-x-7 gap-y-11 p-7 h-5/6 bg-purple-100">
-            {/* {booksOwnedInShelf.map((_bookInShelf, index) => {
+        ) : booksRentedInShelf.length == 0 && tabSelected == 2 ? (
+          <div className="grid grid-cols-3 gap-x-7 gap-y-11 p-7 h-5/6 bg-purple-100 overflow-y-scroll">
+            {booksOwnedInShelf.map((_bookInShelf, index) => {
               return (
-                <BookInShelfCardOwned
+                <BookRentedInShelfCard
                   bookMetadataURI={_bookInShelf.metadataURI}
                   key={index}
                 />
               );
-            })} */}
+            })}
           </div>
         ) : studentBooksCopyInShelf.length > 0 && tabSelected == 3 ? (
-          <div className="grid grid-cols-3 gap-x-7 gap-y-11 p-7 h-5/6 bg-purple-100">
+          <div className="grid grid-cols-3 gap-x-7 gap-y-11 p-7 h-5/6 bg-purple-100 overflow-y-scroll">
             {studentBooksCopyInShelf.map((_bookInShelf, index) => {
               return (
                 <StudentCopyBookInShelfCard

@@ -7,10 +7,9 @@ import { putBookForRent } from "../../controllers/eBookRenter";
 import { useSignerContext } from "../../context/Signer";
 interface Props {
   bookMetadataURI: string;
-  status: number;
 }
 
-const BookOwnedInShelfCard = ({ bookMetadataURI, status }: Props) => {
+const BookRentedInShelfCard = ({ bookMetadataURI }: Props) => {
   const router = useRouter();
   const { signer } = useSignerContext();
   const [bookMetadata, setBookMetadata] = useState<eBook | undefined>();
@@ -34,10 +33,28 @@ const BookOwnedInShelfCard = ({ bookMetadataURI, status }: Props) => {
       </div>
       <div className="flex-1 h-full w-full flex flex-col justify-center items-center py-5">
         <p className="text-sm text-justify">
-          {bookMetadata.description.slice(0, 311)}...
+          {bookMetadata.description.slice(0, 330)}...
         </p>
         <div className="flex flex-col w-full h-full justify-end">
-          <div className="flex justify-end py-3">
+          <div className="flex justify-between">
+            <button
+              className={`text-sm font-semibold text-red-500`}
+              onClick={() => {
+                // router.push(
+                //   {
+                //     pathname: `/exchange`,
+                //     query: {
+                //       selected: 3,
+                //       buyState: false,
+                //       data: JSON.stringify(bookMetadata),
+                //     },
+                //   },
+                //   `/OpenShelf`
+                // );
+              }}
+            >
+              Return Book
+            </button>
             <button
               className="text-sm text-primary self-end"
               onClick={() => {
@@ -55,39 +72,6 @@ const BookOwnedInShelfCard = ({ bookMetadataURI, status }: Props) => {
               Read &#10142;
             </button>
           </div>
-          <div className="flex justify-between">
-            <button
-              disabled={status == 0 ? false : true}
-              className={`text-sm font-semibold ${
-                status == 0 ? "text-red-500" : `text-red-300 cursor-default`
-              }`}
-              onClick={() => {
-                router.push(
-                  {
-                    pathname: `/exchange`,
-                    query: {
-                      selected: 3,
-                      buyState: false,
-                      data: JSON.stringify(bookMetadata),
-                    },
-                  },
-                  `/OpenShelf`
-                );
-              }}
-            >
-              {status == 0 ? `Place Sell Order` : `On Sale`}
-            </button>
-            <button
-              className="text-sm text-red-500 font-semibold"
-              onClick={() => {
-                putBookForRent(signer.signer, bookMetadata.book_id).then(() => {
-                  router.reload();
-                });
-              }}
-            >
-              Put On Rent
-            </button>
-          </div>
         </div>
       </div>
     </div>
@@ -98,4 +82,4 @@ const BookOwnedInShelfCard = ({ bookMetadataURI, status }: Props) => {
   );
 };
 
-export default BookOwnedInShelfCard;
+export default BookRentedInShelfCard;

@@ -109,16 +109,24 @@ export async function getPublisherAddress(bookID, signer) {
   return publisherAddres;
 }
 
-export async function redeem(student, voucher) {
+export async function redeem(student, voucher, cb) {
   const StorageStructuresContractAddress = contract_address.StorageStructures;
   const contract = new ethers.Contract(
     StorageStructuresContractAddress,
     StorageStructures.abi,
     student
   );
-  const bookID = await contract.redeemStudentBookVoucher(voucher);
-  console.log(bookID);
-  return bookID;
+  try {
+    const bookID = await contract.redeemStudentBookVoucher(voucher);
+    cb(1);
+    setTimeout(() => {
+      cb(2);
+    }, 1000)
+    return bookID;
+  } catch (error) {
+    console.log(error);
+    cb(-2);
+  }
 }
 
 export async function getAuthorsDesk(author, authorAddress) {
