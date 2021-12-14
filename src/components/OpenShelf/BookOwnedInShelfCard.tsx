@@ -3,6 +3,8 @@ import { eBook } from "../../controllers/eBookMarketLaunch";
 import PreviewBookCoverPage from "../common/PreviewBookCoverPage";
 import LoadingCircle from "../common/LoadingCircle";
 import { useRouter } from "next/router";
+import { putBookForRent } from "../../controllers/eBookRenter";
+import { useSignerContext } from "../../context/Signer";
 interface Props {
   bookMetadataURI: string;
   status: number;
@@ -10,6 +12,7 @@ interface Props {
 
 const BookOwnedInShelfCard = ({ bookMetadataURI, status }: Props) => {
   const router = useRouter();
+  const { signer } = useSignerContext();
   const [bookMetadata, setBookMetadata] = useState<eBook | undefined>();
   useEffect(() => {
     const fetchMetadata = async () => {
@@ -30,8 +33,28 @@ const BookOwnedInShelfCard = ({ bookMetadataURI, status }: Props) => {
         />
       </div>
       <div className="flex-1 h-full w-full flex flex-col justify-center items-center py-5">
-        <p className="text-sm">{bookMetadata.description.slice(0, 325)}...</p>
-        <div className="flex flex-col w-full h-full pt-4 justify-end">
+        <p className="text-sm text-justify">
+          {bookMetadata.description.slice(0, 311)}...
+        </p>
+        <div className="flex flex-col w-full h-full justify-end">
+          <div className="flex justify-end py-3">
+            <button
+              className="text-sm text-primary self-end"
+              onClick={() => {
+                router.push(
+                  {
+                    pathname: `/bookReader`,
+                    query: {
+                      bookID: bookMetadata.book_id,
+                    },
+                  },
+                  `/OpenShelf`
+                );
+              }}
+            >
+              Read &#10142;
+            </button>
+          </div>
           <div className="flex justify-between">
             <button
               disabled={status == 0 ? false : true}
@@ -55,20 +78,14 @@ const BookOwnedInShelfCard = ({ bookMetadataURI, status }: Props) => {
               {status == 0 ? `Place Sell Order` : `On Sale`}
             </button>
             <button
-              className="text-sm text-primary self-end"
+              className="text-sm text-red-500 font-semibold"
               onClick={() => {
-                router.push(
-                  {
-                    pathname: `/bookReader`,
-                    query: {
-                      bookID: bookMetadata.book_id,
-                    },
-                  },
-                  `/OpenShelf`
-                );
+                putBookForRent(signer.signer, bookMetadata.book_id).then(() => {
+                  router.reload();
+                });
               }}
             >
-              Read &#10142;
+              Put On Rent
             </button>
           </div>
         </div>
