@@ -160,7 +160,7 @@ const BookPreview = (props: Props) => {
             },
             `/OpenShelf`
           );
-        });
+        }, 1000);
       });
     } else {
       setValidRedeemSubmission(false);
@@ -180,8 +180,9 @@ const BookPreview = (props: Props) => {
         />
       )}
       <div
-        className={`${validPurchaseAttempt && "filter blur-xl bg-gray-100"} ${
-          validRedeemAttempt && "filter blur-xl bg-gray-100"
+        className={`${
+          (validPurchaseAttempt || validRedeemAttempt) &&
+          "filter blur-xl bg-gray-100"
         }`}
       >
         {bookPreviewData && (
@@ -309,6 +310,7 @@ const BookPreview = (props: Props) => {
                       type="text"
                       name="eBookVoucherSignature"
                       placeholder="Voucher Signature"
+                      autoComplete="off"
                       onChange={(e) => {
                         if (e.target.value.length == 132) {
                           setValidRedeemSubmission(true);
