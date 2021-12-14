@@ -5,7 +5,17 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {eBookPublisher, Counters} from "./eBookPublisher.sol";
 import {eBookDonator} from "./eBookDonator.sol";
 
+// import {ISuperfluid, ISuperToken, ISuperApp, ISuperAgreement, SuperAppDefinitions} from "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluid.sol";
+// import {IConstantFlowAgreementV1} from "@superfluid-finance/ethereum-contracts/contracts/interfaces/agreements/IConstantFlowAgreementV1.sol";
+// import {eBookRenter} from "./eBookRenter.sol";
+import {eBookRenting} from "./eBookRenting.sol";
+
 contract StorageStructures {
+
+    // ISuperfluid private _host; // host
+    // IConstantFlowAgreementV1 private _cfa; // the stored constant flow agreement class address
+    // ISuperToken private _acceptedToken; // accepted token
+
     struct Book {
         string metadataURI;
         address author;
@@ -17,6 +27,8 @@ contract StorageStructures {
         OWNED,
         ON_SALE,
         LOCKED,
+        ON_RENT,
+        RENTED_ON_RENT,
         RENTED
     }
 
@@ -36,12 +48,44 @@ contract StorageStructures {
     mapping(uint256 => address[]) private _buyers;
     mapping(uint256 => address[]) private _sellers;
     mapping(uint256 => address[]) private _rentors;
+    // mapping(uint256 => address) private _rentingContracts;
 
     eBookDonator private _donator;
+    eBookRenting private _renter;
 
-    constructor(address donatorAddress) {
+    constructor(
+        // ISuperfluid host,
+        // IConstantFlowAgreementV1 cfa,
+        // ISuperToken acceptedToken,
+        address donatorAddress,
+        address renterAddress
+        ) {
+        // require(address(host) != address(0), "host is zero address");
+        // require(address(cfa) != address(0), "cfa is zero address");
+        // require(
+        //     address(acceptedToken) != address(0),
+        //     "acceptedToken is zero address"
+        // );
+
+        // _host = host;
+        // _cfa = cfa;
+        // _acceptedToken = acceptedToken;
         _donator = eBookDonator(donatorAddress);
+        _renter = eBookRenting(renterAddress);
+        _renter._setSS(address(this));
     }
+
+    // function getHost()external view returns (ISuperfluid){
+    //     return _host;
+    // }
+
+    // function getCFA()external view returns (IConstantFlowAgreementV1){
+    //     return _cfa;
+    // }
+
+    // function getAcceptedToken()external view returns (ISuperToken){
+    //     return _acceptedToken;
+    // }
 
     function getReadersShelf(address _reader)
         external
@@ -83,8 +127,8 @@ contract StorageStructures {
         return authorsPublishedBooks;
     }
 
-    function addToDesk(address _author, uint256 bookID) external {
-        _authorsDesk[_author].push(bookID);
+    function addToDesk(address author, uint256 bookID) external {
+        _authorsDesk[author].push(bookID);
     }
 
     function getBook(uint256 bookID) external view returns (Book memory) {
@@ -95,8 +139,14 @@ contract StorageStructures {
         return books;
     }
 
-    function addBook(Book memory _book) external {
-        books.push(_book);
+    function addBook(Book memory book) external {
+        books.push(book);
+        // eBookRenter renter = new eBookRenter(books.length, book.price, _host, _cfa, _acceptedToken, address(this));
+        // _rentingContracts[books.length] = address(renter);
+    }
+
+    function getBookPrice(uint256 bookID) external view returns(uint256) {
+        return this.getBook(bookID).price;
     }
 
     function getBuyersCount(uint256 bookID) external view returns (uint256) {
@@ -185,12 +235,25 @@ contract StorageStructures {
         return _rentors[bookID].length;
     }
 
-    function addRentor(uint256 bookID, address rentor) external {
-        _rentors[bookID].push(rentor);
-        this.setBookStatus(rentor, bookID, eBookStatus.RENTED);
+    modifier onlyRenter(address msgSender){
+        require(msgSender == address(_renter), "Unauthorized request!");
+        _;
     }
 
-    function matchRentor(uint256 bookID) external returns (address) {
+    function addRentor(uint256 bookID, address rentor) external onlyRenter(msg.sender){
+        _rentors[bookID].push(rentor);
+        this.setBookStatus(rentor, bookID, eBookStatus.ON_RENT);
+    }
+
+    function removeRentor(uint256 bookID, address rentor) external onlyRenter(msg.sender) {
+        for (uint256 i = 0; i < _rentors[bookID].length - 1; i++) {
+            _rentors[bookID][i] = _rentors[bookID][i + 1];
+        }
+        _rentors[bookID].pop();
+        this.setBookStatus(rentor, bookID, eBookStatus.OWNED);
+    }
+
+    function matchRentor(uint256 bookID) external onlyRenter(msg.sender) returns (address) {
         address rentor = _rentors[bookID][0];
         for (uint256 i = 0; i < _rentors[bookID].length - 1; i++) {
             _rentors[bookID][i] = _rentors[bookID][i + 1];
@@ -199,11 +262,17 @@ contract StorageStructures {
         return rentor;
     }
 
+    error VoucherAlreadyReedeemed(uint256 bookID, address reader);
+
     function redeemStudentBookVoucher(
         eBookDonator.eBookVoucher calldata voucher
     ) external {
         Book memory book = this.getBook(voucher.bookID);
-        // eBookPublisher publisher = eBookPublisher(book.publisherAddress);
+        for (uint256 i = 0; i < _readersShelf[msg.sender].length; i++) {
+            if (voucher.bookID == _readersShelf[msg.sender][i].bookID) {
+                revert VoucherAlreadyReedeemed(voucher.bookID, msg.sender);
+            }
+        }
         _donator.redeem(book.publisherAddress, msg.sender, voucher);
         this.addToShelf(
             msg.sender,
@@ -228,6 +297,10 @@ contract StorageStructures {
 
     function getDonatorAddress() external view returns (address) {
         return address(_donator);
+    }
+
+    function getRenterAddress() external view returns (address) {
+        return address(_renter);
     }
 
     function getPricedBooksPrinted(uint256 bookID)
@@ -266,6 +339,41 @@ contract StorageStructures {
         returns (uint256)
     {
         return _authorsRevenue[msg.sender][bookID];
+    }
+
+    function addRentedBookToShelf(
+        uint256 bookID,
+        address renter,
+        address rentee
+    ) external {
+        eBook[] memory rentersEBooks = _readersShelf[renter];
+        for (uint256 i = 0; i < rentersEBooks.length; i++) {
+            if (rentersEBooks[i].bookID == bookID) {
+                if (rentersEBooks[i].status == eBookStatus.ON_RENT) {
+                    eBook memory renteesEBook = rentersEBooks[i];
+                    renteesEBook.status = eBookStatus.RENTED;
+                    this.addToShelf(rentee, renteesEBook);
+                    rentersEBooks[i].status == eBookStatus.RENTED_ON_RENT;
+                }
+            }
+        }
+    }
+
+    function removeRentedBookFromShelf(
+        uint256 bookID,
+        address renter,
+        address rentee
+    ) external {
+        for (uint256 i = 0; i < _readersShelf[rentee].length; i++) {
+            if (_readersShelf[rentee][i].bookID == bookID) {
+                _readersShelf[rentee][i] = _readersShelf[rentee][
+                    _readersShelf[rentee].length - 1
+                ];
+                _readersShelf[rentee].pop();
+                _rentors[bookID].push(renter);
+                this.setBookStatus(renter, bookID, eBookStatus.ON_RENT);
+            }
+        }
     }
 
     // -------------------------------------------------------------------------

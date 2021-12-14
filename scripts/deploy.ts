@@ -1,6 +1,8 @@
 const hre = require("hardhat");
 const fs = require("fs");
 
+import { sf } from "../superfluid_config.json";
+
 export async function main() {
   // eBookDonator -------------------------------------------------------
   const eBookDonatorContract = await hre.ethers.getContractFactory(
@@ -10,19 +12,36 @@ export async function main() {
 
   await eBookDonator.deployed();
   const eBookDonatorContractAddress = eBookDonator.address;
-  console.log(`eBookDonator deployed to : ${eBookDonatorContractAddress}'`);
+  console.log(`eBookDonator deployed to : ${eBookDonatorContractAddress}`);
+
+  // eBookRenter -------------------------------------------------------
+  const eBookRenterContract = await hre.ethers.getContractFactory(
+    "eBookRenting"
+  );
+
+  console.log(sf);
+  const eBookRenter = await eBookRenterContract.deploy(
+    sf.network.polytest.host,
+    sf.network.polytest.cfa,
+    sf.network.polytest.acceptedToken
+  );
+
+  await eBookRenter.deployed();
+  const eBookRenterContractAddress = eBookRenter.address;
+  console.log(`eBookRenter deployed to : ${eBookRenterContractAddress}`);
 
   // StorageStructures -------------------------------------------------------
   const StorageStructuresContract = await hre.ethers.getContractFactory(
     "StorageStructures"
   );
   const StorageStructures = await StorageStructuresContract.deploy(
-    eBookDonatorContractAddress
+    eBookDonatorContractAddress,
+    eBookRenterContractAddress
   );
   await StorageStructures.deployed();
   const StorageStructuresContractAddress = StorageStructures.address;
   console.log(
-    `StorageStructures deployed to : ${StorageStructuresContractAddress}'`
+    `StorageStructures deployed to : ${StorageStructuresContractAddress}`
   );
 
   // eBookMarketLaunch -------------------------------------------------------
@@ -34,7 +53,7 @@ export async function main() {
   );
   const eBookMarketLaunchContractAddress = eBookMarketLaunch.address;
   console.log(
-    `eBookMarketLaunch deployed to : ${eBookMarketLaunchContractAddress}'`
+    `eBookMarketLaunch deployed to : ${eBookMarketLaunchContractAddress}`
   );
 
   // eBookExchange ------------------------------------------------------
@@ -45,12 +64,13 @@ export async function main() {
     StorageStructuresContractAddress
   );
   const eBookExchangeContractAddress = eBookExchange.address;
-  console.log(`eBookExchange deployed to : ${eBookExchangeContractAddress}'`);
+  console.log(`eBookExchange deployed to : ${eBookExchangeContractAddress}`);
 
   // saving contract address to a file
 
   const contract_address = JSON.stringify({
     eBookDonator: eBookDonatorContractAddress,
+    eBookRenter: eBookRenterContractAddress,
     StorageStructures: StorageStructuresContractAddress,
     eBookMarketLaunch: eBookMarketLaunchContractAddress,
     eBookExchange: eBookExchangeContractAddress,
