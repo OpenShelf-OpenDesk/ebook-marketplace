@@ -106,7 +106,9 @@ export async function redeem(student, voucher, cb) {
   try {
     const bookID = await contract.redeemStudentBookVoucher(voucher);
     cb(1);
-    cb(2);
+    setTimeout(() => {
+      cb(2);
+    }, 1000)
     return bookID;
   } catch (error) {
     console.log(error);
