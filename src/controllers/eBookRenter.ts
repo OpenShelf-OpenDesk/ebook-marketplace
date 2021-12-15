@@ -23,25 +23,37 @@ export async function removeBookFromRent(reader, bookID) {
   await contract.removeBookFromRent(bookID);
 }
 
-export async function takeBookOnRent(readerAddress, bookID, flowrate) {
+export async function takeBookOnRent(readerAddress, bookID, flowrate, cb) {
   const abiCoder = new ethers.utils.AbiCoder();
   const encodedBookID = abiCoder.encode(["uint256"], [bookID]);
+  cb(1);
   const tx = await createFlow(
     createUser(readerAddress),
     contract_address.eBookRenter,
     flowrate,
     encodedBookID
-  );
+  ).then(() => {
+    setTimeout(() => {
+      cb(2);
+      cb(3);
+    }, 1000);
+  });
   console.log(tx);
 }
 
-export async function returnBookOnRent(readerAddress, bookID) {
+export async function returnBookOnRent(readerAddress, bookID, cb) {
   const abiCoder = new ethers.utils.AbiCoder();
   const encodedBookID = abiCoder.encode(["uint256"], [bookID]);
+  cb(1);
   const tx = await deleteFlow(
     createUser(readerAddress),
     contract_address.eBookRenter,
     encodedBookID
-  );
+  ).then(() => {
+    setTimeout(() => {
+      cb(2);
+      cb(3);
+    }, 1000);
+  });
   console.log(tx);
 }

@@ -15,12 +15,16 @@ import { useRouter } from "next/router";
 import { useLoadingContext } from "../../../context/Loading";
 import LoadingCircle from "../../common/LoadingCircle";
 import { eBookVoucherGenerator } from "../../../utils/eBookVoucherGenerator";
-import { redeem } from "../../../controllers/StorageStructures";
+import {
+  getBookRentorsCount,
+  getPricedBooksPrinted,
+  redeem,
+} from "../../../controllers/StorageStructures";
 import { takeBookOnRent } from "../../../controllers/eBookRenter";
 
 interface Props {}
 
-const StatusTag = ({ status, tag, error = false }) => {
+export const StatusTag = ({ status, tag, error = false }) => {
   return (
     <div className="flex flex-row justify-center items-center space-x-10 text-gray-700">
       {status ? (
@@ -77,6 +81,21 @@ const VoucherRedeemingStatus = ({ statusCode, errorCode = 0 }) => {
   );
 };
 
+const BookRentingStatus = ({ statusCode }) => {
+  return (
+    <section className="flex justify-center fixed z-10 w-screen h-screen ">
+      <div className="flex flex-col justify-center items-start">
+        <StatusTag status={statusCode >= 1} tag="Sending transaction request" />
+        <StatusTag status={statusCode >= 2} tag="Creating Renting Flow" />
+        <StatusTag
+          status={statusCode >= 3}
+          tag="Awaiting transaction success"
+        />
+      </div>
+    </section>
+  );
+};
+
 const BookPreview = (props: Props) => {
   const { setLoading } = useLoadingContext();
   const router = useRouter();
@@ -89,7 +108,11 @@ const BookPreview = (props: Props) => {
     useState<boolean>(false);
   const [progressBuyStatus, setProgressBuyStatus] = useState<number>(0);
   const [redeemProgressStatus, setRedeemProgressStatus] = useState<number>(0);
+  const [validRentAttempt, setValidRentAttempt] = useState<boolean>(false);
+  const [rentProgressStatus, setRentProgressStatus] = useState<number>(0);
   const [errorCode, setErrorCode] = useState<number>(0);
+  const [pricedBooksSold, setPricedBooksSold] = useState<number>(0);
+  const [bookRentorsCount, setBookRentorsCount] = useState<number>(0);
 
   useEffect(() => {
     if (!router.query.bookdata) {
@@ -103,6 +126,21 @@ const BookPreview = (props: Props) => {
       setLoading(true);
     };
   }, []);
+
+  useEffect(() => {
+    bookPreviewData &&
+      getPricedBooksPrinted(bookPreviewData.book_id, signer.signer).then(
+        (booksPrinted) => {
+          setPricedBooksSold(booksPrinted);
+        }
+      );
+    bookPreviewData &&
+      getBookRentorsCount(bookPreviewData.book_id, signer.signer).then(
+        (bookRentorsCount) => {
+          setBookRentorsCount(bookRentorsCount);
+        }
+      );
+  }, [bookPreviewData]);
 
   const setProgressBuyStatusCB = (statusCode) => {
     switch (statusCode) {
@@ -134,6 +172,23 @@ const BookPreview = (props: Props) => {
         break;
       default:
         setProgressBuyStatus(0);
+        break;
+    }
+  };
+
+  const setRentProgressStatusCB = (statusCode) => {
+    switch (statusCode) {
+      case 1:
+        setRentProgressStatus(1);
+        break;
+      case 2:
+        setRentProgressStatus(2);
+        break;
+      case 3:
+        setRentProgressStatus(3);
+        break;
+      default:
+        setRentProgressStatus(0);
         break;
     }
   };
@@ -179,9 +234,12 @@ const BookPreview = (props: Props) => {
           errorCode={errorCode}
         />
       )}
+      {validRentAttempt && (
+        <BookRentingStatus statusCode={rentProgressStatus} />
+      )}
       <div
         className={`${
-          (validPurchaseAttempt || validRedeemAttempt) &&
+          (validPurchaseAttempt || validRedeemAttempt || validRentAttempt) &&
           "filter blur-xl bg-gray-100"
         }`}
       >
@@ -221,11 +279,17 @@ const BookPreview = (props: Props) => {
                       <span className="text-xs font-bold align-top pr-1">
                         MATIC
                       </span>
-                      {(bookPreviewData.launch_price * 1).toFixed(2)}
+                      {(bookPreviewData.launch_price * 1).toFixed(3)}
                     </span>
                     <div className="flex-1 flex flex-col justify-end pt-12">
                       <button
                         className="w-full btn btn-accent btn-sm"
+                        disabled={
+                          bookPreviewData.supply_limit_bool &&
+                          pricedBooksSold < bookPreviewData.supply_limit
+                            ? false
+                            : true
+                        }
                         onClick={async () => {
                           setValidPurchaseAttempt(true);
                           console.log("purchasing");
@@ -250,7 +314,7 @@ const BookPreview = (props: Props) => {
                       <span className="text-xs font-bold align-top pr-1">
                         MATIC
                       </span>
-                      {(bookPreviewData.launch_price * 1).toFixed(2)}
+                      {(bookPreviewData.launch_price * 1).toFixed(3)}
                     </span>
                     <div className="flex-1 flex flex-col justify-end pt-12">
                       <button
@@ -286,21 +350,26 @@ const BookPreview = (props: Props) => {
                     <div className="flex-1 flex flex-col justify-end pt-12">
                       <button
                         className="w-full btn btn-warning btn-sm"
-                        onClick={() => {
-                          takeBookOnRent(
+                        disabled={bookRentorsCount == 0 && true}
+                        onClick={async () => {
+                          setValidRentAttempt(true);
+                          await takeBookOnRent(
                             signer.address,
                             bookPreviewData.book_id,
-                            bookPreviewData.launch_price * 0.2
+                            bookPreviewData.launch_price * 0.2,
+                            setRentProgressStatusCB
                           ).then(() => {
-                            router.push(
-                              {
-                                pathname: `/OpenShelf`,
-                                query: {
-                                  selected: 2,
+                            setTimeout(() => {
+                              router.push(
+                                {
+                                  pathname: `/OpenShelf`,
+                                  query: {
+                                    selected: 2,
+                                  },
                                 },
-                              },
-                              `/OpenShelf`
-                            );
+                                `/OpenShelf`
+                              );
+                            }, 1000);
                           });
                         }}
                       >

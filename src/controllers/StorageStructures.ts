@@ -129,11 +129,12 @@ export async function redeem(student, voucher, cb) {
     student
   );
   try {
-    const bookID = await contract.redeemStudentBookVoucher(voucher);
-    cb(1);
-    setTimeout(() => {
-      cb(2);
-    }, 1000);
+    const bookID = await contract.redeemStudentBookVoucher(voucher).then(() => {
+      cb(1);
+      setTimeout(() => {
+        cb(2)
+      }, 1000)
+    });
     return bookID;
   } catch (error) {
     console.log(error);
@@ -149,7 +150,6 @@ export async function getAuthorsDesk(author, authorAddress) {
     author
   );
   const authorsDesk = await contract.getAuthorsDesk(authorAddress);
-  console.log(authorsDesk);
   return authorsDesk;
 }
 
@@ -161,7 +161,6 @@ export async function getPricedBooksPrinted(bookID, signer) {
     signer
   );
   const pricedBooksPrinted = await contract.getPricedBooksPrinted(bookID);
-  console.log(pricedBooksPrinted);
   return Number(pricedBooksPrinted);
 }
 
@@ -173,7 +172,6 @@ export async function getFreeBooksPrinted(bookID, signer) {
     signer
   );
   const freeBooksPrinted = await contract.getFreeBooksPrinted(bookID);
-  console.log(freeBooksPrinted);
   return Number(freeBooksPrinted);
 }
 
@@ -185,6 +183,16 @@ export async function getAuthorsRevenueForBook(bookID, author) {
     author
   );
   const revenue = await contract.getAuthorsRevenueForBook(bookID);
-  console.log(revenue);
   return ethers.utils.formatUnits(revenue, "ether");
+}
+
+export async function getBookRentorsCount(bookID, signer) {
+  const StorageStructuresContractAddress = contract_address.StorageStructures;
+  const contract = new ethers.Contract(
+    StorageStructuresContractAddress,
+    StorageStructures.abi,
+    signer
+  );
+  const bookRentorsCount = await contract.getRentorsCount(bookID);
+  return Number(bookRentorsCount);
 }

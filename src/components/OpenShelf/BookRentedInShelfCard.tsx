@@ -10,9 +10,10 @@ import {
 import { useSignerContext } from "../../context/Signer";
 interface Props {
   bookMetadataURI: string;
+  cb: (statusCode: any) => void;
 }
 
-const BookRentedInShelfCard = ({ bookMetadataURI }: Props) => {
+const BookRentedInShelfCard = ({ bookMetadataURI, cb }: Props) => {
   const router = useRouter();
   const { signer } = useSignerContext();
   const [bookMetadata, setBookMetadata] = useState<eBook | undefined>();
@@ -26,6 +27,7 @@ const BookRentedInShelfCard = ({ bookMetadataURI }: Props) => {
       setBookMetadata(_metadata);
     });
   }, []);
+
   return bookMetadata ? (
     <div className="group h-80 w-full border border-gray-300 flex flex-row space-x-5 pr-5 overflow-hidden bg-white rounded-lg">
       <div className="flex-1 h-full w-full shadow-lg">
@@ -43,7 +45,7 @@ const BookRentedInShelfCard = ({ bookMetadataURI }: Props) => {
             <button
               className={`text-sm font-semibold text-red-500`}
               onClick={() => {
-                returnBookOnRent(signer.address, bookMetadata.book_id).then(
+                returnBookOnRent(signer.address, bookMetadata.book_id, cb).then(
                   () => {
                     router.reload();
                   }
