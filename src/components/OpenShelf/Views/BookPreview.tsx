@@ -221,7 +221,7 @@ const BookPreview = (props: Props) => {
                       <span className="text-xs font-bold align-top pr-1">
                         MATIC
                       </span>
-                      {bookPreviewData.launch_price}
+                      {(bookPreviewData.launch_price * 1).toFixed(2)}
                     </span>
                     <div className="flex-1 flex flex-col justify-end pt-12">
                       <button
@@ -250,7 +250,7 @@ const BookPreview = (props: Props) => {
                       <span className="text-xs font-bold align-top pr-1">
                         MATIC
                       </span>
-                      {bookPreviewData.launch_price}
+                      {(bookPreviewData.launch_price * 1).toFixed(2)}
                     </span>
                     <div className="flex-1 flex flex-col justify-end pt-12">
                       <button
@@ -278,7 +278,7 @@ const BookPreview = (props: Props) => {
                       <span className="text-xs font-bold align-top pr-1">
                         MATIC
                       </span>
-                      {bookPreviewData.launch_price * 0.2}
+                      {(bookPreviewData.launch_price * 0.2).toFixed(3)}
                       <span className="text-base align-bottom pl-1">
                         / per month
                       </span>
@@ -291,7 +291,17 @@ const BookPreview = (props: Props) => {
                             signer.address,
                             bookPreviewData.book_id,
                             bookPreviewData.launch_price * 0.2
-                          );
+                          ).then(() => {
+                            router.push(
+                              {
+                                pathname: `/OpenShelf`,
+                                query: {
+                                  selected: 2,
+                                },
+                              },
+                              `/OpenShelf`
+                            );
+                          });
                         }}
                       >
                         Buy

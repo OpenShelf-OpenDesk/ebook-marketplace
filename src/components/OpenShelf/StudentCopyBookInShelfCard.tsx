@@ -22,7 +22,7 @@ const StudentCopyBookInShelfCard = ({ bookMetadataURI }: Props) => {
   }, []);
   return bookMetadata ? (
     <div className="group h-80 w-full border border-gray-300 flex flex-row space-x-5 pr-5 overflow-hidden bg-white rounded-lg">
-      <div className="flex-1 h-full w-full shadow-lg transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110">
+      <div className="flex-1 h-full w-full shadow-lg">
         <PreviewBookCoverPage
           src={bookMetadata.ebook_cover_image}
           height={320}

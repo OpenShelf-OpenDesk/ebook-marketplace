@@ -32,11 +32,16 @@ const Shelf = ({ selected, setSelected }: Props) => {
     getBooksInMyShelf(signer.signer, signer.address)
       .then((_booksInShelf) => {
         _booksInShelf.map((_book) => {
-          if (_book.status == 0 || _book.status == 1) {
+          if (
+            _book.status == 0 ||
+            _book.status == 1 ||
+            _book.status == 3 ||
+            _book.status == 4
+          ) {
             setBooksOwnedInShelf((state) => {
               return [...state, _book];
             });
-          } else if (_book.status == 3) {
+          } else if (_book.status == 5) {
             setBooksRentedInShelf((state) => {
               return [...state, _book];
             });
@@ -64,12 +69,12 @@ const Shelf = ({ selected, setSelected }: Props) => {
       setSelected={setSelected}
     >
       <section className="rounded-t-xl h-full w-full">
-        <div className="w-full mt-7 flex flex-row rounded-t-xl">
+        <div className="w-full mt-2 flex flex-row rounded-t-xl">
           <div
             className={`w-2/6 py-3 text-center cursor-pointer ${
               tabSelected == 1
-                ? `font-bold bg-purple-100 rounded-tl-xl border-t-2 border-l-2 border-r-2 border-primary`
-                : `hover:font-semibold hover:bg-gray-50 rounded-tl-xl border-b-2 border-primary`
+                ? `font-bold bg-purple-100 rounded-tl-xl`
+                : `hover:font-semibold hover:bg-gray-50 rounded-tl-xl`
             }`}
             onClick={() => {
               setTabSelected(1);
@@ -80,8 +85,8 @@ const Shelf = ({ selected, setSelected }: Props) => {
           <div
             className={`w-2/6 py-3 text-center cursor-pointer ${
               tabSelected == 2
-                ? `font-bold bg-purple-100 rounded-t-xl border-t-2 border-l-2 border-r-2 border-primary`
-                : `hover:font-semibold hover:bg-gray-50 border-b-2 border-primary`
+                ? `font-bold bg-purple-100`
+                : `hover:font-semibold hover:bg-gray-50`
             }`}
             onClick={() => {
               setTabSelected(2);
@@ -92,8 +97,8 @@ const Shelf = ({ selected, setSelected }: Props) => {
           <div
             className={`w-2/6 py-3 text-center cursor-pointer ${
               tabSelected == 3
-                ? `font-bold bg-purple-100 rounded-tr-xl border-t-2 border-l-2 border-r-2 border-primary`
-                : `hover:font-semibold hover:bg-gray-50 rounded-tr-xl border-b-2 border-primary`
+                ? `font-bold bg-purple-100 rounded-tr-xl`
+                : `hover:font-semibold hover:bg-gray-50 rounded-tr-xl`
             }`}
             onClick={() => {
               setTabSelected(3);
@@ -103,7 +108,7 @@ const Shelf = ({ selected, setSelected }: Props) => {
           </div>
         </div>
         {booksOwnedInShelf.length > 0 && tabSelected == 1 ? (
-          <div className="grid grid-cols-3 gap-x-7 gap-y-7 p-7 h-5/6 bg-purple-100 border-l-2 border-r-2 border-primary overflow-y-scroll">
+          <div className="grid grid-cols-3 gap-x-7 gap-y-7 p-7 h-5/6 bg-purple-100 overflow-y-scroll">
             {console.log(booksOwnedInShelf)}
             {booksOwnedInShelf.map((_bookInShelf, index) => {
               return (
@@ -115,9 +120,9 @@ const Shelf = ({ selected, setSelected }: Props) => {
               );
             })}
           </div>
-        ) : booksRentedInShelf.length == 0 && tabSelected == 2 ? (
+        ) : booksRentedInShelf.length > 0 && tabSelected == 2 ? (
           <div className="grid grid-cols-3 gap-x-7 gap-y-11 p-7 h-5/6 bg-purple-100 overflow-y-scroll">
-            {booksOwnedInShelf.map((_bookInShelf, index) => {
+            {booksRentedInShelf.map((_bookInShelf, index) => {
               return (
                 <BookRentedInShelfCard
                   bookMetadataURI={_bookInShelf.metadataURI}
@@ -138,17 +143,17 @@ const Shelf = ({ selected, setSelected }: Props) => {
             })}
           </div>
         ) : (
-          <div className="w-full h-5/6 flex flex-col justify-center items-center bg-purple-100 border-l-2 border-r-2 border-primary">
+          <div className="w-full h-5/6 flex flex-col justify-center items-center bg-purple-100">
             <Image
               src="/undraw_no_data_re_kwbl.svg"
-              width={300 * 2}
-              height={200 * 2}
+              width={300}
+              height={200}
               layout="fixed"
               className="transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-90 h-full"
             />
             <div className="p-10">
               <p className="font-semibold text-2xl text-gray-700">
-                Shelf is Empty !
+                Shelf is Empty
               </p>
             </div>
           </div>

@@ -38,7 +38,7 @@ export async function createFlow(
 export async function deleteFlow(_sender, _recipient, userData) {
   const tx = await _sender.flow({
     recipient: _recipient,
-    flowRate: 0,
+    flowRate: "0",
     userData,
   });
   return tx;
@@ -50,10 +50,6 @@ export async function editFlow(_sender, _recipient, _newFlowrate: number) {
     flowRate: String(calculateFlowrateInSeconds(_newFlowrate)),
   });
   return tx;
-}
-
-export function formatPrice(_price: number) {
-  return (Math.round(_price * 100) / 100).toFixed(2);
 }
 
 export function calculateFlowrateInSeconds(monthlyFlowrate) {

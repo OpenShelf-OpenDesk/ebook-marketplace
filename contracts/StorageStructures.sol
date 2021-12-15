@@ -130,7 +130,7 @@ contract StorageStructures {
         require(bookSales > 0, "Invalid call request!");
         for (uint256 i = 0; i < _bestSellers.length; i++) {
             if (_bestSellers[i] == 0) {
-                _bestSellers[i] == bookID;
+                _bestSellers[i] = bookID;
                 break;
             } else {
                 if (_bestSellers[i] == bookID) {
@@ -258,13 +258,17 @@ contract StorageStructures {
         external
         onlyRenter(msg.sender)
     {
-        for (uint256 i = 0; i < _rentors[bookID].length - 1; i++) {
-            if (_rentors[bookID][i] == rentor) {
-                for (uint256 j = i; j < _rentors[bookID].length - 1; j++) {
-                    _rentors[bookID][j] = _rentors[bookID][j + 1];
+        if (_rentors[bookID].length == 0) {
+            _rentors[bookID].pop();
+        } else {
+            for (uint256 i = 0; i < _rentors[bookID].length - 1; i++) {
+                if (_rentors[bookID][i] == rentor) {
+                    for (uint256 j = i; j < _rentors[bookID].length - 1; j++) {
+                        _rentors[bookID][j] = _rentors[bookID][j + 1];
+                    }
+                    _rentors[bookID].pop();
+                    break;
                 }
-                _rentors[bookID].pop();
-                break;
             }
         }
         this.setBookStatus(rentor, bookID, eBookStatus.OWNED);
@@ -374,7 +378,8 @@ contract StorageStructures {
                     eBook memory renteesEBook = rentersEBooks[i];
                     renteesEBook.status = eBookStatus.RENTED;
                     this.addToShelf(rentee, renteesEBook);
-                    rentersEBooks[i].status == eBookStatus.RENTED_ON_RENT;
+                    _readersShelf[renter][i].status = eBookStatus
+                        .RENTED_ON_RENT;
                 }
             }
         }
@@ -390,11 +395,11 @@ contract StorageStructures {
                 _readersShelf[rentee][i] = _readersShelf[rentee][
                     _readersShelf[rentee].length - 1
                 ];
-                _readersShelf[rentee].pop();
-                _rentors[bookID].push(renter);
-                this.setBookStatus(renter, bookID, eBookStatus.ON_RENT);
             }
         }
+        _readersShelf[rentee].pop();
+        _rentors[bookID].push(renter);
+        this.setBookStatus(renter, bookID, eBookStatus.ON_RENT);
     }
 
     // -------------------------------------------------------------------------

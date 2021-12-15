@@ -29,6 +29,7 @@ const Home = ({ selected, setSelected }: Props) => {
           setRecentBooks(recentLaunchesMetadataURIs);
           getBestSellers(signer.signer)
             .then(async (bestSellersMetadataURIs) => {
+              console.log(bestSellersMetadataURIs);
               setBestSellerBooks(bestSellersMetadataURIs);
             })
             .then(() => {
@@ -85,6 +86,7 @@ const Home = ({ selected, setSelected }: Props) => {
           <h3 className="text-2xl font-bold">Bestselling</h3>
           <div className="my-5 flex overscroll-x-contain overflow-scroll no-scrollbar">
             {bestSellerBooks.map((book, index) => {
+              console.log(book);
               return <BookCard key={index} book_metadata_uri={book} />;
             })}
           </div>

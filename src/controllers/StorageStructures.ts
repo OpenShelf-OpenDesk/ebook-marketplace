@@ -10,9 +10,17 @@ export async function getRecentLaunches(reader) {
     reader
   );
   const recentlyLaunchedBooks = await contract.getRecentLaunches();
-  return recentlyLaunchedBooks.map((book) => {
-    return book.metadataURI;
-  });
+  if (recentlyLaunchedBooks.length == 15) {
+    return recentlyLaunchedBooks.map((book) => {
+      return book.metadataURI;
+    });
+  } else {
+    return recentlyLaunchedBooks
+      .map((book) => {
+        return book.metadataURI;
+      })
+      .reverse();
+  }
 }
 
 export async function getBestSellers(reader) {
@@ -22,7 +30,11 @@ export async function getBestSellers(reader) {
     StorageStructures.abi,
     reader
   );
-  const bestSellers = await contract.getBestSellers();
+  let bestSellers = await contract.getBestSellers();
+  console.log(bestSellers);
+  bestSellers = bestSellers.filter((book) => {
+    return Number(book.publisherAddress) != 0;
+  });
   return bestSellers.map((book) => {
     return book.metadataURI;
   });
@@ -121,7 +133,7 @@ export async function redeem(student, voucher, cb) {
     cb(1);
     setTimeout(() => {
       cb(2);
-    }, 1000)
+    }, 1000);
     return bookID;
   } catch (error) {
     console.log(error);

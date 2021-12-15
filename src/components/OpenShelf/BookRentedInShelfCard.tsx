@@ -3,7 +3,10 @@ import { eBook } from "../../controllers/eBookMarketLaunch";
 import PreviewBookCoverPage from "../common/PreviewBookCoverPage";
 import LoadingCircle from "../common/LoadingCircle";
 import { useRouter } from "next/router";
-import { putBookForRent } from "../../controllers/eBookRenter";
+import {
+  putBookForRent,
+  returnBookOnRent,
+} from "../../controllers/eBookRenter";
 import { useSignerContext } from "../../context/Signer";
 interface Props {
   bookMetadataURI: string;
@@ -25,7 +28,7 @@ const BookRentedInShelfCard = ({ bookMetadataURI }: Props) => {
   }, []);
   return bookMetadata ? (
     <div className="group h-80 w-full border border-gray-300 flex flex-row space-x-5 pr-5 overflow-hidden bg-white rounded-lg">
-      <div className="flex-1 h-full w-full shadow-lg transition duration-500 ease-in-out transform hover:-translate-y-1 group-hover:scale-110">
+      <div className="flex-1 h-full w-full shadow-lg">
         <PreviewBookCoverPage
           src={bookMetadata.ebook_cover_image}
           height={320}
@@ -40,17 +43,11 @@ const BookRentedInShelfCard = ({ bookMetadataURI }: Props) => {
             <button
               className={`text-sm font-semibold text-red-500`}
               onClick={() => {
-                // router.push(
-                //   {
-                //     pathname: `/exchange`,
-                //     query: {
-                //       selected: 3,
-                //       buyState: false,
-                //       data: JSON.stringify(bookMetadata),
-                //     },
-                //   },
-                //   `/OpenShelf`
-                // );
+                returnBookOnRent(signer.address, bookMetadata.book_id).then(
+                  () => {
+                    router.reload();
+                  }
+                );
               }}
             >
               Return Book

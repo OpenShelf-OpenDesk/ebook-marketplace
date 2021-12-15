@@ -18,7 +18,6 @@ const Desk = ({ selected, setSelected }: Props) => {
   const { signer } = useSignerContext();
 
   const [booksPublishedInDesk, setBooksPublishedInDesk] = useState<any>([]);
-  const [studentBooksInDesk, setStudentBooksInDesk] = useState<any>([]);
 
   useEffect(() => {
     setBooksPublishedInDesk([]);
@@ -44,7 +43,7 @@ const Desk = ({ selected, setSelected }: Props) => {
     >
       <section className="rounded-t-xl h-screen w-full">
         {booksPublishedInDesk.length > 0 ? (
-          <div className="flex flex-col px-7 pt-7 pb-16 space-y-7 h-full bg-green-100 rounded-t-xl border-t-2 border-l-2 border-r-2 border-accent overflow-y-scroll">
+          <div className="flex flex-col px-7 pt-7 pb-16 space-y-7 h-full bg-green-100 rounded-t-xl overflow-y-scroll">
             {booksPublishedInDesk.map((_bookInDesk, index) => {
               return (
                 <BookPublishedDeskCard
@@ -55,17 +54,17 @@ const Desk = ({ selected, setSelected }: Props) => {
             })}
           </div>
         ) : (
-          <div className="w-full h-full flex flex-col justify-center items-center bg-green-100 border-t-2 border-l-2 border-r-2 border-accent rounded-t-xl">
+          <div className="w-full h-full flex flex-col justify-center items-center bg-green-100 rounded-t-xl">
             <Image
               src="/undraw_no_data_re_kwbl1.svg"
-              width={300 * 2}
-              height={200 * 2}
+              width={300}
+              height={200}
               layout="fixed"
               className="transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-90 h-full opacity-60"
             />
             <div className="p-10">
               <p className="font-semibold text-2xl text-gray-700">
-                Desk is Empty !
+                Desk is Empty
               </p>
             </div>
           </div>

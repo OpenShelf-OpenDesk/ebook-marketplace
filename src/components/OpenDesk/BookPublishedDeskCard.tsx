@@ -82,7 +82,7 @@ const BookPublishedDeskCard = ({ bookMetadataURI }: Props) => {
 
   return bookMetadata ? (
     <div className="group w-full border border-gray-300 flex flex-row space-x-5 bg-white rounded-lg">
-      <div className="h-full shadow-lg transition duration-500 ease-in-out transform group-hover:scale-105 bg-white">
+      <div className="h-full shadow-lg bg-white">
         <PreviewBookCoverPage
           src={bookMetadata.ebook_cover_image}
           width={400}
