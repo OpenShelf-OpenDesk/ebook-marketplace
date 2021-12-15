@@ -1,5 +1,8 @@
 <img src="./public/logo.png" alt="OpenShelf | OpenDesk" />
 
+<br>
+<br>
+
 A NFT marketplace for e-Book. Here, Authors can self publish books. Readers can buy or sell books while compensating the author on every exchange transaction.
 
 ## **Our Vision**
@@ -60,8 +63,15 @@ Readers can buy directly from Authors. As the books are being self-published, au
 &nbsp;&nbsp;&nbsp;
 </div>
 
+## Initial Setup
+
+- Add **Metamask** to your browser.
+- Add Polygon Mumbai Testnet to metamask networks (**Please note, this platform is currently functional only on Polygon Matic Testnet**). Search on **[chainlist.org](https://chainlist.org/)**, click Add to Metamask.
+- Add test matic tokens from **[Polygon Faucet](https://faucet.polygon.technology/)**
+- Connect to the website and you are good to go.
+
 ## **Developer Team**
 
-- [Raghav Goyal](https://github.com/rg12301)
-- [Nonit Mittal](https://github.com/NonitMittal)
-- [Ishita Gupta](https://github.com/ishitagupta03)
+- **[Raghav Goyal](https://github.com/rg12301)**
+- **[Nonit Mittal](https://github.com/NonitMittal)**
+- **[Ishita Gupta](https://github.com/ishitagupta03)**
