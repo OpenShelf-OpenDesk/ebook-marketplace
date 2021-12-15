@@ -69,6 +69,8 @@ Readers can buy directly from Authors. As the books are being self-published, au
 - Add Polygon Mumbai Testnet to metamask networks (**Please note, this platform is currently functional only on Polygon Matic Testnet**). Search on **[chainlist.org](https://chainlist.org/)**, click Add to Metamask.
 - Add test matic tokens from **[Polygon Faucet](https://faucet.polygon.technology/)**
 - Connect to the website and you are good to go.
+- To get any book on rent first go to --> **[SuperFluid Dashboard](https://app.superfluid.finance/)** and then connect with the same account from which you want to rent the book. 
+- Then deposit some matic to superfluid. And you are good to get any book on rent if available.
 
 ## **Developer Team**
 
