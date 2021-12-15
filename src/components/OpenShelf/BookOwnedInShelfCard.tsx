@@ -16,7 +16,6 @@ const BookOwnedInShelfCard = ({ bookMetadataURI, status }: Props) => {
   const [bookMetadata, setBookMetadata] = useState<eBook | undefined>();
   useEffect(() => {
     const fetchMetadata = async () => {
-      console.log(status);
       const response = await fetch(bookMetadataURI);
       const json = await response.json();
       return json;

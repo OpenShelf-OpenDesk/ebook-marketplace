@@ -53,7 +53,6 @@ async function uploadBook(eBookFile: File) {
     token: process.env.NEXT_PUBLIC_NFT_STORAGE_API_KEY,
   });
   const eBookFile_cid = await client.storeBlob(new Blob([eBookFile]));
-  console.log(`Uploaded eBook File...`);
   return eBookFile_cid;
 }
 
@@ -64,7 +63,6 @@ async function uploadBookMetadata(eBook: eBook) {
   const metadata_cid = await client.storeBlob(
     new Blob([JSON.stringify(eBook)])
   );
-  console.log(`Uploaded metadata...`);
   return metadata_cid;
 }
 

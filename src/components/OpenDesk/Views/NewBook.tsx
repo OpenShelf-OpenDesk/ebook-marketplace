@@ -74,7 +74,6 @@ const NewBook = (props: Props) => {
   }, []);
 
   const setProgressStatusCB = (statusCode) => {
-    console.log(statusCode);
     switch (statusCode) {
       case 1:
         setProgressStatus(1);
@@ -108,7 +107,6 @@ const NewBook = (props: Props) => {
         supply_limit: supplyLimitBool ? e.target.supply_limit.value : -1,
         ebook_file: selectedBookFile,
       };
-      console.log("publishing");
       await publish(newBook, signer.signer, setProgressStatusCB);
       setTimeout(() => {
         router.push(`/OpenShelf`);

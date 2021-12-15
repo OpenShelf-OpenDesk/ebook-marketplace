@@ -37,7 +37,6 @@ describe("eBookPublisher", function () {
 
     const lazyMinter = new LazyMinter({ contract, signer: minter });
     const voucher = await lazyMinter.createVoucher(1, redeemer.address, 0);
-    console.log(voucher);
     await chai
       .expect(redeemerContract.redeem(voucher))
       .to.emit(contract, "TransferSingle") // transfer from null address to minter

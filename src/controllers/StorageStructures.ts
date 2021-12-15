@@ -31,7 +31,6 @@ export async function getBestSellers(reader) {
     reader
   );
   let bestSellers = await contract.getBestSellers();
-  console.log(bestSellers);
   bestSellers = bestSellers.filter((book) => {
     return Number(book.publisherAddress) != 0;
   });
@@ -70,7 +69,6 @@ export async function getBooksInMyShelf(reader, readerAddress) {
 //     signer
 //   );
 //   const booksOnSale = await contract.getOnSale();
-//   console.log(booksOnSale);
 // }
 
 export async function getBookBuyersCount(bookID, signer) {
@@ -81,7 +79,6 @@ export async function getBookBuyersCount(bookID, signer) {
     signer
   );
   const bookBuyersCount = await contract.getBuyersCount(bookID);
-  console.log(Number(bookBuyersCount));
   return Number(bookBuyersCount);
 }
 
@@ -93,7 +90,6 @@ export async function getBookSellersCount(bookID, signer) {
     signer
   );
   const bookSellersCount = await contract.getSellersCount(bookID);
-  console.log(Number(bookSellersCount));
   return Number(bookSellersCount);
 }
 
@@ -105,7 +101,6 @@ export async function getBookURI(bookID, reader) {
     reader
   );
   const bookURI = await contract.getBookURI(bookID);
-  console.log(bookURI);
   return bookURI;
 }
 
@@ -117,7 +112,6 @@ export async function getPublisherAddress(bookID, signer) {
     signer
   );
   const publisherAddres = await contract.getPublisherAddress(bookID);
-  console.log(publisherAddres);
   return publisherAddres;
 }
 
@@ -149,7 +143,6 @@ export async function getAuthorsDesk(author, authorAddress) {
     author
   );
   const authorsDesk = await contract.getAuthorsDesk(authorAddress);
-  console.log(authorsDesk);
   return authorsDesk;
 }
 
@@ -161,7 +154,6 @@ export async function getPricedBooksPrinted(bookID, signer) {
     signer
   );
   const pricedBooksPrinted = await contract.getPricedBooksPrinted(bookID);
-  console.log(pricedBooksPrinted);
   return Number(pricedBooksPrinted);
 }
 
@@ -173,7 +165,6 @@ export async function getFreeBooksPrinted(bookID, signer) {
     signer
   );
   const freeBooksPrinted = await contract.getFreeBooksPrinted(bookID);
-  console.log(freeBooksPrinted);
   return Number(freeBooksPrinted);
 }
 
@@ -185,6 +176,5 @@ export async function getAuthorsRevenueForBook(bookID, author) {
     author
   );
   const revenue = await contract.getAuthorsRevenueForBook(bookID);
-  console.log(revenue);
   return ethers.utils.formatUnits(revenue, "ether");
 }

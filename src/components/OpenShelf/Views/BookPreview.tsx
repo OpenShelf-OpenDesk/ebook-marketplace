@@ -228,7 +228,6 @@ const BookPreview = (props: Props) => {
                         className="w-full btn btn-accent btn-sm"
                         onClick={async () => {
                           setValidPurchaseAttempt(true);
-                          console.log("purchasing");
                           await purchaseFirstHand(
                             bookPreviewData.book_id,
                             bookPreviewData.launch_price,

@@ -37,10 +37,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       if (_signer) {
         const _address = await _signer.getAddress();
         setSigner({ address: _address, signer: _signer });
-        window &&
-          initializeSF().then((_sf) => {
-            console.log(_sf);
-          });
+        window && initializeSF();
       }
     });
   }, []);
