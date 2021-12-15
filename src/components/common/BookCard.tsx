@@ -42,7 +42,7 @@ const BookCard = ({ book_metadata_uri }: Props) => {
                 ? `${bookMetadata.title.substring(0, 23)}...`
                 : bookMetadata.title}
             </p>
-            <p className="text-xs truncate ...">
+            <p className="text-xs">
               {bookMetadata.description.length > 110
                 ? `${bookMetadata.description.substring(0, 90)}...`
                 : bookMetadata.description}

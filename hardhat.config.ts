@@ -16,7 +16,7 @@ module.exports = {
       chainId: 1337,
     },
     polytest: {
-      url: `${process.env.MUMBAI_MATIC_URL}`, // using alchemy instead of moralis. add your own URL in .env
+      url: `${process.env.MUMBAI_ALCHEMY_URL}`, // using alchemy instead of moralis. add your own URL in .env
       gasPrice: 36000000000,
       accounts: [`0x${process.env.MUMBAI_DEPLOYER_PRIV_KEY}`],
     },

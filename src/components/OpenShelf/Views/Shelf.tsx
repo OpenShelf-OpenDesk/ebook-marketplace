@@ -125,7 +125,8 @@ const Shelf = ({ selected, setSelected }: Props) => {
                 setTabSelected(1);
               }}
             >
-              Owned ({booksOwnedInShelf.length > 0 && booksOwnedInShelf.length})
+              Owned{" "}
+              {booksOwnedInShelf.length > 0 && `(${booksOwnedInShelf.length})`}
             </div>
             <div
               className={`w-2/6 py-3 text-center cursor-pointer ${
@@ -137,8 +138,9 @@ const Shelf = ({ selected, setSelected }: Props) => {
                 setTabSelected(2);
               }}
             >
-              Rented (
-              {booksRentedInShelf.length > 0 && booksRentedInShelf.length})
+              Rented
+              {booksRentedInShelf.length > 0 &&
+                `(${booksRentedInShelf.length})`}
             </div>
             <div
               className={`w-2/6 py-3 text-center cursor-pointer ${
@@ -150,10 +152,9 @@ const Shelf = ({ selected, setSelected }: Props) => {
                 setTabSelected(3);
               }}
             >
-              Student Copy (
+              Distributed Copy
               {studentBooksCopyInShelf.length > 0 &&
-                studentBooksCopyInShelf.length}
-              )
+                `(${studentBooksCopyInShelf.length})`}
             </div>
           </div>
           {booksOwnedInShelf.length > 0 && tabSelected == 1 ? (

@@ -279,16 +279,14 @@ const BookPreview = (props: Props) => {
                       <span className="text-xs font-bold align-top pr-1">
                         MATIC
                       </span>
-                      {(bookPreviewData.launch_price * 1).toFixed(3)}
+                      {(bookPreviewData.launch_price * 1).toFixed(2)}
                     </span>
                     <div className="flex-1 flex flex-col justify-end pt-12">
                       <button
                         className="w-full btn btn-accent btn-sm"
                         disabled={
                           bookPreviewData.supply_limit_bool &&
-                          pricedBooksSold < bookPreviewData.supply_limit
-                            ? false
-                            : true
+                          pricedBooksSold == bookPreviewData.supply_limit
                         }
                         onClick={async () => {
                           setValidPurchaseAttempt(true);
@@ -313,7 +311,7 @@ const BookPreview = (props: Props) => {
                       <span className="text-xs font-bold align-top pr-1">
                         MATIC
                       </span>
-                      {(bookPreviewData.launch_price * 1).toFixed(3)}
+                      {(bookPreviewData.launch_price * 1).toFixed(2)}
                     </span>
                     <div className="flex-1 flex flex-col justify-end pt-12">
                       <button
