@@ -62,7 +62,7 @@ contract StorageStructures {
         address _reader,
         uint256 bookID,
         eBookStatus _status
-    ) external {
+    ) internal {
         for (uint256 i = 0; i < _readersShelf[_reader].length; i++) {
             if (_readersShelf[_reader][i].bookID == bookID) {
                 _readersShelf[_reader][i].status = _status;
@@ -168,6 +168,7 @@ contract StorageStructures {
     }
 
     function addSeller(uint256 bookID, address seller) external {
+        setBookStatus(seller, bookID, StorageStructures.eBookStatus.ON_SALE);
         _sellers[bookID].push(seller);
     }
 
@@ -251,7 +252,7 @@ contract StorageStructures {
         onlyRenter(msg.sender)
     {
         _rentors[bookID].push(rentor);
-        this.setBookStatus(rentor, bookID, eBookStatus.ON_RENT);
+        setBookStatus(rentor, bookID, eBookStatus.ON_RENT);
     }
 
     function removeRentor(uint256 bookID, address rentor)
@@ -271,7 +272,7 @@ contract StorageStructures {
                 }
             }
         }
-        this.setBookStatus(rentor, bookID, eBookStatus.OWNED);
+        setBookStatus(rentor, bookID, eBookStatus.OWNED);
     }
 
     function matchRentor(uint256 bookID)
@@ -398,8 +399,8 @@ contract StorageStructures {
             }
         }
         _readersShelf[rentee].pop();
+        setBookStatus(renter, bookID, eBookStatus.ON_RENT);
         _rentors[bookID].push(renter);
-        this.setBookStatus(renter, bookID, eBookStatus.ON_RENT);
     }
 
     // -------------------------------------------------------------------------

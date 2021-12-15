@@ -57,11 +57,6 @@ contract eBookExchange is ReentrancyGuard {
             _ss.executeOrder(buyer, msg.sender, bookID);
         } else {
             _ss.addSeller(bookID, msg.sender);
-            _ss.setBookStatus(
-                msg.sender,
-                bookID,
-                StorageStructures.eBookStatus.ON_SALE
-            );
         }
     }
 

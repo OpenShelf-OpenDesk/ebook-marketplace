@@ -292,7 +292,6 @@ const BookPreview = (props: Props) => {
                         }
                         onClick={async () => {
                           setValidPurchaseAttempt(true);
-                          console.log("purchasing");
                           await purchaseFirstHand(
                             bookPreviewData.book_id,
                             bookPreviewData.launch_price,
