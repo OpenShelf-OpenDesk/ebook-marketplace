@@ -1,0 +1,51 @@
+specVersion: 0.0.2
+description: OpenShelf OpenDesk Subgraph
+repository: https://github.com/rg12301/ebook-marketplace
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Publisher
+    network: mumbai
+    source:
+      address: "0xA4D4B47EcAEdEdBF988D09F3fF0fb37906612aaC"
+      abi: Publisher
+      startBlock: 23947723
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./mappings/Publisher.ts
+      entities:
+        - Book
+      abis:
+        - name: Publisher
+          file: ./abis/Publisher.json
+      eventHandlers:
+        - event: BookPublished(uint256,uint256,bool,uint256,string)
+          handler: handleBookPublished
+templates:
+  - name: Book
+    kind: ethereum/contract
+    network: mumbai
+    source:
+      abi: Book
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./mappings/Book.ts
+      entities:
+        - Book
+        - Copy
+        - BookAuthor
+      abis:
+        - name: Book
+          file: ./abis/Book.json
+      eventHandlers:
+        - event: ShelfUpdated(uint256,uint256,indexed address,string)
+          handler: handleShelfUpdated
+        - event: AuthorAdded(uint256,indexed address,uint256,bool)
+          handler: handleAuthorAdded
+        - event: BookUpdated(uint256,indexed address,uint256,uint256,bool,uint256,uint256,uint256,string,uint256,uint256)
+          handler: handleBookUpdated

@@ -1,0 +1,20 @@
+{
+  "name": "os-od-subgraph",
+  "version": "1.0.0",
+  "description": "[OpenShelf | OpenDesk] - Subgraph",
+  "main": "index.js",
+  "scripts": {
+    "codegen": "graph codegen ./subgraph.yaml",
+    "auth": "graph auth --product hosted-service 2c96c54fa5c54e66a1546f21708edab1",
+    "deploy": "graph deploy --product hosted-service nonitmittal/openshelf-opendesk-subgraph"
+  },
+  "keywords": [
+    "subgraph"
+  ],
+  "author": "@rg12301, @nonitmittal",
+  "license": "ISC",
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.25.3",
+    "@graphprotocol/graph-ts": "^0.24.1"
+  }
+}

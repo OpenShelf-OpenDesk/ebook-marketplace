@@ -1,0 +1,30 @@
+type BookAuthor @entity {
+  id: ID!
+  authorAddress: String!
+  share: BigInt!
+  authorRights: Boolean!
+}
+
+type Book @entity {
+  id: ID!
+  bookID: BigInt!
+  authors: [BookAuthor!]!
+  minter: String!
+  price: BigInt!
+  maxPrice: BigInt!
+  supplyLimited: Boolean!
+  pricedBookSupplyLimit: BigInt!
+  freeBooksPrinted: BigInt!
+  pricedBooksPrinted: BigInt!
+  totalRevenue: BigInt!
+  withdrawableRevenue: BigInt!
+  metadataURI: String!
+}
+
+type Copy @entity {
+  id: ID!
+  UID: BigInt!
+  book: Book!
+  readerAddress: String!
+  status: String!
+}
