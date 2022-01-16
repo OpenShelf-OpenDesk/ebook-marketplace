@@ -30,6 +30,7 @@
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-ganache": "^2.0.1",
     "@openzeppelin/contracts": "^4.3.2",
+    "@openzeppelin/contracts-upgradeable": "^4.4.2",
     "@types/react": "17.0.31",
     "@types/react-pdf": "^5.0.8",
     "autoprefixer": "^10.3.7",

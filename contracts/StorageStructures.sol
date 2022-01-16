@@ -243,7 +243,10 @@ contract StorageStructures {
     }
 
     modifier onlyRenter(address msgSender) {
-        require(msgSender == address(_renter), "Unauthorized request!");
+        require(
+            msgSender == address(_renter) || _renter.getPermission(),
+            "Unauthorized request!"
+        );
         _;
     }
 

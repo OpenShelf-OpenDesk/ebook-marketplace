@@ -1,0 +1,141 @@
+{
+  "Schema": {
+    "bookMetaData": {
+      "bookId": "uint",
+      "title": "string",
+      "subTitle": "string",
+      "language": "string",
+      "datePublished": "date",
+      "author": [{ "authorId": "uint", "share": "percentage" }],
+      "contributors": ["unit"],
+      "description": "string",
+      "copyrights": "string",
+      "keywords": ["", "", ""],
+      "supplyLimit": {
+        "limited": "bool",
+        "limit": "unit"
+      },
+      "series": {
+        "seriesId": "uint",
+        "seriesNo": "unit"
+      },
+      "fiction": "bool",
+      "genre": ["", "", ""],
+      "bookCoverImage": "string",
+      "currency": "string",
+      "price": "decimal",
+      "royalties": "percentage"
+    },
+
+    "authorMetaData": {
+      "id": "uint",
+      "profile": ["address"]
+    },
+
+    "contributorMetaData": {
+      "id": "uint",
+      "role": "string",
+      "profile": ["address"]
+    },
+
+    "profileMetaData": {
+      "address": "address",
+      "name": "string",
+      "handles": {
+        "instagram": "string",
+        "twitter": "string",
+        "linkedin": "string",
+        "goodReads": "string"
+      },
+      "aboutMe": "string"
+    }
+  },
+
+  "categories": {
+    "genre": [
+      "action",
+      "adventure",
+      "classics",
+      "comic",
+      "graphic novel",
+      "detective and mystery",
+      "fantasy",
+      "historical fiction",
+      "horror",
+      "literary fiction",
+      "romance",
+      "science fiction",
+      "short stories",
+      "suspense & thrillers",
+      "women's fiction",
+      "biographies",
+      "auto-biographies",
+      "cookbooks",
+      "essays",
+      "history",
+      "memoir",
+      "poetry",
+      "self help",
+      "art & architecture",
+      "business & economics",
+      "children's",
+      "diary",
+      "crime",
+      "encyclopedia",
+      "drama",
+      "guide",
+      "fairy tale",
+      "health & fitness",
+      "home & garden",
+      "humour",
+      "journal",
+      "math",
+      "picture book",
+      "philosophy",
+      "prayer",
+      "political thriller",
+      "religion & spirituality",
+      "sport & leisure",
+      "western",
+      "travel",
+      "young adult"
+    ],
+    "role": [
+      "editor",
+      "foreword",
+      "illustrator & photographer",
+      "narrator",
+      "introduction & preface",
+      "translator"
+    ],
+    "accessRole": ["admin", "author", "reader", "contributor"]
+  },
+
+  "functionalities": {
+    "admin": ["withdraw(fees withdraw)", "setFees(for direct/indirect sale)"],
+    "author": [
+      "publishBook",
+      "updatePrice",
+      "withdrawRevenue(make two variables withdrawableAmount, totalRevenue)",
+      "updateMarketSupply"
+    ],
+    "reader": [
+      "buyPrimaryMarket",
+      "buySecondaryMarket",
+      "sellSecondaryMarket",
+      "redeemVoucher",
+      "putOnRent",
+      "removeFromRent",
+      "takeBookOnRent",
+      "returnBookOnRent"
+    ],
+    "TheGraph": [
+      "getRecentLaunches",
+      "getBestSellers",
+      "searchByAuthor",
+      "searchByBookTitle",
+      "searchByGenre"
+    ],
+    "contributor": []
+  }
+}

@@ -14,6 +14,7 @@ contract eBookRenting is SuperAppBase {
     IConstantFlowAgreementV1 private _cfa; // the stored constant flow agreement class address
     ISuperToken private _acceptedToken; // accepted token
     bool private _onlyOnce = true;
+    bool private _allowed = false;
 
     struct RenteeRenterPair {
         address renter;
@@ -94,6 +95,10 @@ contract eBookRenting is SuperAppBase {
         _onlyOnce = false;
     }
 
+    function getPermission() external view returns (bool) {
+        return _allowed;
+    }
+
     function putBookForRent(uint256 bookID)
         external
         ownedInShelf(msg.sender, bookID)
@@ -172,7 +177,9 @@ contract eBookRenting is SuperAppBase {
                 "0x",
                 _ctx
             );
+            _allowed = true;
             _ss.addRentedBookToShelf(bookID, renter, context.msgSender);
+            _allowed = false;
             rentee_renter_pairs[bookID][context.msgSender].renter = renter;
             rentee_renter_pairs[bookID][context.msgSender]
                 .outflow = outFlowRate;
@@ -210,11 +217,13 @@ contract eBookRenting is SuperAppBase {
             "0x",
             _ctx
         );
+        _allowed = true;
         _ss.removeRentedBookFromShelf(
             bookID,
             rentee_renter_pairs[bookID][context.msgSender].renter,
             context.msgSender
         );
+        _allowed = false;
         rentee_renter_pairs[bookID][context.msgSender].renter = address(0);
         rentee_renter_pairs[bookID][context.msgSender].outflow =
             rentee_renter_pairs[bookID][context.msgSender].outflow -
