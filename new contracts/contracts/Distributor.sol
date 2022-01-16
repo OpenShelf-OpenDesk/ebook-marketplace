@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.4;
 
-import "./contracts-upgradeable/proxy/utils/Initializable.sol";
-import "./contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import "./contracts-upgradeable/utils/cryptography/draft-EIP712Upgradeable.sol";
-import "./contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol";
-import "./contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
+import "../contracts-upgradeable/proxy/utils/Initializable.sol";
+import "../contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "../contracts-upgradeable/utils/cryptography/draft-EIP712Upgradeable.sol";
+import "../contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol";
+import "../contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import {ISuperToken} from "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluid.sol";
 
 import "./Types.sol";
@@ -17,7 +17,6 @@ contract Distributor is
     ReentrancyGuardUpgradeable,
     EIP712Upgradeable
 {
-    using Types for Types.book;
     using Types for Types.ERROR;
     using Types for Types.author;
     using SafeMathUpgradeable for uint256;
@@ -31,8 +30,10 @@ contract Distributor is
     ISuperToken private _acceptedToken;
 
     // Mappings -----------------------------------------
-
-    constructor() initializer {}
+    mapping(uint256 => address[]) private _buyers;
+    mapping(uint256 => address[]) private _sellers;
+    mapping(uint256 => address[]) private _buyersForAcceptedToken;
+    mapping(uint256 => address[]) private _sellersForAcceptedToken;
 
     function initialize(ISuperToken acceptedToken, address publisher)
         public
@@ -52,6 +53,91 @@ contract Distributor is
     // Modifiers -----------------------------------------
 
     // Private Functions -----------------------------------------
+    function _addSeller(
+        uint256 bookID,
+        address newSeller,
+        bool payementInAcceptedToken
+    ) private {
+        if (payementInAcceptedToken) {
+            _sellersForAcceptedToken[bookID].push(newSeller);
+        } else {
+            _sellers[bookID].push(newSeller);
+        }
+        Book book = Book(_publisher.getBookAddress(bookID));
+        book.sellerAdded(newSeller);
+    }
+
+    function _addBuyer(
+        uint256 bookID,
+        address newBuyer,
+        bool payementInAcceptedToken
+    ) private {
+        if (payementInAcceptedToken) {
+            _buyersForAcceptedToken[bookID].push(newBuyer);
+        } else {
+            _buyers[bookID].push(newBuyer);
+        }
+        Book book = Book(_publisher.getBookAddress(bookID));
+        book.buyerAdded(newBuyer);
+    }
+
+    function _executeOrder(
+        uint256 bookID,
+        address reader,
+        bool buy,
+        bool payementInAcceptedToken
+    ) private returns (address) {
+        address matchFound;
+        if (buy) {
+            if (payementInAcceptedToken) {
+                matchFound = _sellersForAcceptedToken[bookID][0];
+                for (
+                    uint256 i = 0;
+                    i < _sellersForAcceptedToken[bookID].length - 1;
+                    i++
+                ) {
+                    _sellersForAcceptedToken[bookID][
+                        i
+                    ] = _sellersForAcceptedToken[bookID][i + 1];
+                }
+                delete _sellersForAcceptedToken[bookID][
+                    _sellersForAcceptedToken[bookID].length - 1
+                ];
+            } else {
+                matchFound = _sellers[bookID][0];
+                for (uint256 i = 0; i < _sellers[bookID].length - 1; i++) {
+                    _sellers[bookID][i] = _sellers[bookID][i + 1];
+                }
+                delete _sellers[bookID][_sellers[bookID].length - 1];
+            }
+        } else {
+            if (payementInAcceptedToken) {
+                matchFound = _buyersForAcceptedToken[bookID][0];
+                for (
+                    uint256 i = 0;
+                    i < _buyersForAcceptedToken[bookID].length - 1;
+                    i++
+                ) {
+                    _buyersForAcceptedToken[bookID][
+                        i
+                    ] = _buyersForAcceptedToken[bookID][i + 1];
+                }
+                delete _buyersForAcceptedToken[bookID][
+                    _buyersForAcceptedToken[bookID].length - 1
+                ];
+            } else {
+                matchFound = _buyers[bookID][0];
+                for (uint256 i = 0; i < _buyers[bookID].length - 1; i++) {
+                    _buyers[bookID][i] = _buyers[bookID][i + 1];
+                }
+                delete _buyers[bookID][_buyers[bookID].length - 1];
+            }
+        }
+        Book book = Book(_publisher.getBookAddress(bookID));
+        book.orderExecuted(reader, buy);
+        return matchFound;
+    }
+
     function _verify(Types.BookVoucher calldata voucher)
         private
         view
@@ -128,8 +214,9 @@ contract Distributor is
         );
 
         if (payementInAcceptedToken) {
-            if (book.getBuyersCount(payementInAcceptedToken) > 0) {
-                address buyer = book.executeOrder(
+            if (this.getBuyersCount(bookID, payementInAcceptedToken) > 0) {
+                address buyer = _executeOrder(
+                    bookID,
                     msg.sender,
                     false,
                     payementInAcceptedToken
@@ -147,11 +234,12 @@ contract Distributor is
                     );
                 }
             } else {
-                book.addSeller(msg.sender, payementInAcceptedToken);
+                _addSeller(bookID, msg.sender, payementInAcceptedToken);
             }
         } else {
-            if (book.getBuyersCount(payementInAcceptedToken) > 0) {
-                address buyer = book.executeOrder(
+            if (this.getBuyersCount(bookID, payementInAcceptedToken) > 0) {
+                address buyer = _executeOrder(
+                    bookID,
                     msg.sender,
                     false,
                     payementInAcceptedToken
@@ -163,7 +251,7 @@ contract Distributor is
                     );
                 }
             } else {
-                book.addSeller(msg.sender, payementInAcceptedToken);
+                _addSeller(bookID, msg.sender, payementInAcceptedToken);
             }
         }
     }
@@ -183,8 +271,9 @@ contract Distributor is
         if (payementInAcceptedToken) {
             _transferAcceptedToken(msg.sender, address(this), price);
 
-            if (book.getSellersCount(payementInAcceptedToken) > 0) {
-                seller = book.executeOrder(
+            if (this.getSellersCount(bookID, payementInAcceptedToken) > 0) {
+                seller = _executeOrder(
+                    bookID,
                     msg.sender,
                     true,
                     payementInAcceptedToken
@@ -202,7 +291,7 @@ contract Distributor is
                     );
                 }
             } else {
-                book.addBuyer(msg.sender, payementInAcceptedToken);
+                _addBuyer(bookID, msg.sender, payementInAcceptedToken);
             }
         } else {
             require(
@@ -211,8 +300,9 @@ contract Distributor is
                     uint256(Types.ERROR.INSUFFICIENT_FUNDS_PROVIDED)
                 )
             );
-            if (book.getSellersCount(payementInAcceptedToken) > 0) {
-                seller = book.executeOrder(
+            if (this.getSellersCount(bookID, payementInAcceptedToken) > 0) {
+                seller = _executeOrder(
+                    bookID,
                     msg.sender,
                     true,
                     payementInAcceptedToken
@@ -224,8 +314,32 @@ contract Distributor is
                     );
                 }
             } else {
-                book.addBuyer(msg.sender, payementInAcceptedToken);
+                _addBuyer(bookID, msg.sender, payementInAcceptedToken);
             }
+        }
+    }
+
+    function getBuyersCount(uint256 bookID, bool payementInAcceptedToken)
+        external
+        view
+        returns (uint256)
+    {
+        if (payementInAcceptedToken) {
+            return _buyersForAcceptedToken[bookID].length;
+        } else {
+            return _buyers[bookID].length;
+        }
+    }
+
+    function getSellersCount(uint256 bookID, bool payementInAcceptedToken)
+        external
+        view
+        returns (uint256)
+    {
+        if (payementInAcceptedToken) {
+            return _sellersForAcceptedToken[bookID].length;
+        } else {
+            return _sellers[bookID].length;
         }
     }
 

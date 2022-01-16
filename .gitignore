@@ -45,3 +45,4 @@ artifacts
 
 data.json
 contracts
+!new contracts/contracts

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.4;
 
-import "./contracts-upgradeable/proxy/utils/Initializable.sol";
-import "./contracts-upgradeable/utils/CountersUpgradeable.sol";
-import "./contracts-upgradeable/utils/StringsUpgradeable.sol";
+import "../contracts-upgradeable/proxy/utils/Initializable.sol";
+import "../contracts-upgradeable/utils/CountersUpgradeable.sol";
+import "../contracts-upgradeable/utils/StringsUpgradeable.sol";
 
 import {ISuperfluid, ISuperToken, ISuperApp, ISuperAgreement, SuperAppDefinitions} from "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluid.sol";
 import {IConstantFlowAgreementV1} from "@superfluid-finance/ethereum-contracts/contracts/interfaces/agreements/IConstantFlowAgreementV1.sol";
@@ -14,7 +14,6 @@ import {Book} from "./Book.sol";
 import {Publisher} from "./Publisher.sol";
 
 contract Rentor is Initializable, SuperAppBase {
-    using Types for Types.book;
     using Types for Types.ERROR;
 
     // Storage Variables -----------------------------------------
@@ -32,9 +31,7 @@ contract Rentor is Initializable, SuperAppBase {
     ISuperToken private _acceptedToken;
 
     // Constants -----------------------------------------
-    uint8 private rentingPercentage = 20; // perMonth Basis
-
-    constructor() initializer {}
+    uint8 private rentingPercentage; // perMonth Basis
 
     function initialize(
         ISuperfluid host,
@@ -43,6 +40,7 @@ contract Rentor is Initializable, SuperAppBase {
         address publisher
     ) public initializer {
         _publisher = Publisher(publisher);
+        rentingPercentage = 20;
         require(
             address(host) != address(0),
             StringsUpgradeable.toString(uint256(Types.ERROR.IS_ZERO_ADDRESS))

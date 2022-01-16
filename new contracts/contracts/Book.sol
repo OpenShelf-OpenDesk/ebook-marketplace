@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.4;
 
-import "./contracts-upgradeable/proxy/utils/Initializable.sol";
-import "./contracts-upgradeable/utils/CountersUpgradeable.sol";
-import "./contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
-import "./contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import "./contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "../contracts-upgradeable/proxy/utils/Initializable.sol";
+import "../contracts-upgradeable/utils/CountersUpgradeable.sol";
+import "../contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
+import "../contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "../contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
 import "./Types.sol";
 import {Publisher} from "./Publisher.sol";
@@ -25,7 +25,6 @@ contract Book is
     using Types for Types.book;
     using Types for Types.copy;
     using Types for Types.BOOK_STATUS;
-    using Types for Types.BookVoucher;
     using Types for Types.ERROR;
 
     // Storage Variables -----------------------------------------
@@ -47,12 +46,6 @@ contract Book is
     address private _distributor;
     address private _rentor;
 
-    // Arrays ------------------------------------------
-    address[] private _buyers;
-    address[] private _sellers;
-    address[] private _buyersForAcceptedToken;
-    address[] private _sellersForAcceptedToken;
-
     // Mappings ------------------------------------------
     mapping(address => Types.copy) private copiesRecord;
 
@@ -63,26 +56,27 @@ contract Book is
     event ShelfUpdated(
         uint256 bookID,
         uint256 UID,
-        address reader,
-        Types.BOOK_STATUS bookStatus
+        address indexed reader,
+        string bookStatus
     );
     event BookUpdated(
         uint256 bookID,
-        Types.author[] authors,
-        address minter,
+        address indexed minter,
         uint256 price,
         uint256 maxPrice,
         bool supplyLimited,
         uint256 pricedBookSupplyLimit,
-        uint256 freeBooksPrinted,
-        uint256 pricedBooksPrinted,
         uint256 totalRevenue,
         uint256 withdrawableRevenue,
         string metadataURI,
-        uint256 buyersCount,
-        uint256 sellersCount,
-        uint256 buyersCountForAcceptedToken,
-        uint256 sellersCountForAcceptedToken
+        uint256 freeBooksPrinted,
+        uint256 pricedBooksPrinted
+    );
+    event AuthorAdded(
+        uint256 bookID,
+        address indexed authorAddress,
+        uint256 shares,
+        bool authorRights
     );
 
     // Roles -----------------------------------------
@@ -115,17 +109,22 @@ contract Book is
     }
 
     // Initializer -----------------------------------------
-    constructor() initializer {
+    constructor() {
         _publisher = msg.sender;
         _setupRole(PUBLISHER_ROLE, _publisher);
     }
 
     function initialize(
-        string memory bookURI,
-        Types.book memory book,
-        address msgSender,
         address distributor,
-        address rentor
+        address rentor,
+        address msgSender,
+        uint256 bookID,
+        uint256 price,
+        Types.author[] calldata authors,
+        bool supplyLimited,
+        uint256 pricedBookSupplyLimit,
+        string memory metaDataURI,
+        string memory bookURI
     ) public initializer {
         __ReentrancyGuard_init();
         require(
@@ -133,35 +132,41 @@ contract Book is
             StringsUpgradeable.toString(uint256(Types.ERROR.PERMISSION_DENIED))
         );
         // Initializing Storage Variables
-        _bookID = book.bookID;
+        _bookID = bookID;
         _minter = msgSender;
-        _price = book.price;
-        _supplyLimited = book.supplyLimited;
-        _pricedBookSupplyLimit = book.pricedBookSupplyLimit;
-        _metadataURI = book.metadataURI;
-        _pricedBookUID.increment();
+        _price = price;
+        _supplyLimited = supplyLimited;
+        _pricedBookSupplyLimit = pricedBookSupplyLimit;
+        _metadataURI = metaDataURI;
         _bookURI = bookURI;
+        _pricedBookUID.increment();
         _distributor = distributor;
         _setupRole(DISTRIBUTOR_ROLE, distributor);
         _rentor = rentor;
         _setupRole(RENTOR_ROLE, rentor);
 
-        for (uint256 i = 0; i < book.authors.length; i++) {
+        for (uint256 i = 0; i < authors.length; i++) {
             // Minting first copy for Author
-            _authors.push(book.authors[i]);
+            _authors.push(authors[i]);
             _addRecord(
                 FREE_BOOK_ID,
-                book.authors[i].authorAddress,
+                authors[i].authorAddress,
                 Types.BOOK_STATUS.LOCKED
             );
             _freeBooksPrinted.increment();
 
             // Granting initial roles
-            if (book.authors[i].authorRights) {
-                _setupRole(AUTHOR_ROLE, book.authors[i].authorAddress);
+            if (authors[i].authorRights) {
+                _setupRole(AUTHOR_ROLE, authors[i].authorAddress);
             } else {
-                _setupRole(CO_AUTHOR_ROLE, book.authors[i].authorAddress);
+                _setupRole(CO_AUTHOR_ROLE, authors[i].authorAddress);
             }
+            emit AuthorAdded(
+                _bookID,
+                authors[i].authorAddress,
+                authors[i].shares,
+                authors[i].authorRights
+            );
         }
     }
 
@@ -172,7 +177,12 @@ contract Book is
         Types.BOOK_STATUS bookStatus
     ) private {
         copiesRecord[reader] = Types.copy(UID, bookStatus, _price);
-        emit ShelfUpdated(_bookID, UID, reader, bookStatus);
+        emit ShelfUpdated(
+            _bookID,
+            UID,
+            reader,
+            Types.getEnumValueInString(bookStatus)
+        );
     }
 
     function _changeRecordStatus(
@@ -184,7 +194,7 @@ contract Book is
             _bookID,
             copiesRecord[reader].UID,
             reader,
-            newBookStatus
+            Types.getEnumValueInString(newBookStatus)
         );
     }
 
@@ -195,28 +205,23 @@ contract Book is
             _bookID,
             copiesRecord[to].UID,
             to,
-            copiesRecord[to].bookStatus
+            Types.getEnumValueInString(copiesRecord[to].bookStatus)
         );
     }
 
     function _emitBookUpdated() private {
         emit BookUpdated(
             _bookID,
-            _authors,
             _minter,
             _price,
             _maxPrice,
             _supplyLimited,
             _pricedBookSupplyLimit,
-            _freeBooksPrinted.current(),
-            _pricedBooksPrinted.current(),
             _totalRevenue,
             _withdrawableRevenue,
             _metadataURI,
-            _buyers.length,
-            _sellers.length,
-            _buyersForAcceptedToken.length,
-            _sellersForAcceptedToken.length
+            _freeBooksPrinted.current(),
+            _pricedBooksPrinted.current()
         );
     }
 
@@ -238,93 +243,19 @@ contract Book is
         _setupRole(READER_ROLE, msg.sender);
     }
 
-    function addSeller(address newSeller, bool payementInAcceptedToken)
+    function sellerAdded(address newSeller)
         external
         onlyRole(DISTRIBUTOR_ROLE)
     {
-        if (payementInAcceptedToken) {
-            _sellersForAcceptedToken.push(newSeller);
-        } else {
-            _sellers.push(newSeller);
-        }
         _revokeRole(READER_ROLE, newSeller);
         _setupRole(SELLER_ROLE, newSeller);
         _changeRecordStatus(newSeller, Types.BOOK_STATUS.ON_SALE);
         _emitBookUpdated();
     }
 
-    function addBuyer(address newBuyer, bool payementInAcceptedToken)
-        external
-        onlyRole(DISTRIBUTOR_ROLE)
-    {
-        if (payementInAcceptedToken) {
-            _buyersForAcceptedToken.push(newBuyer);
-        } else {
-            _buyers.push(newBuyer);
-        }
+    function buyerAdded(address newBuyer) external onlyRole(DISTRIBUTOR_ROLE) {
         _setupRole(BUYER_ROLE, newBuyer);
         _emitBookUpdated();
-    }
-
-    function executeOrder(
-        address reader,
-        bool buy,
-        bool payementInAcceptedToken
-    ) external onlyRole(DISTRIBUTOR_ROLE) returns (address) {
-        address matchFound;
-        if (buy) {
-            if (payementInAcceptedToken) {
-                matchFound = _sellersForAcceptedToken[0];
-                for (
-                    uint256 i = 0;
-                    i < _sellersForAcceptedToken.length - 1;
-                    i++
-                ) {
-                    _sellersForAcceptedToken[i] = _sellersForAcceptedToken[
-                        i + 1
-                    ];
-                }
-                delete _sellersForAcceptedToken[
-                    _sellersForAcceptedToken.length - 1
-                ];
-            } else {
-                matchFound = _sellers[0];
-                for (uint256 i = 0; i < _sellers.length - 1; i++) {
-                    _sellers[i] = _sellers[i + 1];
-                }
-                delete _sellers[_sellers.length - 1];
-            }
-            _revokeRole(SELLER_ROLE, matchFound);
-            _transferRecord(matchFound, reader);
-            _changeRecordStatus(reader, Types.BOOK_STATUS.OWNED);
-            return matchFound;
-        } else {
-            if (payementInAcceptedToken) {
-                matchFound = _buyersForAcceptedToken[0];
-                for (
-                    uint256 i = 0;
-                    i < _buyersForAcceptedToken.length - 1;
-                    i++
-                ) {
-                    _buyersForAcceptedToken[i] = _buyersForAcceptedToken[i + 1];
-                }
-                delete _buyersForAcceptedToken[
-                    _buyersForAcceptedToken.length - 1
-                ];
-            } else {
-                matchFound = _buyers[0];
-                for (uint256 i = 0; i < _buyers.length - 1; i++) {
-                    _buyers[i] = _buyers[i + 1];
-                }
-                delete _buyers[_buyers.length - 1];
-            }
-            _revokeRole(BUYER_ROLE, matchFound);
-            _setupRole(READER_ROLE, matchFound);
-            _transferRecord(reader, matchFound);
-            _changeRecordStatus(matchFound, Types.BOOK_STATUS.OWNED);
-        }
-        _emitBookUpdated();
-        return matchFound;
     }
 
     function getBookStatus(address msgSender)
@@ -335,28 +266,25 @@ contract Book is
         return copiesRecord[msgSender].bookStatus;
     }
 
-    function getBuyersCount(bool payementInAcceptedToken)
+    function orderExecuted(address reader, bool buy)
         external
-        view
-        returns (uint256)
+        onlyRole(DISTRIBUTOR_ROLE)
+        returns (address)
     {
-        if (payementInAcceptedToken) {
-            return _buyersForAcceptedToken.length;
+        address matchFound;
+        if (buy) {
+            _revokeRole(SELLER_ROLE, matchFound);
+            _transferRecord(matchFound, reader);
+            _changeRecordStatus(reader, Types.BOOK_STATUS.OWNED);
+            return matchFound;
         } else {
-            return _buyers.length;
+            _revokeRole(BUYER_ROLE, matchFound);
+            _setupRole(READER_ROLE, matchFound);
+            _transferRecord(reader, matchFound);
+            _changeRecordStatus(matchFound, Types.BOOK_STATUS.OWNED);
         }
-    }
-
-    function getSellersCount(bool payementInAcceptedToken)
-        external
-        view
-        returns (uint256)
-    {
-        if (payementInAcceptedToken) {
-            return _sellersForAcceptedToken.length;
-        } else {
-            return _sellers.length;
-        }
+        _emitBookUpdated();
+        return matchFound;
     }
 
     function hasNoRole(address msgSender) external view returns (bool) {
@@ -384,13 +312,13 @@ contract Book is
     }
 
     function addRevenue() external onlyRole(DISTRIBUTOR_ROLE) nonReentrant {
-        _totalRevenue += _price;
+        _pricedBookSupplyLimit += _price;
         _withdrawableRevenue += _price;
         _emitBookUpdated();
     }
 
     function getTotalRevenue() external view returns (uint256) {
-        return _totalRevenue;
+        return _pricedBookSupplyLimit;
     }
 
     function getWithdrawableRevenue() external view returns (uint256) {

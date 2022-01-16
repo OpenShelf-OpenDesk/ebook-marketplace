@@ -1,4 +1,5 @@
 require("@nomiclabs/hardhat-waffle");
+require("@openzeppelin/hardhat-upgrades");
 require("dotenv").config({ path: __dirname + "/.env" });
 
 module.exports = {
@@ -17,11 +18,14 @@ module.exports = {
     },
     polytest: {
       url: `${process.env.MUMBAI_ALCHEMY_URL}`, // using alchemy instead of moralis. add your own URL in .env
-      gasPrice: 36000000000,
+      gasPrice: 40000000000,
       accounts: [`0x${process.env.MUMBAI_DEPLOYER_PRIV_KEY}`],
     },
   },
-  solidity: "0.8.4",
+  solidity: "0.8.7",
+  paths: {
+    sources: "./new contracts/contracts",
+  },
 };
 
 export {};

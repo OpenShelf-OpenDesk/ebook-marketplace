@@ -1,0 +1,584 @@
+{
+  "manifestVersion": "3.2",
+  "admin": {
+    "address": "0x5a76d9eD28DA677874Dba6C33b4f5137D5B11dF8",
+    "txHash": "0xfb9dae4ac17ae34da467ccd63b7072cef3d0fda1d34b893fd5c4c94ba57a4462",
+    "deployTransaction": {
+      "hash": "0xfb9dae4ac17ae34da467ccd63b7072cef3d0fda1d34b893fd5c4c94ba57a4462",
+      "type": 0,
+      "accessList": null,
+      "blockHash": "0xe4afd3764332ffbc7eba17da6dbb8160fccbea0e4406d22601b68892b1d4946b",
+      "blockNumber": 23945629,
+      "transactionIndex": 0,
+      "confirmations": 1,
+      "from": "0x4794a6045F66e5E3fcb64d3d0e8a0f77D4df425c",
+      "gasPrice": {
+        "type": "BigNumber",
+        "hex": "0x09502f9000"
+      },
+      "gasLimit": {
+        "type": "BigNumber",
+        "hex": "0x0762b4"
+      },
+      "to": null,
+      "value": {
+        "type": "BigNumber",
+        "hex": "0x00"
+      },
+      "nonce": 93,
+      "data": "0x608060405234801561001057600080fd5b50600080546001600160a01b031916339081178255604051909182917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908290a350610759806100616000396000f3fe60806040526004361061007b5760003560e01c80639623609d1161004e5780639623609d1461011157806399a88ec414610124578063f2fde38b14610144578063f3b7dead146101645761007b565b8063204e1c7a14610080578063715018a6146100bc5780637eff275e146100d35780638da5cb5b146100f3575b600080fd5b34801561008c57600080fd5b506100a061009b366004610515565b610184565b6040516001600160a01b03909116815260200160405180910390f35b3480156100c857600080fd5b506100d1610215565b005b3480156100df57600080fd5b506100d16100ee366004610554565b610292565b3480156100ff57600080fd5b506000546001600160a01b03166100a0565b6100d161011f36600461058c565b61031c565b34801561013057600080fd5b506100d161013f366004610554565b6103ad565b34801561015057600080fd5b506100d161015f366004610515565b610405565b34801561017057600080fd5b506100a061017f366004610515565b6104ef565b6000806000836001600160a01b03166040516101aa90635c60da1b60e01b815260040190565b600060405180830381855afa9150503d80600081146101e5576040519150601f19603f3d011682016040523d82523d6000602084013e6101ea565b606091505b5091509150816101f957600080fd5b8080602001905181019061020d9190610538565b949350505050565b6000546001600160a01b031633146102485760405162461bcd60e51b815260040161023f906106c0565b60405180910390fd5b600080546040516001600160a01b03909116907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908390a3600080546001600160a01b0319169055565b6000546001600160a01b031633146102bc5760405162461bcd60e51b815260040161023f906106c0565b6040516308f2839760e41b81526001600160a01b038281166004830152831690638f283970906024015b600060405180830381600087803b15801561030057600080fd5b505af1158015610314573d6000803e3d6000fd5b505050505050565b6000546001600160a01b031633146103465760405162461bcd60e51b815260040161023f906106c0565b60405163278f794360e11b81526001600160a01b03841690634f1ef286903490610376908690869060040161065d565b6000604051808303818588803b15801561038f57600080fd5b505af11580156103a3573d6000803e3d6000fd5b5050505050505050565b6000546001600160a01b031633146103d75760405162461bcd60e51b815260040161023f906106c0565b604051631b2ce7f360e11b81526001600160a01b038281166004830152831690633659cfe6906024016102e6565b6000546001600160a01b0316331461042f5760405162461bcd60e51b815260040161023f906106c0565b6001600160a01b0381166104945760405162461bcd60e51b815260206004820152602660248201527f4f776e61626c653a206e6577206f776e657220697320746865207a65726f206160448201526564647265737360d01b606482015260840161023f565b600080546040516001600160a01b03808516939216917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e091a3600080546001600160a01b0319166001600160a01b0392909216919091179055565b6000806000836001600160a01b03166040516101aa906303e1469160e61b815260040190565b600060208284031215610526578081fd5b81356105318161070b565b9392505050565b600060208284031215610549578081fd5b81516105318161070b565b60008060408385031215610566578081fd5b82356105718161070b565b915060208301356105818161070b565b809150509250929050565b6000806000606084860312156105a0578081fd5b83356105ab8161070b565b925060208401356105bb8161070b565b9150604084013567ffffffffffffffff808211156105d7578283fd5b818601915086601f8301126105ea578283fd5b8135818111156105fc576105fc6106f5565b604051601f8201601f19908116603f01168101908382118183101715610624576106246106f5565b8160405282815289602084870101111561063c578586fd5b82602086016020830137856020848301015280955050505050509250925092565b600060018060a01b038416825260206040818401528351806040850152825b818110156106985785810183015185820160600152820161067c565b818111156106a95783606083870101525b50601f01601f191692909201606001949350505050565b6020808252818101527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572604082015260600190565b634e487b7160e01b600052604160045260246000fd5b6001600160a01b038116811461072057600080fd5b5056fea2646970667358221220d849f96f3086b9f82cdcf665adb8c697ace05638da1c7c16ab2d26293717af6764736f6c63430008020033",
+      "r": "0x3c95c4308900f1c836e0bfdfa0ad085bd785984114b6afe18e1adf50e8c90c7d",
+      "s": "0x21c7bbc901f303b354f45d15863cb41a2d16e4d2c90b883ec31620cb89399b2f",
+      "v": 160037,
+      "creates": "0x5a76d9eD28DA677874Dba6C33b4f5137D5B11dF8",
+      "chainId": 80001
+    }
+  },
+  "proxies": [
+    {
+      "address": "0xA46b193EFaDb96d96f5AFf105F11A2299bBE9750",
+      "txHash": "0xc7075a757d5057e637ae7b661123c8d9b50c389bfc0871522009b271bdfbba33",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xD0F88C2573267Bb9A17C162B7cEBf35B52bF2448",
+      "txHash": "0x72db2b7c48efd0986c428c018474f8b415df6b6cf4d841d9e3e52babc646221d",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x0BcE9b475225904897191b8F199Bf45B7B120a39",
+      "txHash": "0xc22b68da5949303ba4003b79a9e6540a8ae067247b53c42b18cda1b2ba5dd8d8",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xA8667Fbab6fED5C36a6E44Ff8E6062cE6c54Db0C",
+      "txHash": "0xcc5998d42d3582129999d59cf99ef07a4e84414e13c099f2eaa036e3b0876d91",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x1e56A9bB23c1A516E71d17243c991f9ea6b35c29",
+      "txHash": "0x064b6795876e830036c182053eaf31120414410b92b8ea52a4c989af7f07d1f1",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x50aBf4BFDC4B1baC49D79019dc6149faaB7f95d2",
+      "txHash": "0xd706c43ae625738afd06312595dde6f46bb5a6b629b50e80dd8ae3a7167085cb",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xd4997E0B4fA2EFb7eF7Fe15F6C79BF46c55295bF",
+      "txHash": "0x1b5caf8a4d4cfd91c4858502193dafb5d051eeaea302cbf973ddebd6ba414d32",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x92c8bF91827CDCC217D629C49Eb7173c6e2740CB",
+      "txHash": "0x1a33b94cd8bc16537c89151c67049899cacf24de6dbe31b746d058bea15aae62",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xA4D4B47EcAEdEdBF988D09F3fF0fb37906612aaC",
+      "txHash": "0xe6d9c247c3ce153b3bbe0fddce76e6a0289c87e798e5f33cc2cc83f63c13bb7e",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x4F9C2843a5b0375d2ad690e1C4dB2d2d605D0F27",
+      "txHash": "0x567a4b6839b7adef4a2fdefe24d767d1f734605fa13844534b3a23010588d23d",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x0E033afaE575c46e58cfd10F7BF9ad3aBDb1052b",
+      "txHash": "0x2857d3fcd7dfeff4348179fb1c8d531d18fe261290c32163d62159c06f033948",
+      "kind": "transparent"
+    }
+  ],
+  "impls": {
+    "39dab968a194cb3c5a4fb2946f3379d4cde4ce9f16cb46063669d28508ef75f2": {
+      "address": "0xcd4a6E59505289232044CD156Ef2b97eF2b3e1cB",
+      "txHash": "0x62a676af13a0101536173d809b263b5097e562b0a33b2045596a4cc7fedef1f1",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "new contracts/contracts-upgradeable/proxy/utils/Initializable.sol:39"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "new contracts/contracts-upgradeable/proxy/utils/Initializable.sol:44"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "new contracts/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "new contracts/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:68"
+          },
+          {
+            "contract": "Publisher",
+            "label": "_bookID",
+            "type": "t_struct(Counter)2955_storage",
+            "src": "new contracts/contracts/Publisher.sol:19"
+          },
+          {
+            "contract": "Publisher",
+            "label": "publishedBooks",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "new contracts/contracts/Publisher.sol:20"
+          },
+          {
+            "contract": "Publisher",
+            "label": "_distributor",
+            "type": "t_address",
+            "src": "new contracts/contracts/Publisher.sol:21"
+          },
+          {
+            "contract": "Publisher",
+            "label": "_rentor",
+            "type": "t_address",
+            "src": "new contracts/contracts/Publisher.sol:22"
+          }
+        ],
+        "types": {
+          "t_struct(Counter)2955_storage": {
+            "label": "struct CountersUpgradeable.Counter",
+            "members": [
+              {
+                "label": "_value",
+                "type": "t_uint256"
+              }
+            ]
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "5e667a14a524d17ee1a57023f30258afb4abc4be2b9905ee170a0dc888e8c8f3": {
+      "address": "0x7908e47ec5D3717f4464B28322FEF353DB955575",
+      "txHash": "0xfd5d544ab3f9f8be810388b1a7378b14acac3a3cf792f92f92d4e108cbe3b987",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "new contracts/contracts-upgradeable/proxy/utils/Initializable.sol:39"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "new contracts/contracts-upgradeable/proxy/utils/Initializable.sol:44"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "new contracts/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "new contracts/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:68"
+          },
+          {
+            "contract": "EIP712Upgradeable",
+            "label": "_HASHED_NAME",
+            "type": "t_bytes32",
+            "src": "new contracts/contracts-upgradeable/utils/cryptography/draft-EIP712Upgradeable.sol:30"
+          },
+          {
+            "contract": "EIP712Upgradeable",
+            "label": "_HASHED_VERSION",
+            "type": "t_bytes32",
+            "src": "new contracts/contracts-upgradeable/utils/cryptography/draft-EIP712Upgradeable.sol:31"
+          },
+          {
+            "contract": "EIP712Upgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "new contracts/contracts-upgradeable/utils/cryptography/draft-EIP712Upgradeable.sol:142"
+          },
+          {
+            "contract": "Distributor",
+            "label": "_publisher",
+            "type": "t_contract(Publisher)6681",
+            "src": "new contracts/contracts/Distributor.sol:27"
+          },
+          {
+            "contract": "Distributor",
+            "label": "_acceptedToken",
+            "type": "t_contract(ISuperToken)1351",
+            "src": "new contracts/contracts/Distributor.sol:30"
+          },
+          {
+            "contract": "Distributor",
+            "label": "_buyers",
+            "type": "t_mapping(t_uint256,t_array(t_address)dyn_storage)",
+            "src": "new contracts/contracts/Distributor.sol:33"
+          },
+          {
+            "contract": "Distributor",
+            "label": "_sellers",
+            "type": "t_mapping(t_uint256,t_array(t_address)dyn_storage)",
+            "src": "new contracts/contracts/Distributor.sol:34"
+          },
+          {
+            "contract": "Distributor",
+            "label": "_buyersForAcceptedToken",
+            "type": "t_mapping(t_uint256,t_array(t_address)dyn_storage)",
+            "src": "new contracts/contracts/Distributor.sol:35"
+          },
+          {
+            "contract": "Distributor",
+            "label": "_sellersForAcceptedToken",
+            "type": "t_mapping(t_uint256,t_array(t_address)dyn_storage)",
+            "src": "new contracts/contracts/Distributor.sol:36"
+          }
+        ],
+        "types": {
+          "t_contract(Publisher)6681": {
+            "label": "contract Publisher"
+          },
+          "t_contract(ISuperToken)1351": {
+            "label": "contract ISuperToken"
+          },
+          "t_mapping(t_uint256,t_array(t_address)dyn_storage)": {
+            "label": "mapping(uint256 => address[])"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bytes32": {
+            "label": "bytes32"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "6c788531f23bfa71c494918f241ed9d1f126f08c489559bc5e0191ada542ef92": {
+      "address": "0x9295ff7c8b11547FC11D530Ed1D187A220d01894",
+      "txHash": "0x8e9dd26b754f5ccb7c55f5d43d826199f2ef466c655811bdb5de43370b009bf9",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "new contracts/contracts-upgradeable/proxy/utils/Initializable.sol:39"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "new contracts/contracts-upgradeable/proxy/utils/Initializable.sol:44"
+          },
+          {
+            "contract": "Rentor",
+            "label": "rentors",
+            "type": "t_mapping(t_uint256,t_array(t_address)dyn_storage)",
+            "src": "new contracts/contracts/Rentor.sol:21"
+          },
+          {
+            "contract": "Rentor",
+            "label": "renteeRentorPair",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_address))",
+            "src": "new contracts/contracts/Rentor.sol:22"
+          },
+          {
+            "contract": "Rentor",
+            "label": "flowBalances",
+            "type": "t_mapping(t_address,t_int96)",
+            "src": "new contracts/contracts/Rentor.sol:23"
+          },
+          {
+            "contract": "Rentor",
+            "label": "rentedBooksRecord",
+            "type": "t_mapping(t_address,t_array(t_uint256)dyn_storage)",
+            "src": "new contracts/contracts/Rentor.sol:24"
+          },
+          {
+            "contract": "Rentor",
+            "label": "_publisher",
+            "type": "t_contract(Publisher)4813",
+            "src": "new contracts/contracts/Rentor.sol:26"
+          },
+          {
+            "contract": "Rentor",
+            "label": "_host",
+            "type": "t_contract(ISuperfluid)1885",
+            "src": "new contracts/contracts/Rentor.sol:29"
+          },
+          {
+            "contract": "Rentor",
+            "label": "_cfa",
+            "type": "t_contract(IConstantFlowAgreementV1)555",
+            "src": "new contracts/contracts/Rentor.sol:30"
+          },
+          {
+            "contract": "Rentor",
+            "label": "_acceptedToken",
+            "type": "t_contract(ISuperToken)1351",
+            "src": "new contracts/contracts/Rentor.sol:31"
+          },
+          {
+            "contract": "Rentor",
+            "label": "rentingPercentage",
+            "type": "t_uint8",
+            "src": "new contracts/contracts/Rentor.sol:34"
+          }
+        ],
+        "types": {
+          "t_mapping(t_uint256,t_array(t_address)dyn_storage)": {
+            "label": "mapping(uint256 => address[])"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_mapping(t_uint256,t_mapping(t_address,t_address))": {
+            "label": "mapping(uint256 => mapping(address => address))"
+          },
+          "t_mapping(t_address,t_address)": {
+            "label": "mapping(address => address)"
+          },
+          "t_mapping(t_address,t_int96)": {
+            "label": "mapping(address => int96)"
+          },
+          "t_int96": {
+            "label": "int96"
+          },
+          "t_mapping(t_address,t_array(t_uint256)dyn_storage)": {
+            "label": "mapping(address => uint256[])"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]"
+          },
+          "t_contract(Publisher)4813": {
+            "label": "contract Publisher"
+          },
+          "t_contract(ISuperfluid)1885": {
+            "label": "contract ISuperfluid"
+          },
+          "t_contract(IConstantFlowAgreementV1)555": {
+            "label": "contract IConstantFlowAgreementV1"
+          },
+          "t_contract(ISuperToken)1351": {
+            "label": "contract ISuperToken"
+          },
+          "t_uint8": {
+            "label": "uint8"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "d3c01e8f704062c5bbe70c679467c0120030d8be13e8c5d1038fa2cef1a33cee": {
+      "address": "0x966F8c4334FE98f52Af32Fe54Aee7055EE974f2C",
+      "txHash": "0xdc781914fd1216758d0e41dee94aabf6e132802d33d13a24fb75486008560671",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "new contracts/contracts-upgradeable/proxy/utils/Initializable.sol:39"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "new contracts/contracts-upgradeable/proxy/utils/Initializable.sol:44"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "new contracts/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "new contracts/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:68"
+          },
+          {
+            "contract": "Publisher",
+            "label": "_bookID",
+            "type": "t_struct(Counter)2955_storage",
+            "src": "new contracts/contracts/Publisher.sol:19"
+          },
+          {
+            "contract": "Publisher",
+            "label": "publishedBooks",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "new contracts/contracts/Publisher.sol:20"
+          },
+          {
+            "contract": "Publisher",
+            "label": "_distributor",
+            "type": "t_address",
+            "src": "new contracts/contracts/Publisher.sol:21"
+          },
+          {
+            "contract": "Publisher",
+            "label": "_rentor",
+            "type": "t_address",
+            "src": "new contracts/contracts/Publisher.sol:22"
+          }
+        ],
+        "types": {
+          "t_struct(Counter)2955_storage": {
+            "label": "struct CountersUpgradeable.Counter",
+            "members": [
+              {
+                "label": "_value",
+                "type": "t_uint256"
+              }
+            ]
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "41bc117e7467c5d30d93efa5f80e6c6b9e37ad8bbcebb0f4a8c0516e2899bd7c": {
+      "address": "0x92869982298E1458C15e903a7fAa8a02A7577367",
+      "txHash": "0x2a3e7af1afb6b0846a6fe0dbced104ddbf3843085e94647e8eb9cf500f419d86",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "new contracts/contracts-upgradeable/proxy/utils/Initializable.sol:39"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "new contracts/contracts-upgradeable/proxy/utils/Initializable.sol:44"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "new contracts/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "new contracts/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:68"
+          },
+          {
+            "contract": "Publisher",
+            "label": "_bookID",
+            "type": "t_struct(Counter)2955_storage",
+            "src": "new contracts/contracts/Publisher.sol:19"
+          },
+          {
+            "contract": "Publisher",
+            "label": "publishedBooks",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "new contracts/contracts/Publisher.sol:20"
+          },
+          {
+            "contract": "Publisher",
+            "label": "_distributor",
+            "type": "t_address",
+            "src": "new contracts/contracts/Publisher.sol:21"
+          },
+          {
+            "contract": "Publisher",
+            "label": "_rentor",
+            "type": "t_address",
+            "src": "new contracts/contracts/Publisher.sol:22"
+          }
+        ],
+        "types": {
+          "t_struct(Counter)2955_storage": {
+            "label": "struct CountersUpgradeable.Counter",
+            "members": [
+              {
+                "label": "_value",
+                "type": "t_uint256"
+              }
+            ]
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    }
+  }
+}

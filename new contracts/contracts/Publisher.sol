@@ -1,27 +1,25 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.4;
 
-import "./contracts-upgradeable/proxy/utils/Initializable.sol";
-import "./contracts-upgradeable/utils/CountersUpgradeable.sol";
-import "./contracts-upgradeable/utils/StringsUpgradeable.sol";
-import "./contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "../contracts-upgradeable/proxy/utils/Initializable.sol";
+import "../contracts-upgradeable/utils/CountersUpgradeable.sol";
+import "../contracts-upgradeable/utils/StringsUpgradeable.sol";
+import "../contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import "./Types.sol";
 import {Book} from "./Book.sol";
 
 contract Publisher is Initializable, ReentrancyGuardUpgradeable {
     using CountersUpgradeable for CountersUpgradeable.Counter;
-    using Types for Types.book;
     using Types for Types.ERROR;
     using Types for Types.author;
+    using Types for Types.book;
 
     // Storage Variables -----------------------------------------
     CountersUpgradeable.Counter private _bookID;
     mapping(uint256 => address) private publishedBooks;
     address private _distributor;
     address private _rentor;
-
-    constructor() initializer {}
 
     function initialize() public initializer {
         __ReentrancyGuard_init();
@@ -31,7 +29,6 @@ contract Publisher is Initializable, ReentrancyGuardUpgradeable {
     // Events -----------------------------------------
     event BookPublished(
         uint256 bookID,
-        Types.author[] authors,
         uint256 price,
         bool supplyLimited,
         uint256 pricedBookSupplyLimit,
@@ -60,16 +57,26 @@ contract Publisher is Initializable, ReentrancyGuardUpgradeable {
         nonReentrant
     {
         Book newBook = new Book();
-        newBook.initialize(bookURI, book, msg.sender, _distributor, _rentor);
-        publishedBooks[_bookID.current()] = address(newBook);
         emit BookPublished(
             _bookID.current(),
-            book.authors,
             book.price,
             book.supplyLimited,
             book.pricedBookSupplyLimit,
             book.metadataURI
         );
+        newBook.initialize(
+            _distributor,
+            _rentor,
+            msg.sender,
+            _bookID.current(),
+            book.price,
+            book.authors,
+            book.supplyLimited,
+            book.pricedBookSupplyLimit,
+            book.metadataURI,
+            bookURI
+        );
+        publishedBooks[_bookID.current()] = address(newBook);
         _bookID.increment();
     }
 

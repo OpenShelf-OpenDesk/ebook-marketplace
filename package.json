@@ -9,7 +9,8 @@
     "lint": "next lint",
     "node": "npx hardhat node",
     "localhost": "npx hardhat run scripts/deploy.ts --network ganache",
-    "remote": "npx hardhat run scripts/deploy.ts --network polytest"
+    "remote": "npx hardhat run scripts/deploy.ts --network polytest",
+    "remote-new": "npx hardhat run --show-stack-traces scripts/new_deploy.ts --network polytest"
   },
   "dependencies": {
     "@ethersproject/contracts": "^5.5.0",
@@ -31,6 +32,7 @@
     "@nomiclabs/hardhat-ganache": "^2.0.1",
     "@openzeppelin/contracts": "^4.3.2",
     "@openzeppelin/contracts-upgradeable": "^4.4.2",
+    "@openzeppelin/hardhat-upgrades": "^1.13.0",
     "@types/react": "17.0.31",
     "@types/react-pdf": "^5.0.8",
     "autoprefixer": "^10.3.7",
